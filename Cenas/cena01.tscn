@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpmdsl8el4xm3"]
+
+[ext_resource type="Script" path="res://Cenas/hello_world.gd" id="1_hello"]
+[ext_resource type="Script" path="res://Cenas/personagem.gd" id="2_personagem"]
+
+[node name="Node2D" type="Node2D" unique_id=1585751784]
+script = ExtResource("1_hello")
+
+[node name="Personagem" type="Node2D" parent="."]
+script = ExtResource("2_personagem")
+
+[node name="Quadrado" type="Polygon2D" parent="Personagem"]
+polygon = PackedVector2Array(-24, -24, 24, -24, 24, 24, -24, 24)
+color = Color(1, 0, 0, 1)
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Instrucoes" type="Label" parent="Interface"]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 600.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 22
+text = "Mova o quadrado vermelho: setas ou WASD"
+mouse_filter = 2
