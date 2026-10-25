@@ -42,10 +42,16 @@ func _verify() -> void:
 	await physics_frame
 	_check(second_run.level == 1 and second_run.pending_level_ups == 0 and second_run.state == RunProgress.RunState.COMBAT, "Reinicio deve limpar progresso e estado", errors)
 	_check(second_player.runtime_stats.triple_shot == false and second_player.health.current == 100, "Reinicio deve limpar melhorias e vida", errors)
-	second_run.toggle_pause()
+	var pause_key: InputEventKey = InputEventKey.new()
+	pause_key.physical_keycode = KEY_ESCAPE
+	pause_key.pressed = true
+	_check(InputMap.event_is_action(pause_key, "pause"), "Evento sintetico deve corresponder a pausa", errors)
+	Input.parse_input_event(pause_key)
+	await process_frame
+	await process_frame
 	_check(get_tree_paused() and second_results.visible, "Pausa normal deve abrir menu", errors)
 	_check(str(second_results.get_node("Overlay/Panel/Content/Title").text) == "PAUSA", "Menu de pausa deve identificar estado", errors)
-	second_run.toggle_pause()
+	(second_results.get_node("Overlay/Panel/Content/Resume") as Button).pressed.emit()
 	_check(not get_tree_paused() and not second_results.visible, "Retomar deve fechar menu", errors)
 	second_player.health.apply_damage(second_player.health.current)
 	_check(second_run.state == RunProgress.RunState.GAME_OVER and second_results.visible, "Morte deve exibir derrota", errors)
