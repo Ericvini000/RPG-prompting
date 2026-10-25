@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://bogbhdse4ufsa"]
 
 [ext_resource type="Texture2D" uid="uid://c32ravjvxdey1" path="res://assets/tiles/arena_floor.svg" id="1_h6hwi"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ttojf"]
 texture = ExtResource("1_h6hwi")
@@ -152,3 +153,6 @@ position = Vector2(-256, 0)
 [node name="Symbol" type="Polygon2D" parent="Spawns/EnemySpawn03" unique_id=928209849]
 color = Color(0.5137255, 0.7019608, 0.7254902, 1)
 polygon = PackedVector2Array(0, -10, 18, 0, 0, 10, -18, 0)
+
+[node name="Player" parent="." unique_id=1511162441 instance=ExtResource("2_player")]
+position = Vector2(64, 32)

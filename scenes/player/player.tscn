@@ -1,0 +1,66 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_controller"]
+[ext_resource type="Resource" path="res://data/player_stats.tres" id="2_stats"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
+radius = 13.0
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_controller")
+stats = ExtResource("2_stats")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_feet")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Shadow" type="Polygon2D" parent="Visuals"]
+z_index = -1
+color = Color(0.02, 0.05, 0.08, 0.65)
+polygon = PackedVector2Array(-20, 0, -14, -5, 0, -8, 14, -5, 20, 0, 14, 5, 0, 8, -14, 5)
+
+[node name="CharacterSprite" type="Node2D" parent="Visuals"]
+
+[node name="Cloak" type="Polygon2D" parent="Visuals/CharacterSprite"]
+color = Color(0.48, 0.19, 0.16, 1)
+polygon = PackedVector2Array(-12, -35, 12, -35, 18, -8, 0, -1, -18, -8)
+
+[node name="CloakTrim" type="Polygon2D" parent="Visuals/CharacterSprite"]
+color = Color(0.84, 0.5, 0.28, 1)
+polygon = PackedVector2Array(-18, -8, 0, -1, 18, -8, 15, -5, 0, 3, -15, -5)
+
+[node name="Torso" type="Polygon2D" parent="Visuals/CharacterSprite"]
+color = Color(0.16, 0.4, 0.43, 1)
+polygon = PackedVector2Array(0, -43, 14, -32, 10, -18, 0, -14, -10, -18, -14, -32)
+
+[node name="Hood" type="Polygon2D" parent="Visuals/CharacterSprite"]
+color = Color(0.11, 0.31, 0.36, 1)
+polygon = PackedVector2Array(0, -58, 13, -51, 13, -38, 0, -32, -13, -38, -13, -51)
+
+[node name="Face" type="Polygon2D" parent="Visuals/CharacterSprite"]
+color = Color(0.86, 0.69, 0.5, 1)
+polygon = PackedVector2Array(-8, -48, 8, -48, 7, -37, 0, -33, -7, -37)
+
+[node name="BowPivot" type="Node2D" parent="Visuals"]
+position = Vector2(10, -28)
+
+[node name="Bow" type="Polygon2D" parent="Visuals/BowPivot"]
+color = Color(0.81, 0.54, 0.27, 1)
+polygon = PackedVector2Array(16, -18, 27, -10, 30, 0, 27, 10, 16, 18, 19, 12, 23, 0, 19, -12)
+
+[node name="BowString" type="Line2D" parent="Visuals/BowPivot"]
+points = PackedVector2Array(17, -16, 15, 0, 17, 16)
+width = 1.5
+default_color = Color(0.91, 0.9, 0.75, 1)
+
+[node name="BowOrigin" type="Marker2D" parent="Visuals/BowPivot"]
+position = Vector2(31, 0)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -18)
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
