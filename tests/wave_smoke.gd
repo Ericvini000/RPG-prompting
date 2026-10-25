@@ -25,17 +25,20 @@ func _verify() -> void:
 
 	player.global_position = (arena.get_node("Spawns/EnemySpawn01") as Marker2D).global_position
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check_wave(director, player, 2, [35, 35, 35, 25, 25], errors)
 
 	player.global_position = (arena.get_node("Spawns/EnemySpawn02") as Marker2D).global_position
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check_wave(director, player, 3, [35, 35, 25, 25, 100], errors)
 
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check(waves_seen == [1, 2, 3], "Ondas devem iniciar em ordem, uma vez cada", errors)
@@ -64,6 +67,13 @@ func _kill_active(director: Node) -> void:
 	var enemies: Array[EnemyController] = director.active_enemies.duplicate()
 	for enemy: EnemyController in enemies:
 		enemy.health.apply_damage(enemy.health.current)
+
+
+func _resolve_choices(main: Node) -> void:
+	var run_manager: RunProgress = root.get_node("RunManager") as RunProgress
+	var manager: UpgradeManager = main.get_node("UpgradeManager") as UpgradeManager
+	while run_manager.pending_level_ups > 0:
+		manager.select_upgrade(manager.current_offer[0].upgrade_id)
 
 
 func _check(condition: bool, message: String, errors: Array[String]) -> void:

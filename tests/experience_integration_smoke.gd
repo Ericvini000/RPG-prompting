@@ -29,21 +29,25 @@ func _verify() -> void:
 	var second_enemy: EnemyController = director.active_enemies[0]
 	second_enemy.health.apply_damage(second_enemy.health.current)
 	_check(manager.get("level") == 2 and manager.get("experience") == 0, "20 XP devem subir ao nivel 2", errors)
+	_resolve_choices(main)
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check(director.current_wave == 2, "Segunda onda deve iniciar", errors)
 	_check(manager.get("level") == 2 and manager.get("experience") == 20, "XP restante da primeira onda deve ser preservado", errors)
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check(director.current_wave == 3, "Terceira onda deve iniciar", errors)
 	_check(manager.get("level") == 4 and manager.get("experience") == 10, "Segunda onda deve conceder 60 XP e preservar excedente", errors)
 	_kill_active(director)
+	_resolve_choices(main)
 	await physics_frame
 	await physics_frame
 	_check(manager.get("level") == 5 and manager.get("experience") == 35, "Três ondas devem conceder 175 XP no total", errors)
-	_check(manager.get("pending_level_ups") == 4 and level_requests[0] == 4, "Quatro evolucoes devem permanecer pendentes", errors)
+	_check(manager.get("pending_level_ups") == 0 and level_requests[0] == 4, "Quatro evolucoes devem ser solicitadas e resolvidas", errors)
 	_check(not progress_events.is_empty() and progress_events.back() == Vector2i(35, 60), "Sinal final deve informar 35 de 60 XP", errors)
 	_finish(errors)
 
@@ -52,6 +56,13 @@ func _kill_active(director: WaveDirector) -> void:
 	var enemies: Array[EnemyController] = director.active_enemies.duplicate()
 	for enemy: EnemyController in enemies:
 		enemy.health.apply_damage(enemy.health.current)
+
+
+func _resolve_choices(main: Node) -> void:
+	var run_manager: RunProgress = root.get_node("RunManager") as RunProgress
+	var upgrade_manager: UpgradeManager = main.get_node("UpgradeManager") as UpgradeManager
+	while run_manager.pending_level_ups > 0:
+		upgrade_manager.select_upgrade(upgrade_manager.current_offer[0].upgrade_id)
 
 
 func _check(condition: bool, message: String, errors: Array[String]) -> void:

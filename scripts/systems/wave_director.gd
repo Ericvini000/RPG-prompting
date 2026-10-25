@@ -33,6 +33,7 @@ func _ready() -> void:
 	for child: Node in arena.get_node("Spawns").get_children():
 		if child is Marker2D and child.name.begins_with("EnemySpawn"):
 			_spawn_points.append(child as Marker2D)
+	run_manager.state_changed.connect(_on_run_state_changed)
 	call_deferred("_start_next_wave")
 
 
@@ -47,6 +48,9 @@ func _start_next_wave() -> void:
 	if current_wave >= waves.size():
 		_completed = true
 		arena_completed.emit()
+		return
+	if run_manager.state == RunProgress.RunState.UPGRADE_SELECTION:
+		_waiting_for_spawns = true
 		return
 	var wave: WaveData = waves[current_wave]
 	if wave == null or wave.enemy_scenes.is_empty():
@@ -93,4 +97,9 @@ func _choose_spawns(count: int) -> Array[Marker2D]:
 func _on_enemy_defeated(_xp_reward: int, enemy: EnemyController) -> void:
 	active_enemies.erase(enemy)
 	if active_enemies.is_empty():
+		call_deferred("_start_next_wave")
+
+
+func _on_run_state_changed(new_state: int) -> void:
+	if _waiting_for_spawns and new_state == RunProgress.RunState.COMBAT:
 		call_deferred("_start_next_wave")

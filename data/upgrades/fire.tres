@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/data/upgrade_definition.gd" id="1_definition"]
+[ext_resource type="Texture2D" path="res://assets/icons/fire.svg" id="2_icon"]
+[resource]
+script = ExtResource("1_definition")
+upgrade_id = "UPG-007"
+title = "Flecha Flamejante"
+description = "O inimigo atingido sofre queimadura."
+effect_text = "3 dano/s por 3 s"
+icon = ExtResource("2_icon")
+effect = 6
+magnitude = 3.0
+duration = 3.0
+max_stacks = 1

@@ -6,6 +6,16 @@
 [ext_resource type="Resource" path="res://data/wave_02.tres" id="4_wave_02"]
 [ext_resource type="Resource" path="res://data/wave_03.tres" id="5_wave_03"]
 [ext_resource type="Script" path="res://scripts/main/main_controller.gd" id="6_main"]
+[ext_resource type="PackedScene" path="res://scenes/ui/upgrade_screen.tscn" id="7_screen"]
+[ext_resource type="Script" path="res://scripts/systems/upgrade_manager.gd" id="8_manager"]
+[ext_resource type="Resource" path="res://data/upgrades/damage.tres" id="9_damage"]
+[ext_resource type="Resource" path="res://data/upgrades/rapid.tres" id="10_rapid"]
+[ext_resource type="Resource" path="res://data/upgrades/agility.tres" id="11_agility"]
+[ext_resource type="Resource" path="res://data/upgrades/vitality.tres" id="12_vitality"]
+[ext_resource type="Resource" path="res://data/upgrades/pierce.tres" id="13_pierce"]
+[ext_resource type="Resource" path="res://data/upgrades/triple.tres" id="14_triple"]
+[ext_resource type="Resource" path="res://data/upgrades/fire.tres" id="15_fire"]
+[ext_resource type="Resource" path="res://data/upgrades/dash.tres" id="16_dash"]
 
 [node name="Main" type="Node2D" unique_id=20680396]
 script = ExtResource("6_main")
@@ -23,3 +33,12 @@ position = Vector2(576, 344)
 script = ExtResource("2_director")
 arena = NodePath("../Arena01")
 waves = Array[Resource]([ExtResource("3_wave_01"), ExtResource("4_wave_02"), ExtResource("5_wave_03")])
+
+[node name="UpgradeScreen" parent="." instance=ExtResource("7_screen")]
+
+[node name="UpgradeManager" type="Node" parent="." node_paths=PackedStringArray("player", "screen")]
+process_mode = 3
+script = ExtResource("8_manager")
+player = NodePath("../Arena01/Player")
+screen = NodePath("../UpgradeScreen")
+definitions = Array[Resource]([ExtResource("9_damage"), ExtResource("10_rapid"), ExtResource("11_agility"), ExtResource("12_vitality"), ExtResource("13_pierce"), ExtResource("14_triple"), ExtResource("15_fire"), ExtResource("16_dash")])
