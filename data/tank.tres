@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+max_health = 100
+move_speed = 65.0
+contact_damage = 20
+attack_interval = 1.0
+xp_reward = 25

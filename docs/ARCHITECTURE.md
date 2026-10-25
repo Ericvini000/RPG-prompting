@@ -136,3 +136,9 @@ Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes depen
 - `EnemyController` usa perseguição direta, colisão física e uma área de contato. Ao morrer, emite `enemy_defeated(xp_reward)` uma vez; nenhum gerenciador consome XP nesta etapa.
 - **Parâmetros provisórios que não constam no GDD:** duração máxima da flecha de 1,5 s e intervalo de contato do perseguidor de 0,8 s. São valores de teste, sujeitos a avaliação de gameplay.
 - Um único perseguidor é instanciado no primeiro marcador de inimigo. As ondas e a progressão permanecem para COD-006/COD-007.
+
+## 11. Inimigos adicionais de COD-006
+
+`EnemyController` concentra aquisição do alvo, vida e sinal de derrota. `ContactEnemyController` implementa perseguição e contato para perseguidor e tanque. `RangedEnemyController` tenta manter distância, move-se com colisão física e cria projéteis inimigos. O projétil reutiliza `Projectile`, com máscara para cenário e hurtbox do jogador. Esses scripts não alteram os recursos `.tres` durante a partida.
+
+**Parâmetros provisórios para teste, não fixados pelo GDD:** velocidade do projétil inimigo de 430 px/s, distância preferida do atirador de 220 px com tolerância de 24 px e intervalo de contato do tanque de 1,0 s. O intervalo de disparo do atirador de 1,8 s e os atributos de vida, velocidade, dano e XP dos dois inimigos seguem a seção 5 do GDD.

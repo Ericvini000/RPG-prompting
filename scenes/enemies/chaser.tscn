@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/enemies/enemy_controller.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/enemies/contact_enemy_controller.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/chaser.tres" id="2_data"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="4_hurtbox"]

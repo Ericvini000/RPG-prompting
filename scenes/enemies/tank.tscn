@@ -1,0 +1,61 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/contact_enemy_controller.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/tank.tres" id="2_data"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="4_hurtbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 18.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_attack"]
+radius = 37.0
+
+[node name="Tank" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_enemy")
+data = ExtResource("2_data")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+health = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_body")
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("CircleShape2D_attack")
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0.03, 0.04, 0.06, 0.7)
+polygon = PackedVector2Array(-24, 0, -16, -7, 0, -9, 16, -7, 24, 0, 16, 7, 0, 9, -16, 7)
+
+[node name="Armor" type="Polygon2D" parent="."]
+color = Color(0.35, 0.4, 0.43, 1)
+polygon = PackedVector2Array(-22, -8, -24, -41, -15, -56, 15, -56, 24, -41, 22, -8, 0, 2)
+
+[node name="Chest" type="Polygon2D" parent="."]
+color = Color(0.54, 0.51, 0.43, 1)
+polygon = PackedVector2Array(-16, -45, 0, -52, 16, -45, 13, -22, 0, -16, -13, -22)
+
+[node name="Helmet" type="Polygon2D" parent="."]
+color = Color(0.24, 0.3, 0.35, 1)
+polygon = PackedVector2Array(-15, -48, -10, -65, 0, -70, 10, -65, 15, -48, 0, -39)
+
+[node name="Visor" type="Polygon2D" parent="."]
+color = Color(0.95, 0.35, 0.25, 1)
+polygon = PackedVector2Array(-10, -52, 10, -52, 7, -47, -7, -47)

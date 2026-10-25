@@ -1,0 +1,56 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/ranged_enemy_controller.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/ranged_enemy.tres" id="2_data"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="4_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/combat/enemy_bolt.tscn" id="5_bolt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 12.0
+
+[node name="RangedEnemy" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_enemy")
+data = ExtResource("2_data")
+projectile_scene = ExtResource("5_bolt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+health = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_body")
+
+[node name="ProjectileOrigin" type="Marker2D" parent="."]
+position = Vector2(0, -28)
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0.04, 0.06, 0.09, 0.55)
+polygon = PackedVector2Array(-18, 0, -11, -5, 0, -7, 11, -5, 18, 0, 11, 5, 0, 7, -11, 5)
+
+[node name="Robe" type="Polygon2D" parent="."]
+color = Color(0.3, 0.31, 0.61, 1)
+polygon = PackedVector2Array(-13, -8, -15, -31, -9, -45, 9, -45, 15, -31, 13, -8, 0, 1)
+
+[node name="Hood" type="Polygon2D" parent="."]
+color = Color(0.16, 0.18, 0.41, 1)
+polygon = PackedVector2Array(-12, -39, -7, -53, 0, -58, 7, -53, 12, -39, 0, -32)
+
+[node name="Face" type="Polygon2D" parent="."]
+color = Color(0.71, 0.58, 0.43, 1)
+polygon = PackedVector2Array(-6, -41, 6, -41, 6, -31, 0, -27, -6, -31)
+
+[node name="Focus" type="Polygon2D" parent="."]
+color = Color(1, 0.52, 0.3, 1)
+polygon = PackedVector2Array(-7, -34, 0, -31, 7, -34, 0, -28)

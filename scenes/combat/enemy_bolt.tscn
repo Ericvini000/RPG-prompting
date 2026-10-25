@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/projectile.gd" id="1_projectile"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bolt"]
+radius = 5.0
+
+[node name="EnemyBolt" type="Area2D"]
+collision_layer = 64
+collision_mask = 17
+script = ExtResource("1_projectile")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bolt")
+
+[node name="Glow" type="Polygon2D" parent="."]
+color = Color(0.94, 0.3, 0.29, 0.55)
+polygon = PackedVector2Array(-13, 0, 0, -10, 13, 0, 0, 10)
+
+[node name="Core" type="Polygon2D" parent="."]
+color = Color(1, 0.76, 0.43, 1)
+polygon = PackedVector2Array(-7, 0, 0, -5, 7, 0, 0, 5)
