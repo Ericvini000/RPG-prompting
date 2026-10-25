@@ -7,10 +7,13 @@ func _initialize() -> void:
 
 func _verify() -> void:
 	var errors: Array[String] = []
-	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
-	root.add_child(main)
-	var player: PlayerController = main.get_node("Arena01/Player") as PlayerController
-	var chaser: EnemyController = main.get_node("Arena01/Chaser") as EnemyController
+	var arena: Node2D = (load("res://scenes/arena_01.tscn") as PackedScene).instantiate() as Node2D
+	root.add_child(arena)
+	var player: PlayerController = arena.get_node("Player") as PlayerController
+	var chaser: EnemyController = (load("res://scenes/enemies/chaser.tscn") as PackedScene).instantiate() as EnemyController
+	chaser.target = player
+	arena.add_child(chaser)
+	chaser.global_position = (arena.get_node("Spawns/EnemySpawn01") as Marker2D).global_position
 	var player_health: HealthComponent = player.health
 	var chaser_health: HealthComponent = chaser.health
 	_check(player_health.current == 100, "Arqueiro deve iniciar com 100 de vida", errors)
@@ -45,7 +48,7 @@ func _verify() -> void:
 	_check(rewards == [10], "Morte deve emitir 10 XP uma unica vez", errors)
 	await physics_frame
 	_check(not is_instance_valid(chaser), "Inimigo morto deve ser removido", errors)
-	var pillar: StaticBody2D = main.get_node("Arena01/Obstacles/Pillar01") as StaticBody2D
+	var pillar: StaticBody2D = arena.get_node("Obstacles/Pillar01") as StaticBody2D
 	var blocked_arrow: Projectile = player.fire_at(pillar.global_position)
 	_check(blocked_arrow != null, "Arqueiro deve conseguir atirar contra obstaculos", errors)
 	for index: int in range(25):

@@ -7,15 +7,14 @@ func _initialize() -> void:
 
 func _verify() -> void:
 	var errors: Array[String] = []
-	var packed: PackedScene = load("res://scenes/main.tscn") as PackedScene
+	var packed: PackedScene = load("res://scenes/arena_01.tscn") as PackedScene
 	if packed == null:
 		_finish(["A cena principal não carrega"])
 		return
 
-	var main: Node = packed.instantiate()
-	root.add_child(main)
-	var arena: Node2D = main.get_node_or_null("Arena01") as Node2D
-	var player: CharacterBody2D = main.get_node_or_null("Arena01/Player") as CharacterBody2D
+	var arena: Node2D = packed.instantiate() as Node2D
+	root.add_child(arena)
+	var player: CharacterBody2D = arena.get_node_or_null("Player") as CharacterBody2D
 	if arena == null or player == null:
 		_finish(["A arena deve conter Player como CharacterBody2D"])
 		return

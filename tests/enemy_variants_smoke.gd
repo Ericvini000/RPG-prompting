@@ -37,7 +37,10 @@ func _verify() -> void:
 	for index: int in range(85):
 		await physics_frame
 	_check(shots.size() == 2, "Atirador deve respeitar o intervalo de 1,8 s", errors)
-	ranged.queue_free()
+	var ranged_rewards: Array[int] = []
+	ranged.enemy_defeated.connect(func(xp: int) -> void: ranged_rewards.append(xp))
+	ranged.health.apply_damage(ranged.health.current)
+	_check(ranged_rewards == [15], "Atirador deve emitir 15 XP ao morrer", errors)
 	for shot: Projectile in shots:
 		if is_instance_valid(shot):
 			shot.queue_free()

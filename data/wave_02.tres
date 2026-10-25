@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/wave_data.gd" id="1_wave"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chaser.tscn" id="2_chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="3_ranged"]
+
+[resource]
+script = ExtResource("1_wave")
+enemy_scenes = Array[PackedScene]([ExtResource("2_chaser"), ExtResource("2_chaser"), ExtResource("2_chaser"), ExtResource("3_ranged"), ExtResource("3_ranged")])

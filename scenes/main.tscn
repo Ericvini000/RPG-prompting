@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://o5f3n3k5r0rd"]
 
 [ext_resource type="PackedScene" uid="uid://bogbhdse4ufsa" path="res://scenes/arena_01.tscn" id="1_o5qli"]
+[ext_resource type="Script" path="res://scripts/systems/wave_director.gd" id="2_director"]
+[ext_resource type="Resource" path="res://data/wave_01.tres" id="3_wave_01"]
+[ext_resource type="Resource" path="res://data/wave_02.tres" id="4_wave_02"]
+[ext_resource type="Resource" path="res://data/wave_03.tres" id="5_wave_03"]
 
 [node name="Main" type="Node2D" unique_id=20680396]
 
@@ -12,3 +16,8 @@ polygon = PackedVector2Array(-2048, -2048, 3328, -2048, 3328, 2768, -2048, 2768)
 [node name="Arena01" type="Node2D" parent="." unique_id=470233615 instance=ExtResource("1_o5qli")]
 y_sort_enabled = true
 position = Vector2(576, 344)
+
+[node name="WaveDirector" type="Node" parent="." node_paths=PackedStringArray("arena")]
+script = ExtResource("2_director")
+arena = NodePath("../Arena01")
+waves = Array[Resource]([ExtResource("3_wave_01"), ExtResource("4_wave_02"), ExtResource("5_wave_03")])

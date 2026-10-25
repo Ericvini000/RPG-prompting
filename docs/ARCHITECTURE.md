@@ -9,7 +9,7 @@ Este documento descreve a arquitetura pretendida para o MVP 0.1. Os contratos de
 
 ## 1. Estado atual e estrutura de diretórios
 
-A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor de teste. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; tests/arena_smoke.gd, tests/player_smoke.gd e tests/combat_smoke.gd verificam a fundação, o personagem e o combate. Funplay MCP e GdUnit4 são addons existentes.
+A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor. COD-006 acrescentou atirador, tanque e três ondas. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; os testes smoke em tests/ verificam a fundação, o combate e as ondas. Funplay MCP e GdUnit4 são addons existentes.
 
 O GDD propõe esta organização para o MVP:
 
@@ -41,7 +41,7 @@ Criar diretórios e arquivos apenas quando uma tarefa precisar deles. A estrutur
 | Chaser, RangedEnemy, Tank | Cenas de inimigo configuradas por EnemyData. |
 | HUD, UpgradeScreen, ResultScreen | Apresentação; recebem eventos sem controlar diretamente atributos de entidades. |
 
-Atualmente, Main contém fundo e Arena01. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, marcadores de spawn, Player e um perseguidor de teste. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector, outros inimigos e interfaces ainda pertencem a tarefas futuras.
+Atualmente, Main contém fundo, Arena01 e WaveDirector. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, oito marcadores de spawn inimigo e Player. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector instancia inimigos na arena a partir de WaveData. Interfaces e progressão pertencem a tarefas futuras.
 
 ## 3. Scripts principais e responsabilidades
 
@@ -126,7 +126,7 @@ A arena atual habilita Y-sort e mantém o piso em z_index inferior. Uma futura S
 - Para alterações de cenas e recursos, importar o projeto, validar scripts e carregamento em Godot 4.7.2 e executar a cena visualmente quando controles, colisões ou apresentação forem afetados.
 - Cobrir os casos mínimos do GDD: dano e cadência acumulados, XP excedente, múltiplos níveis pendentes, cartas diferentes por oferta, exclusão de habilidades únicas e reset da partida.
 
-Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-006 a COD-011.
+Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-007 a COD-011.
 
 ## 10. Implementação de combate para COD-004/COD-005
 
@@ -135,10 +135,16 @@ Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes depen
 - O arqueiro mantém o intervalo de ataque do GDD (0,60 s), cria `Projectile` em `BowOrigin` e usa `PlayerStats` para dano e velocidade. A flecha move-se em `Area2D`, resolve uma colisão por vez e se remove após impacto ou tempo máximo.
 - `EnemyController` usa perseguição direta, colisão física e uma área de contato. Ao morrer, emite `enemy_defeated(xp_reward)` uma vez; nenhum gerenciador consome XP nesta etapa.
 - **Parâmetros provisórios que não constam no GDD:** duração máxima da flecha de 1,5 s e intervalo de contato do perseguidor de 0,8 s. São valores de teste, sujeitos a avaliação de gameplay.
-- Um único perseguidor é instanciado no primeiro marcador de inimigo. As ondas e a progressão permanecem para COD-006/COD-007.
+- COD-005 usou um perseguidor fixo para teste; COD-006 substituiu essa instância pela criação de inimigos a cada onda. A progressão permanece para COD-007.
 
 ## 11. Inimigos adicionais de COD-006
 
 `EnemyController` concentra aquisição do alvo, vida e sinal de derrota. `ContactEnemyController` implementa perseguição e contato para perseguidor e tanque. `RangedEnemyController` tenta manter distância, move-se com colisão física e cria projéteis inimigos. O projétil reutiliza `Projectile`, com máscara para cenário e hurtbox do jogador. Esses scripts não alteram os recursos `.tres` durante a partida.
 
 **Parâmetros provisórios para teste, não fixados pelo GDD:** velocidade do projétil inimigo de 430 px/s, distância preferida do atirador de 220 px com tolerância de 24 px e intervalo de contato do tanque de 1,0 s. O intervalo de disparo do atirador de 1,8 s e os atributos de vida, velocidade, dano e XP dos dois inimigos seguem a seção 5 do GDD.
+
+## 12. Ondas de COD-006
+
+`WaveData` guarda uma lista ordenada de cenas inimigas. Os arquivos `data/wave_01.tres` a `data/wave_03.tres` reproduzem exatamente as três composições do GDD. `WaveDirector` é um nó de Main, instancia inimigos na arena e acompanha `enemy_defeated`. Após a última derrota de uma onda, inicia a próxima por chamada diferida; após a terceira, emite `arena_completed()` uma vez. `wave_changed(number)` informa a onda ativa.
+
+Os oito marcadores fixos da arena oferecem posições distintas. O diretor seleciona apenas marcadores a pelo menos 128 px da posição atual do jogador e a pelo menos 80 px entre si. Se não houver marcadores suficientes no momento, aguarda até existir uma seleção válida, sem criar uma onda parcial. Essas distâncias são parâmetros técnicos configuráveis, sujeitos a avaliação visual. XP recebido, vitória e interface permanecem para COD-007/COD-010.
