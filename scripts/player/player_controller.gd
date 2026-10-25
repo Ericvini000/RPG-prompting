@@ -1,10 +1,15 @@
 extends CharacterBody2D
 class_name PlayerController
 
+signal arrow_fired(arrow: Projectile)
+
 @export var stats: PlayerStats
+@export var arrow_scene: PackedScene
 
 @onready var visuals: Node2D = $Visuals
 @onready var bow_pivot: Node2D = $Visuals/BowPivot
+@onready var bow_origin: Marker2D = $Visuals/BowPivot/BowOrigin
+@onready var health: HealthComponent = $HealthComponent
 
 var _aim_direction: Vector2 = Vector2.RIGHT
 var _move_direction: Vector2 = Vector2.ZERO
@@ -12,6 +17,7 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _dash_time_left: float = 0.0
 var _dash_cooldown_left: float = 0.0
 var _animation_time: float = 0.0
+var _attack_time_left: float = 0.0
 
 
 func _ready() -> void:
@@ -20,12 +26,20 @@ func _ready() -> void:
 		push_error("Player precisa de PlayerStats.")
 		set_physics_process(false)
 		return
+	health.configure(stats.max_health, stats.hurt_invulnerability)
+	health.died.connect(_on_died)
 	$Camera2D.make_current()
 
 
 func _physics_process(delta: float) -> void:
+	if health.current <= 0:
+		velocity = Vector2.ZERO
+		return
 	_move_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	aim_at(get_global_mouse_position())
+	_attack_time_left = maxf(_attack_time_left - delta, 0.0)
+	if Input.is_action_pressed("attack") and _attack_time_left <= 0.0:
+		fire_at(get_global_mouse_position())
 
 	if Input.is_action_just_pressed("dash") and can_dash():
 		_dash_direction = _move_direction if not _move_direction.is_zero_approx() else _aim_direction
@@ -38,6 +52,21 @@ func _physics_process(delta: float) -> void:
 	_dash_time_left = maxf(_dash_time_left - delta, 0.0)
 	_dash_cooldown_left = maxf(_dash_cooldown_left - delta, 0.0)
 	_animate(delta)
+
+
+func fire_at(world_position: Vector2) -> Projectile:
+	if health.current <= 0 or arrow_scene == null:
+		return null
+	aim_at(world_position)
+	var arrow: Projectile = arrow_scene.instantiate() as Projectile
+	if arrow == null:
+		return null
+	get_parent().add_child(arrow)
+	arrow.global_position = bow_origin.global_position
+	arrow.configure(_aim_direction, stats.arrow_speed, roundi(stats.base_damage))
+	_attack_time_left = stats.attack_interval
+	arrow_fired.emit(arrow)
+	return arrow
 
 
 func aim_at(world_position: Vector2) -> void:
@@ -58,6 +87,10 @@ func is_dashing() -> bool:
 
 func is_invulnerable() -> bool:
 	return is_dashing()
+
+
+func _on_died() -> void:
+	visuals.modulate = Color(0.55, 0.55, 0.55, 1.0)
 
 
 func _animate(delta: float) -> void:
