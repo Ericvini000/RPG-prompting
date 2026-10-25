@@ -1,5 +1,12 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=4 uid="uid://booocj81moxur"]
 
-[ext_resource type="PackedScene" path="res://scenes/arena_01.tscn" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://bogbhdse4ufsa" path="res://scenes/arena_01.tscn" id="1_arena"]
 
-[node name="Arena01" instance=ExtResource("1_arena")]
+[node name="Arena01" unique_id=1319863371 instance=ExtResource("1_arena")]
+
+
+[node name="Wall02" parent="Bounds" parent_id_path=PackedInt32Array(1201729183) index="1" unique_id=1302117005]
+position = Vector2(1, 0)
+
+[node name="Player" parent="." index="4" unique_id=1511162441]
+position = Vector2(64, 31)

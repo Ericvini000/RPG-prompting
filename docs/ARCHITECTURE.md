@@ -9,7 +9,7 @@ Este documento descreve a arquitetura pretendida para o MVP 0.1. Os contratos de
 
 ## 1. Estado atual e estrutura de diretórios
 
-A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; tests/arena_smoke.gd e tests/player_smoke.gd verificam a fundação e o personagem. Funplay MCP e GdUnit4 são addons existentes.
+A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor de teste. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; tests/arena_smoke.gd, tests/player_smoke.gd e tests/combat_smoke.gd verificam a fundação, o personagem e o combate. Funplay MCP e GdUnit4 são addons existentes.
 
 O GDD propõe esta organização para o MVP:
 
@@ -41,7 +41,7 @@ Criar diretórios e arquivos apenas quando uma tarefa precisar deles. A estrutur
 | Chaser, RangedEnemy, Tank | Cenas de inimigo configuradas por EnemyData. |
 | HUD, UpgradeScreen, ResultScreen | Apresentação; recebem eventos sem controlar diretamente atributos de entidades. |
 
-Atualmente, Main contém fundo e Arena01. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, marcadores de spawn e Player como CharacterBody2D. Player contém colisão, formas provisórias, BowOrigin e Camera2D. WaveDirector, inimigos, projéteis, interfaces e componentes de vida são planejamento do MVP, ainda sem implementação.
+Atualmente, Main contém fundo e Arena01. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, marcadores de spawn, Player e um perseguidor de teste. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector, outros inimigos e interfaces ainda pertencem a tarefas futuras.
 
 ## 3. Scripts principais e responsabilidades
 
@@ -96,7 +96,7 @@ As conexões ficam no dono da cena ou em um ponto de composição explícito. A 
 
 Arquivos .tres são configuração imutável durante uma partida. Os atributos efetivos, bônus acumulados, vida atual, experiência e cartas adquiridas ficam em estado de execução separado. Isso evita que uma partida modifique dados compartilhados ou contamine o reinício.
 
-**Proposta técnica:** criar scripts Resource tipados em scripts/data/ e instâncias de configuração em data/ conforme COD-003, COD-006 e COD-008 exigirem. O nome e formato de cada campo que não conste no GDD serão aprovados na tarefa correspondente.
+`PlayerStats` e `EnemyData` já possuem scripts Resource tipados em `scripts/data/` e instâncias em `data/`. `UpgradeDefinition` e `WaveData` serão acrescentados nas tarefas correspondentes. Campos que não constam no GDD devem ser registrados como propostas até avaliação de gameplay.
 
 ## 7. Combate, dano e colisões
 
@@ -106,7 +106,7 @@ Arquivos .tres são configuração imutável durante uma partida. Os atributos e
 - Dash respeita recarga, duração e velocidade configuráveis e concede invulnerabilidade durante o movimento. A proteção de 0,50 s após dano também vem dos atributos iniciais do GDD.
 - Perseguidor e tanque usam perseguição direta e colisões no MVP. Navegação avançada fica para depois.
 
-**Implementação atual:** o cenário permanece na camada física 1, e Player usa camada 2 com máscara 1. Isso permite a colisão do personagem com paredes e pilares. As camadas e máscaras de inimigos e projéteis continuam como **proposta** para COD-004 e tarefas posteriores; o GDD não fixa seus números.
+**Implementação atual:** o cenário permanece na camada física 1, e Player usa camada 2 com máscara 1. O corpo do perseguidor usa camada 4 e máscara 3; sua hurtbox usa camada 8. A hurtbox do jogador usa camada 16. Flechas usam camada 32 e monitoram cenário (1) e hurtbox inimiga (8). A área de contato do perseguidor monitora a hurtbox do jogador (16). Os números das camadas são escolhas técnicas desta implementação, sem alterar as regras do GDD.
 
 O controlador atual usa os valores de data/player_stats.tres, sem modificar esse recurso durante o jogo. Ele normaliza a diagonal, move o CharacterBody2D pela física, gira BowPivot na direção do mouse e expõe BowOrigin para a próxima etapa. O dash usa a direção de movimento ou, quando parado, a direção da mira. Esse comportamento parado é uma **proposta de implementação**, pois o GDD não especifica a direção do dash sem entrada de movimento.
 
@@ -114,7 +114,7 @@ O controlador atual usa os valores de data/player_stats.tres, sem modificar esse
 
 O piso usa losangos 2:1 de 128 × 64 pixels em TileMapLayer. O movimento do arqueiro é livre nas coordenadas 2D da tela, com oito direções e diagonal normalizada; não depende de converter WASD em coordenadas de grade. Objetos e personagens usam o ponto de contato dos pés com o chão para a ordem visual. BowOrigin fica na altura do arco, separado da referência dos pés.
 
-A arena atual habilita Y-sort e mantém o piso em z_index inferior. Na estrutura planejada pelo GDD, SortingRoot reunirá paredes, jogador, inimigos e projéteis quando essas entidades forem criadas. Qualquer reorganização dos nós atuais deverá preservar a aparência e as colisões existentes.
+A arena atual habilita Y-sort e mantém o piso em z_index inferior. Uma futura SortingRoot poderá reunir as entidades quando a composição da arena exigir. Qualquer reorganização dos nós atuais deverá preservar a aparência e as colisões existentes.
 
 ## 9. Padrões de desenvolvimento e testes
 
@@ -126,4 +126,13 @@ A arena atual habilita Y-sort e mantém o piso em z_index inferior. Na estrutura
 - Para alterações de cenas e recursos, importar o projeto, validar scripts e carregamento em Godot 4.7.2 e executar a cena visualmente quando controles, colisões ou apresentação forem afetados.
 - Cobrir os casos mínimos do GDD: dano e cadência acumulados, XP excedente, múltiplos níveis pendentes, cartas diferentes por oferta, exclusão de habilidades únicas e reset da partida.
 
-Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-004 a COD-011.
+Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-006 a COD-011.
+
+## 10. Implementação de combate para COD-004/COD-005
+
+- O piso contém 110 tiles, com coordenadas de grade `x = -4..6` e `y = -5..4`. Os limites acompanham os vértices externos do piso. A câmera usa zoom 0,85 para mostrar a arena ampliada no início. `Cenas/cena01.tscn` herda o piso da arena base e conserva seus ajustes locais de posição.
+- `PlayerStats` e `EnemyData` são recursos de configuração. `HealthComponent` guarda vida e invulnerabilidade em tempo de execução e emite `health_changed` e `died`. A hurtbox consulta o estado de dash do dono antes de aplicar dano.
+- O arqueiro mantém o intervalo de ataque do GDD (0,60 s), cria `Projectile` em `BowOrigin` e usa `PlayerStats` para dano e velocidade. A flecha move-se em `Area2D`, resolve uma colisão por vez e se remove após impacto ou tempo máximo.
+- `EnemyController` usa perseguição direta, colisão física e uma área de contato. Ao morrer, emite `enemy_defeated(xp_reward)` uma vez; nenhum gerenciador consome XP nesta etapa.
+- **Parâmetros provisórios que não constam no GDD:** duração máxima da flecha de 1,5 s e intervalo de contato do perseguidor de 0,8 s. São valores de teste, sujeitos a avaliação de gameplay.
+- Um único perseguidor é instanciado no primeiro marcador de inimigo. As ondas e a progressão permanecem para COD-006/COD-007.

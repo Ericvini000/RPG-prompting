@@ -41,7 +41,13 @@ func _verify() -> void:
 	else:
 		_check(floor_layer.tile_set.tile_shape == TileSet.TILE_SHAPE_ISOMETRIC, "TileSet deve ser isométrico", errors)
 		_check(floor_layer.tile_set.tile_size == Vector2i(128, 64), "Tiles devem medir 128x64", errors)
-		_check(floor_layer.get_used_cells().size() >= 40, "Piso deve conter ao menos 40 células", errors)
+		_check(floor_layer.get_used_cells().size() == 110, "Piso deve conter ao menos 40 células", errors)
+
+	var alias_scene: PackedScene = load("res://Cenas/cena01.tscn") as PackedScene
+	if alias_scene != null:
+		var alias_arena: Node2D = alias_scene.instantiate() as Node2D
+		_check((alias_arena.get_node("Floor") as TileMapLayer).get_used_cells().size() == 110, "Cena 1 deve herdar o piso ampliado", errors)
+		alias_arena.free()
 
 	_check(arena.y_sort_enabled, "Arena deve habilitar ordenação por Y", errors)
 	_check(_has_collision(arena.get_node_or_null("Bounds")), "Limites devem ter colisão", errors)
@@ -57,7 +63,7 @@ func _verify() -> void:
 		var pillar_hit: Dictionary = arena.get_world_2d().direct_space_state.intersect_ray(pillar_ray)
 		_check(pillar_hit.get("collider") == pillar, "Pilar deve bloquear fisicamente o caminho", errors)
 	var rim_ray: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(
-			arena.to_global(Vector2(64, 220)), arena.to_global(Vector2(64, 310))
+			arena.to_global(Vector2(84, 280)), arena.to_global(Vector2(84, 360))
 	)
 	var rim_hit: Dictionary = arena.get_world_2d().direct_space_state.intersect_ray(rim_ray)
 	_check(rim_hit.get("collider") is StaticBody2D, "Limite inferior deve bloquear fisicamente o caminho", errors)

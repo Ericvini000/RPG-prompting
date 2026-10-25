@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_controller.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/chaser.tres" id="2_data"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="4_hurtbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 13.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_attack"]
+radius = 30.0
+
+[node name="Chaser" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_enemy")
+data = ExtResource("2_data")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+health = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_body")
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("CircleShape2D_attack")
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0.04, 0.04, 0.08, 0.58)
+polygon = PackedVector2Array(-19, 0, -12, -5, 0, -7, 12, -5, 19, 0, 12, 5, 0, 7, -12, 5)
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.48, 0.14, 0.27, 1)
+polygon = PackedVector2Array(-13, -10, -16, -31, -8, -48, 8, -48, 16, -31, 13, -10, 0, 0)
+
+[node name="Face" type="Polygon2D" parent="."]
+color = Color(0.87, 0.53, 0.37, 1)
+polygon = PackedVector2Array(-8, -38, 8, -38, 6, -27, 0, -22, -6, -27)
+
+[node name="Eyes" type="Polygon2D" parent="."]
+color = Color(1, 0.81, 0.34, 1)
+polygon = PackedVector2Array(-7, -34, -2, -33, -5, -30, 0, -33, 5, -30, 2, -33, 7, -34)

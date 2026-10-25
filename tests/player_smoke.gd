@@ -77,14 +77,14 @@ func _verify() -> void:
 	for index: int in range(80):
 		await physics_frame
 	_check(player.call("can_dash"), "Dash deve voltar após a recarga", errors)
-	player.position = Vector2(64, 220)
+	player.position = Vector2(84, 280)
 	Input.action_press("move_down")
 	Input.action_press("dash")
 	for index: int in range(15):
 		await physics_frame
 	Input.action_release("dash")
 	Input.action_release("move_down")
-	_check(player.position.y < 260.0, "Player não deve atravessar a parede durante o dash", errors)
+	_check(player.position.y < 325.0, "Player não deve atravessar a parede durante o dash", errors)
 
 	_finish(errors)
 
