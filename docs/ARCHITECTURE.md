@@ -178,3 +178,36 @@ RunManager é o único controlador da pausa e dos cinco estados do GDD. A pausa 
 ## 17. Estabilização de COD-011
 
 A importação, os doze testes smoke, o carregamento headless da cena principal e as renderizações das interfaces estão registrados em [VALIDATION_MVP_0.1.md](VALIDATION_MVP_0.1.md). Uma partida jogada por uma pessoa permanece necessária para avaliar sensação de combate e os parâmetros provisórios, sem alterar as regras do GDD até haver decisão aprovada.
+
+## 18. Política de versionamento, GitFlow e GitHub
+
+### 18.1. Papel das branches
+
+| Branch | Origem | Integração | Finalidade |
+| --- | --- | --- | --- |
+| `main` | Versão publicada | Recebe Pull Requests de `release/*` e `hotfix/*` | Histórico estável e versões entregues. |
+| `develop` | Inicialmente, a `main` estável do MVP 0.1 | Recebe Pull Requests de `feature/*`, `docs/*` e sincronizações de `main` | Integração da próxima versão. |
+| `feature/<tarefa>-<resumo>` | `develop` | Pull Request para `develop` | Uma funcionalidade ou tarefa de gameplay por branch. |
+| `docs/<tarefa>-<resumo>` | `develop` | Pull Request para `develop` | Documentação sem alteração de código do jogo. |
+| `release/<versão>` | `develop` | Pull Request para `main`; depois, sincronização de `main` para `develop` por Pull Request | Estabilização, correções e preparação de uma versão. |
+| `hotfix/<tarefa>-<resumo>` | `main` | Pull Request para `main`; depois, sincronização de `main` para `develop` por Pull Request | Correção urgente da versão publicada. |
+
+As branches `main` e `develop` não recebem implementação nem commits diretos. Cada tarefa começa em uma branch própria, criada após verificar `git status`, a branch ativa e os refs remotos. Alterações de outra tarefa que ainda não tenham commit devem ser preservadas e isoladas antes de trocar de branch. Não usar force push para reescrever o histórico compartilhado.
+
+### 18.2. Commits, Pull Requests e validação
+
+- Criar commits atômicos, com mensagens descritivas sobre a função da mudança. Evitar misturar documentação, ajustes de editor e gameplay sem relação.
+- Abrir Pull Request para toda integração em `develop` ou `main`. Descrever escopo, arquivos relevantes, testes executados, resultados, riscos e problemas conhecidos.
+- Revisar o diff e executar testes proporcionais antes do merge. Para cenas ou recursos Godot, importar o projeto e executar as verificações headless pertinentes; alterações visuais ou de controle também exigem inspeção jogável.
+- Resolver conflitos preservando trabalho existente e confirmar os testes após a resolução. Não fazer merge com verificações obrigatórias falhando.
+- Manter `docs/GDD.md` e este documento alinhados quando uma decisão de gameplay ou arquitetura for aprovada. Propostas continuam identificadas como tal até a aprovação.
+
+### 18.3. Proteções no GitHub
+
+Após publicar a base estável do MVP 0.1 e criar `develop`, proteger `main` e `develop` no GitHub. Exigir Pull Request antes de integrar, bloquear force push e exclusão das branches e aplicar as regras também aos administradores, sem bypass rotineiro. Ativar resolução de conversas e revisão obrigatória conforme houver revisores disponíveis. Exigir um status check automatizado somente depois de o workflow correspondente existir e passar nas duas branches; exigir um check inexistente impediria qualquer merge.
+
+O alvo dos Pull Requests é `develop` para `feature/*` e `docs/*`, e `main` para `release/*` e `hotfix/*`. Após integrar uma release ou hotfix em `main`, trazer os commits para `develop` por Pull Request para impedir divergência entre as linhas de desenvolvimento. Tags de versão seguem o commit aprovado em `main` após uma release ou hotfix; nenhuma tag faz parte da migração inicial GIT-001.
+
+### 18.4. Migração inicial
+
+A migração começa pela auditoria dos commits locais ainda não publicados e das alterações não commitadas. Preservar ambos antes de trocar de branch. A publicação única da `main` estável do MVP 0.1 é uma exceção de bootstrap, anterior à proteção e dependente de aprovação explícita; ela não autoriza novos pushes diretos. Criar `develop` exatamente a partir desse commit e publicá-la. Depois, configurar as proteções e criar `docs/gitflow-workflow` a partir de `develop` para integrar esta política e as instruções de `AGENTS.md` por Pull Request. Nenhuma branch, tag, proteção ou configuração remota deve ser criada ou alterada sem aprovação explícita da execução da migração.
