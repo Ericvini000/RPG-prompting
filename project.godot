@@ -22,6 +22,10 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[autoload]
+
+RunManager="*res://scripts/core/run_manager.gd"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/funplay_mcp/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
