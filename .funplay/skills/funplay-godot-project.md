@@ -11,9 +11,9 @@ Use this project through the local Funplay MCP for Godot editor server.
 
 ## Project Context
 
-- Project name: `RPG-prompt`
-- Main scene: ``
-- Project root: `C:/Users/Eric Vinicius/OneDrive/Documentos/rpg-prompt/`
+- Project name: `Arqueiro Roguelite`
+- Main scene: `res://scenes/main.tscn`
+- Project root: `res://` (the currently open Godot project)
 
 ## Operating Rules
 
