@@ -1,0 +1,154 @@
+[gd_scene format=4 uid="uid://bogbhdse4ufsa"]
+
+[ext_resource type="Texture2D" uid="uid://c32ravjvxdey1" path="res://assets/tiles/arena_floor.svg" id="1_h6hwi"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ttojf"]
+texture = ExtResource("1_h6hwi")
+texture_region_size = Vector2i(128, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_vvodx"]
+tile_shape = 1
+tile_layout = 5
+tile_size = Vector2i(128, 64)
+sources/0 = SubResource("TileSetAtlasSource_ttojf")
+
+[node name="Arena01" type="Node2D" unique_id=470233615]
+y_sort_enabled = true
+position = Vector2(576, 344)
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1986852559]
+z_index = -10
+position = Vector2(-108, -56)
+tile_map_data = PackedByteArray("AAD8//z/AAAAAAAAAAD8//3/AAABAAAAAAD8//7/AAACAAAAAAD8////AAADAAAAAAD8/wAAAAAAAAAAAAD8/wEAAAABAAAAAAD8/wIAAAACAAAAAAD8/wMAAAADAAAAAAD9//z/AAADAAAAAAD9//3/AAAAAAAAAAD9//7/AAABAAAAAAD9////AAACAAAAAAD9/wAAAAADAAAAAAD9/wEAAAAAAAAAAAD9/wIAAAABAAAAAAD9/wMAAAACAAAAAAD+//z/AAACAAAAAAD+//3/AAADAAAAAAD+//7/AAAAAAAAAAD+////AAABAAAAAAD+/wAAAAACAAAAAAD+/wEAAAADAAAAAAD+/wIAAAAAAAAAAAD+/wMAAAABAAAAAAD///z/AAABAAAAAAD///3/AAACAAAAAAD///7/AAADAAAAAAD/////AAAAAAAAAAD//wAAAAABAAAAAAD//wEAAAACAAAAAAD//wIAAAADAAAAAAD//wMAAAAAAAAAAAAAAPz/AAAAAAAAAAAAAP3/AAABAAAAAAAAAP7/AAACAAAAAAAAAP//AAADAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAIAAAACAAAAAAAAAAMAAAADAAAAAAABAPz/AAADAAAAAAABAP3/AAAAAAAAAAABAP7/AAABAAAAAAABAP//AAACAAAAAAABAAAAAAADAAAAAAABAAEAAAAAAAAAAAABAAIAAAABAAAAAAABAAMAAAACAAAAAAACAPz/AAACAAAAAAACAP3/AAADAAAAAAACAP7/AAAAAAAAAAACAP//AAABAAAAAAACAAAAAAACAAAAAAACAAEAAAADAAAAAAACAAIAAAAAAAAAAAACAAMAAAABAAAAAAADAPz/AAABAAAAAAADAP3/AAACAAAAAAADAP7/AAADAAAAAAADAP//AAAAAAAAAAADAAAAAAABAAAAAAADAAEAAAACAAAAAAADAAIAAAADAAAAAAADAAMAAAAAAAAAAAAGAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAEAAIAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAGAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAP//AAAAAAAAAAAFAP//AAAAAAAAAAAFAP7/AAAAAAAAAAAEAP7/AAAAAAAAAAAEAP3/AAAAAAAAAAAEAPz/AAAAAAAAAAAFAPz/AAAAAAAAAAAFAP3/AAAAAAAAAAAGAP3/AAAAAAAAAAAGAPz/AAAAAAAAAAAGAP//AAAAAAAAAAAGAP7/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_vvodx")
+
+[node name="Bounds" type="Node2D" parent="." unique_id=1201729183]
+y_sort_enabled = true
+
+[node name="Wall01" type="StaticBody2D" parent="Bounds" unique_id=575747314]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Bounds/Wall01" unique_id=1796297199]
+polygon = PackedVector2Array(64, -256, 576, 0, 556.00977, 0.62469506, 64, -236)
+
+[node name="Visual" type="Polygon2D" parent="Bounds/Wall01" unique_id=343120676]
+color = Color(0.40784314, 0.5058824, 0.54509807, 1)
+polygon = PackedVector2Array(64, -256, 576, 0, 556.00977, 0.62469506, 64, -236)
+
+[node name="Wall02" type="StaticBody2D" parent="Bounds" unique_id=1302117005]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Bounds/Wall02" unique_id=2086673393]
+polygon = PackedVector2Array(576, 0, 64, 288, 64, 268, 556.00977, 0.62469506)
+
+[node name="Visual" type="Polygon2D" parent="Bounds/Wall02" unique_id=2018787401]
+color = Color(0.40784314, 0.5058824, 0.54509807, 1)
+polygon = PackedVector2Array(576, 0, 64, 288, 64, 268, 556.00977, 0.62469506)
+
+[node name="Wall03" type="StaticBody2D" parent="Bounds" unique_id=159003389]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Bounds/Wall03" unique_id=22566061]
+polygon = PackedVector2Array(64, 288, -448, 0, -428.00977, 0.62469506, 64, 268)
+
+[node name="Visual" type="Polygon2D" parent="Bounds/Wall03" unique_id=1094264623]
+color = Color(0.40784314, 0.5058824, 0.54509807, 1)
+polygon = PackedVector2Array(64, 288, -448, 0, -428.00977, 0.62469506, 64, 268)
+
+[node name="Wall04" type="StaticBody2D" parent="Bounds" unique_id=822722132]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Bounds/Wall04" unique_id=1446643857]
+polygon = PackedVector2Array(-448, 0, 64, -256, 64, -236, -428.00977, 0.62469506)
+
+[node name="Visual" type="Polygon2D" parent="Bounds/Wall04" unique_id=1925322357]
+color = Color(0.40784314, 0.5058824, 0.54509807, 1)
+polygon = PackedVector2Array(-448, 0, 64, -256, 64, -236, -428.00977, 0.62469506)
+
+[node name="Obstacles" type="Node2D" parent="." unique_id=1666463576]
+y_sort_enabled = true
+
+[node name="Pillar01" type="StaticBody2D" parent="Obstacles" unique_id=1283071962]
+position = Vector2(0, -64)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Obstacles/Pillar01" unique_id=27046975]
+polygon = PackedVector2Array(-38, 0, 0, -18, 38, 0, 0, 18)
+
+[node name="LeftFace" type="Polygon2D" parent="Obstacles/Pillar01" unique_id=169448917]
+color = Color(0.20392157, 0.2784314, 0.33333334, 1)
+polygon = PackedVector2Array(-38, -47, 0, -25, 0, 8, -38, -14)
+
+[node name="RightFace" type="Polygon2D" parent="Obstacles/Pillar01" unique_id=565279801]
+color = Color(0.14901961, 0.22352941, 0.27058825, 1)
+polygon = PackedVector2Array(0, -25, 38, -47, 38, -14, 0, 8)
+
+[node name="TopFace" type="Polygon2D" parent="Obstacles/Pillar01" unique_id=1093762006]
+color = Color(0.50980395, 0.6, 0.60784316, 1)
+polygon = PackedVector2Array(0, -69, 38, -47, 0, -25, -38, -47)
+
+[node name="Pillar02" type="StaticBody2D" parent="Obstacles" unique_id=819210223]
+position = Vector2(192, 96)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Obstacles/Pillar02" unique_id=1373078163]
+polygon = PackedVector2Array(-38, 0, 0, -18, 38, 0, 0, 18)
+
+[node name="LeftFace" type="Polygon2D" parent="Obstacles/Pillar02" unique_id=1586425499]
+color = Color(0.20392157, 0.2784314, 0.33333334, 1)
+polygon = PackedVector2Array(-38, -47, 0, -25, 0, 8, -38, -14)
+
+[node name="RightFace" type="Polygon2D" parent="Obstacles/Pillar02" unique_id=425903040]
+color = Color(0.14901961, 0.22352941, 0.27058825, 1)
+polygon = PackedVector2Array(0, -25, 38, -47, 38, -14, 0, 8)
+
+[node name="TopFace" type="Polygon2D" parent="Obstacles/Pillar02" unique_id=786192658]
+color = Color(0.50980395, 0.6, 0.60784316, 1)
+polygon = PackedVector2Array(0, -69, 38, -47, 0, -25, -38, -47)
+
+[node name="Pillar03" type="StaticBody2D" parent="Obstacles" unique_id=1124834633]
+position = Vector2(-64, 96)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Obstacles/Pillar03" unique_id=2081261406]
+polygon = PackedVector2Array(-38, 0, 0, -18, 38, 0, 0, 18)
+
+[node name="LeftFace" type="Polygon2D" parent="Obstacles/Pillar03" unique_id=1510147351]
+color = Color(0.20392157, 0.2784314, 0.33333334, 1)
+polygon = PackedVector2Array(-38, -47, 0, -25, 0, 8, -38, -14)
+
+[node name="RightFace" type="Polygon2D" parent="Obstacles/Pillar03" unique_id=2080919806]
+color = Color(0.14901961, 0.22352941, 0.27058825, 1)
+polygon = PackedVector2Array(0, -25, 38, -47, 38, -14, 0, 8)
+
+[node name="TopFace" type="Polygon2D" parent="Obstacles/Pillar03" unique_id=1637570889]
+color = Color(0.50980395, 0.6, 0.60784316, 1)
+polygon = PackedVector2Array(0, -69, 38, -47, 0, -25, -38, -47)
+
+[node name="Spawns" type="Node2D" parent="." unique_id=742894868]
+y_sort_enabled = true
+
+[node name="PlayerSpawn" type="Marker2D" parent="Spawns" unique_id=1408376876]
+position = Vector2(64, 32)
+
+[node name="Symbol" type="Polygon2D" parent="Spawns/PlayerSpawn" unique_id=2121674770]
+color = Color(0.9137255, 0.73333335, 0.4745098, 1)
+polygon = PackedVector2Array(0, -10, 18, 0, 0, 10, -18, 0)
+
+[node name="EnemySpawn01" type="Marker2D" parent="Spawns" unique_id=1675692020]
+position = Vector2(128, -128)
+
+[node name="Symbol" type="Polygon2D" parent="Spawns/EnemySpawn01" unique_id=973211475]
+color = Color(0.5137255, 0.7019608, 0.7254902, 1)
+polygon = PackedVector2Array(0, -10, 18, 0, 0, 10, -18, 0)
+
+[node name="EnemySpawn02" type="Marker2D" parent="Spawns" unique_id=175015602]
+position = Vector2(320, 32)
+
+[node name="Symbol" type="Polygon2D" parent="Spawns/EnemySpawn02" unique_id=149443170]
+color = Color(0.5137255, 0.7019608, 0.7254902, 1)
+polygon = PackedVector2Array(0, -10, 18, 0, 0, 10, -18, 0)
+
+[node name="EnemySpawn03" type="Marker2D" parent="Spawns" unique_id=1150343229]
+position = Vector2(-256, 0)
+
+[node name="Symbol" type="Polygon2D" parent="Spawns/EnemySpawn03" unique_id=928209849]
+color = Color(0.5137255, 0.7019608, 0.7254902, 1)
+polygon = PackedVector2Array(0, -10, 18, 0, 0, 10, -18, 0)

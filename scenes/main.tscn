@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://o5f3n3k5r0rd"]
+
+[ext_resource type="PackedScene" uid="uid://bogbhdse4ufsa" path="res://scenes/arena_01.tscn" id="1_o5qli"]
+
+[node name="Main" type="Node2D" unique_id=20680396]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=1523244982]
+z_index = -100
+color = Color(0.047058824, 0.09019608, 0.12941177, 1)
+polygon = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+
+[node name="Arena01" type="Node2D" parent="." unique_id=470233615 instance=ExtResource("1_o5qli")]
+y_sort_enabled = true
+position = Vector2(576, 344)
