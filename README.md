@@ -14,9 +14,9 @@ O design oficial do MVP 0.1 está em [docs/GDD.md](docs/GDD.md). A organização
 
 ## Estado atual
 
-COD-001 a COD-006 estão disponíveis para teste. A arena de 110 tiles isométricos (128 × 64 px) tem limites e pilares com colisão. O arqueiro move-se com WASD, mira com o mouse, dispara flechas ao manter o clique esquerdo e usa dash com Espaço. Perseguidor, atirador e tanque usam formas e cores provisórias originais. Três ondas configuradas em recursos `.tres` aparecem em sequência.
+COD-001 a COD-007 estão disponíveis para teste. A arena de 110 tiles isométricos (128 × 64 px) tem limites e pilares com colisão. O arqueiro move-se com WASD, mira com o mouse, dispara flechas ao manter o clique esquerdo e usa dash com Espaço. Perseguidor, atirador e tanque usam formas e cores provisórias originais. Três ondas configuradas em recursos `.tres` aparecem em sequência.
 
-A cena principal está em `scenes/main.tscn`; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores, evita pontos próximos ao arqueiro, acompanha suas derrotas e sinaliza a conclusão após a terceira onda. Ainda faltam o gerenciamento de XP, níveis, cartas, HUD e resultados de partida; os sinais de recompensa já são emitidos pelos inimigos.
+A cena principal está em `scenes/main.tscn`; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores, evita pontos próximos ao arqueiro e sinaliza a conclusão após a terceira onda. O RunManager acumula o XP das derrotas, calcula níveis e mantém uma escolha pendente por evolução. Ainda faltam a seleção de cartas, a pausa para escolhê-las, HUD e resultados de partida; por enquanto o progresso não aparece na tela.
 
 ## Começar a desenvolver
 
@@ -34,6 +34,8 @@ Na raiz do projeto, os comandos de verificação são:
     godot --headless --path . --script res://tests/combat_smoke.gd
     godot --headless --path . --script res://tests/enemy_variants_smoke.gd
     godot --headless --path . --script res://tests/wave_smoke.gd
+    godot --headless --path . --script res://tests/run_manager_smoke.gd
+    godot --headless --path . --script res://tests/experience_integration_smoke.gd
     godot --headless --path . --quit-after 2
 
 Substitua godot pelo caminho do executável instalado, se necessário. A verificação visual no editor continua necessária para alterações de controles, colisões ou apresentação.
@@ -43,7 +45,7 @@ Substitua godot pelo caminho do executável instalado, se necessário. A verific
 1. Inicie a cena principal com F5. O arqueiro aparece no centro da arena ampliada; a primeira onda cria quatro perseguidores.
 2. Use WASD para mover, aponte com o mouse e mantenha o clique esquerdo para disparar. Tente acertar o inimigo e os pilares; as flechas desaparecem no impacto.
 3. Pressione Espaço para usar o dash. Teste o contato com o inimigo durante e após a esquiva, assim como as colisões com obstáculos e limites.
-4. Derrote todos os inimigos de cada onda. A segunda traz atiradores; a terceira acrescenta um tanque. A recompensa e a conclusão são emitidas por sinais; a interface e o sistema de experiência serão implementados em tarefas futuras.
+4. Derrote todos os inimigos de cada onda. A segunda traz atiradores; a terceira acrescenta um tanque. O XP e os níveis são calculados internamente; os testes automatizados conferem os valores enquanto a interface ainda não existe.
 
 Esc está mapeado para uma pausa futura, sem interface nesta etapa. Não há tela de derrota ou reinício; para repetir o teste, execute novamente a cena.
 
@@ -56,8 +58,8 @@ Esc está mapeado para uma pausa futura, sem interface nesta etapa. Não há tel
 | scripts/ | Controladores, componentes de vida, projétil e dados tipados. |
 | data/ | Recursos de atributos do arqueiro, inimigos e composição das ondas. |
 | assets/tiles/ | Atlas provisório do piso. |
-| tests/ | Verificações da arena, personagem, combate e ondas. |
+| tests/ | Verificações da arena, personagem, combate, ondas e progressão. |
 | Cenas/cena01.tscn | Cena 1 preservada, que herda a arena atual. |
 | addons/ | Funplay MCP e GdUnit4 já existentes. |
 
-O backlog COD-001 a COD-011 e os critérios de conclusão do MVP estão no GDD. A próxima etapa é COD-007: experiência e níveis.
+O backlog COD-001 a COD-011 e os critérios de conclusão do MVP estão no GDD. A próxima etapa é COD-008: seleção de cartas e pausa do combate.

@@ -5,8 +5,10 @@
 [ext_resource type="Resource" path="res://data/wave_01.tres" id="3_wave_01"]
 [ext_resource type="Resource" path="res://data/wave_02.tres" id="4_wave_02"]
 [ext_resource type="Resource" path="res://data/wave_03.tres" id="5_wave_03"]
+[ext_resource type="Script" path="res://scripts/main/main_controller.gd" id="6_main"]
 
 [node name="Main" type="Node2D" unique_id=20680396]
+script = ExtResource("6_main")
 
 [node name="Background" type="Polygon2D" parent="." unique_id=1523244982]
 z_index = -100

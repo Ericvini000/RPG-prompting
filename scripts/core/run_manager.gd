@@ -1,4 +1,5 @@
 extends Node
+class_name RunProgress
 
 signal experience_changed(xp: int, required: int)
 signal level_up_requested()

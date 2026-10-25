@@ -9,7 +9,7 @@ Este documento descreve a arquitetura pretendida para o MVP 0.1. Os contratos de
 
 ## 1. Estado atual e estrutura de diretórios
 
-A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor. COD-006 acrescentou atirador, tanque e três ondas. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; os testes smoke em tests/ verificam a fundação, o combate e as ondas. Funplay MCP e GdUnit4 são addons existentes.
+A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor. COD-006 acrescentou atirador, tanque e três ondas. COD-007 acrescentou XP, níveis e fila de escolhas pendentes. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; os testes smoke em tests/ verificam a fundação, o combate, as ondas e a progressão. Funplay MCP e GdUnit4 são addons existentes.
 
 O GDD propõe esta organização para o MVP:
 
@@ -41,7 +41,7 @@ Criar diretórios e arquivos apenas quando uma tarefa precisar deles. A estrutur
 | Chaser, RangedEnemy, Tank | Cenas de inimigo configuradas por EnemyData. |
 | HUD, UpgradeScreen, ResultScreen | Apresentação; recebem eventos sem controlar diretamente atributos de entidades. |
 
-Atualmente, Main contém fundo, Arena01 e WaveDirector. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, oito marcadores de spawn inimigo e Player. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector instancia inimigos na arena a partir de WaveData. Interfaces e progressão pertencem a tarefas futuras.
+Atualmente, Main contém fundo, Arena01 e WaveDirector e reinicia o estado do RunManager ao começar uma partida. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, oito marcadores de spawn inimigo e Player. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector instancia inimigos na arena a partir de WaveData e conecta suas recompensas de XP ao RunManager. Interfaces e seleção de cartas pertencem a tarefas futuras.
 
 ## 3. Scripts principais e responsabilidades
 
@@ -62,7 +62,7 @@ Os nomes acima são contratos de responsabilidade do GDD. Separações adicionai
 
 ## 4. Autoload e estados
 
-**RunManager é o único Autoload definido pelo GDD.** Ele será o controlador único dos estados READY, COMBAT, UPGRADE_SELECTION, VICTORY e GAME_OVER. Deve armazenar os dados transitórios da sessão e, no futuro, permitir continuidade entre salas. WaveDirector e UpgradeManager pertencem às cenas e se comunicam por referências explícitas e sinais.
+**RunManager é o único Autoload definido pelo GDD.** Ele já mantém nível, XP e evoluções pendentes. Será também o controlador único dos estados READY, COMBAT, UPGRADE_SELECTION, VICTORY e GAME_OVER nas tarefas correspondentes. Deve armazenar os dados transitórios da sessão e, no futuro, permitir continuidade entre salas. WaveDirector e UpgradeManager pertencem às cenas e se comunicam por referências explícitas e sinais.
 
 Ao subir de nível, o combate pausa e a tela de cartas continua recebendo entrada. Se houver várias evoluções pendentes, cada escolha é apresentada em sequência; só depois o combate retoma. Vitória, derrota e reinício passam pelo controlador de estados, evitando que vários scripts alterem pausa ou término independentemente.
 
@@ -126,16 +126,16 @@ A arena atual habilita Y-sort e mantém o piso em z_index inferior. Uma futura S
 - Para alterações de cenas e recursos, importar o projeto, validar scripts e carregamento em Godot 4.7.2 e executar a cena visualmente quando controles, colisões ou apresentação forem afetados.
 - Cobrir os casos mínimos do GDD: dano e cadência acumulados, XP excedente, múltiplos níveis pendentes, cartas diferentes por oferta, exclusão de habilidades únicas e reset da partida.
 
-Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-007 a COD-011.
+Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-008 a COD-011.
 
 ## 10. Implementação de combate para COD-004/COD-005
 
 - O piso contém 110 tiles, com coordenadas de grade `x = -4..6` e `y = -5..4`. Os limites acompanham os vértices externos do piso. A câmera usa zoom 0,85 para mostrar a arena ampliada no início. `Cenas/cena01.tscn` herda o piso da arena base e conserva seus ajustes locais de posição.
 - `PlayerStats` e `EnemyData` são recursos de configuração. `HealthComponent` guarda vida e invulnerabilidade em tempo de execução e emite `health_changed` e `died`. A hurtbox consulta o estado de dash do dono antes de aplicar dano.
 - O arqueiro mantém o intervalo de ataque do GDD (0,60 s), cria `Projectile` em `BowOrigin` e usa `PlayerStats` para dano e velocidade. A flecha move-se em `Area2D`, resolve uma colisão por vez e se remove após impacto ou tempo máximo.
-- `EnemyController` usa perseguição direta, colisão física e uma área de contato. Ao morrer, emite `enemy_defeated(xp_reward)` uma vez; nenhum gerenciador consome XP nesta etapa.
+- `EnemyController` usa perseguição direta, colisão física e uma área de contato. Ao morrer, emite `enemy_defeated(xp_reward)` uma vez; COD-007 passou a encaminhar a recompensa ao RunManager.
 - **Parâmetros provisórios que não constam no GDD:** duração máxima da flecha de 1,5 s e intervalo de contato do perseguidor de 0,8 s. São valores de teste, sujeitos a avaliação de gameplay.
-- COD-005 usou um perseguidor fixo para teste; COD-006 substituiu essa instância pela criação de inimigos a cada onda. A progressão permanece para COD-007.
+- COD-005 usou um perseguidor fixo para teste; COD-006 substituiu essa instância pela criação de inimigos a cada onda. COD-007 conectou o XP ao RunManager.
 
 ## 11. Inimigos adicionais de COD-006
 
@@ -147,4 +147,10 @@ Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes depen
 
 `WaveData` guarda uma lista ordenada de cenas inimigas. Os arquivos `data/wave_01.tres` a `data/wave_03.tres` reproduzem exatamente as três composições do GDD. `WaveDirector` é um nó de Main, instancia inimigos na arena e acompanha `enemy_defeated`. Após a última derrota de uma onda, inicia a próxima por chamada diferida; após a terceira, emite `arena_completed()` uma vez. `wave_changed(number)` informa a onda ativa.
 
-Os oito marcadores fixos da arena oferecem posições distintas. O diretor seleciona apenas marcadores a pelo menos 128 px da posição atual do jogador e a pelo menos 80 px entre si. Se não houver marcadores suficientes no momento, aguarda até existir uma seleção válida, sem criar uma onda parcial. Essas distâncias são parâmetros técnicos configuráveis, sujeitos a avaliação visual. XP recebido, vitória e interface permanecem para COD-007/COD-010.
+Os oito marcadores fixos da arena oferecem posições distintas. O diretor seleciona apenas marcadores a pelo menos 128 px da posição atual do jogador e a pelo menos 80 px entre si. Se não houver marcadores suficientes no momento, aguarda até existir uma seleção válida, sem criar uma onda parcial. Essas distâncias são parâmetros técnicos configuráveis, sujeitos a avaliação visual. Vitória e interface permanecem para tarefas futuras.
+
+## 13. Experiência e níveis de COD-007
+
+`RunManager` é o Autoload registrado em `project.godot`; seu script tipado usa a classe `RunProgress`. Main chama `reset_run()` ao iniciar uma nova sessão. WaveDirector conecta o sinal `enemy_defeated(xp_reward)` de cada inimigo criado a `add_experience(amount)`, sem modificar EnemyData. O cálculo usa `20 + 10 × (nível atual − 1)` e subtrai cada limiar em sequência, preservando XP excedente.
+
+Cada nível ganho incrementa `pending_level_ups` e emite `level_up_requested()` uma vez; `experience_changed(xp, required)` publica o progresso após a recompensa. `consume_pending_level_up()` remove uma escolha da fila sem apagar XP. COD-008 usará essa fila para mostrar as cartas e pausar o combate. Até essa interface existir, o jogo continua ativo e os níveis ficam pendentes; não há seleção automática.

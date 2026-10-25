@@ -9,6 +9,8 @@ signal arena_completed()
 @export var minimum_player_distance: float = 128.0
 @export var minimum_spawn_separation: float = 80.0
 
+@onready var run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
+
 var current_wave: int = 0
 var active_enemies: Array[EnemyController] = []
 
@@ -65,6 +67,7 @@ func _start_next_wave() -> void:
 		arena.add_child(enemy)
 		enemy.global_position = locations[index].global_position
 		enemy.enemy_defeated.connect(_on_enemy_defeated.bind(enemy))
+		enemy.enemy_defeated.connect(run_manager.add_experience)
 		active_enemies.append(enemy)
 	current_wave += 1
 	wave_changed.emit(current_wave)
