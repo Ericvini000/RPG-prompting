@@ -1,0 +1,105 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_track"]
+bg_color = Color(0.13, 0.2, 0.25, 0.95)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health"]
+bg_color = Color(0.82, 0.3, 0.31, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp"]
+bg_color = Color(0.39, 0.75, 0.78, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="HUD" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_hud")
+
+[node name="Overlay" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Top" type="HBoxContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 88.0
+theme_override_constants/separation = 32
+
+[node name="Health" type="VBoxContainer" parent="Overlay/Top"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Value" type="Label" parent="Overlay/Top/Health"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.68, 1)
+theme_override_font_sizes/font_size = 20
+text = "VIDA  100 / 100"
+
+[node name="Bar" type="ProgressBar" parent="Overlay/Top/Health"]
+custom_minimum_size = Vector2(300, 18)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_track")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health")
+show_percentage = false
+value = 100.0
+
+[node name="Progress" type="VBoxContainer" parent="Overlay/Top"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="Level" type="Label" parent="Overlay/Top/Progress"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.5, 1)
+theme_override_font_sizes/font_size = 20
+text = "NÍVEL 1     XP 0 / 20"
+
+[node name="Bar" type="ProgressBar" parent="Overlay/Top/Progress"]
+custom_minimum_size = Vector2(350, 18)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_track")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp")
+show_percentage = false
+
+[node name="Wave" type="Label" parent="Overlay/Top"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_color = Color(0.75, 0.88, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "ARENA"
+
+[node name="Dash" type="Label" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -310.0
+offset_top = -60.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.9, 0.76, 0.47, 1)
+theme_override_font_sizes/font_size = 20
+text = "DASH  PRONTO [ESPAÇO]"
+horizontal_alignment = 2

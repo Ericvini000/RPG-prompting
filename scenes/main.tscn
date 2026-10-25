@@ -16,6 +16,8 @@
 [ext_resource type="Resource" path="res://data/upgrades/triple.tres" id="14_triple"]
 [ext_resource type="Resource" path="res://data/upgrades/fire.tres" id="15_fire"]
 [ext_resource type="Resource" path="res://data/upgrades/dash.tres" id="16_dash"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="17_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/result_screen.tscn" id="18_result"]
 
 [node name="Main" type="Node2D" unique_id=20680396]
 script = ExtResource("6_main")
@@ -42,3 +44,7 @@ script = ExtResource("8_manager")
 player = NodePath("../Arena01/Player")
 screen = NodePath("../UpgradeScreen")
 definitions = Array[Resource]([ExtResource("9_damage"), ExtResource("10_rapid"), ExtResource("11_agility"), ExtResource("12_vitality"), ExtResource("13_pierce"), ExtResource("14_triple"), ExtResource("15_fire"), ExtResource("16_dash")])
+
+[node name="HUD" parent="." instance=ExtResource("17_hud")]
+
+[node name="ResultScreen" parent="." instance=ExtResource("18_result")]

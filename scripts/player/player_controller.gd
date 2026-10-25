@@ -18,6 +18,8 @@ var _dash_time_left: float = 0.0
 var _dash_cooldown_left: float = 0.0
 var _animation_time: float = 0.0
 var _attack_time_left: float = 0.0
+var _hurt_flash_left: float = 0.0
+var _last_health: int = 0
 var runtime_stats: PlayerRuntimeStats
 
 
@@ -29,6 +31,8 @@ func _ready() -> void:
 		return
 	runtime_stats = PlayerRuntimeStats.new(stats)
 	health.configure(stats.max_health, stats.hurt_invulnerability)
+	_last_health = health.current
+	health.health_changed.connect(_on_health_changed)
 	health.died.connect(_on_died)
 	$Camera2D.make_current()
 
@@ -104,6 +108,14 @@ func can_dash() -> bool:
 	return _dash_cooldown_left <= 0.0 and not is_dashing()
 
 
+func dash_cooldown_remaining() -> float:
+	return _dash_cooldown_left
+
+
+func dash_cooldown_total() -> float:
+	return runtime_stats.effective_dash_cooldown()
+
+
 func is_dashing() -> bool:
 	return _dash_time_left > 0.0
 
@@ -116,7 +128,15 @@ func _on_died() -> void:
 	visuals.modulate = Color(0.55, 0.55, 0.55, 1.0)
 
 
+func _on_health_changed(current: int, _maximum: int) -> void:
+	if current > 0 and current < _last_health:
+		_hurt_flash_left = 0.18
+	_last_health = current
+
+
 func _animate(delta: float) -> void:
+	_hurt_flash_left = maxf(0.0, _hurt_flash_left - delta)
+	visuals.modulate = Color(1.0, 0.38, 0.35, 1.0) if _hurt_flash_left > 0.0 else Color.WHITE
 	var moving: bool = not _move_direction.is_zero_approx() or is_dashing()
 	if moving:
 		_animation_time += delta * (18.0 if is_dashing() else 11.0)

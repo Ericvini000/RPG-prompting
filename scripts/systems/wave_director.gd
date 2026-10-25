@@ -43,13 +43,13 @@ func _process(_delta: float) -> void:
 
 
 func _start_next_wave() -> void:
-	if _completed or _player == null or _player.health.current <= 0:
+	if _completed or _player == null or _player.health.current <= 0 or run_manager.state == RunProgress.RunState.GAME_OVER or run_manager.state == RunProgress.RunState.VICTORY:
 		return
 	if current_wave >= waves.size():
 		_completed = true
 		arena_completed.emit()
 		return
-	if run_manager.state == RunProgress.RunState.UPGRADE_SELECTION:
+	if run_manager.state != RunProgress.RunState.COMBAT or get_tree().paused:
 		_waiting_for_spawns = true
 		return
 	var wave: WaveData = waves[current_wave]

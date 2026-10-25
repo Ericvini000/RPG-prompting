@@ -63,7 +63,7 @@ func select_upgrade(upgrade_id: String) -> void:
 	else:
 		current_offer.clear()
 		screen.hide_offer()
-		run_manager.begin_combat()
+		run_manager.finish_upgrade_selection()
 
 
 func _on_level_up_requested() -> void:
