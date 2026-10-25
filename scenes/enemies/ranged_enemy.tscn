@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/ranged_enemy_controller.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/ranged_enemy.tres" id="2_data"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="4_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/combat/enemy_bolt.tscn" id="5_bolt"]
+[ext_resource type="Script" path="res://scripts/components/burn_component.gd" id="6_burn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 12.0
@@ -22,6 +23,10 @@ shape = SubResource("CircleShape2D_body")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
+
+[node name="BurnComponent" type="Node" parent="." node_paths=PackedStringArray("health")]
+script = ExtResource("6_burn")
+health = NodePath("../HealthComponent")
 
 [node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
 collision_layer = 8

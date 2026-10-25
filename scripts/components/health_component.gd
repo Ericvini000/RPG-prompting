@@ -38,3 +38,11 @@ func heal(amount: int) -> void:
 		return
 	current = mini(maximum, current + amount)
 	health_changed.emit(current, maximum)
+
+
+func increase_max_health(amount: int) -> void:
+	if amount <= 0 or current <= 0:
+		return
+	maximum += amount
+	current += amount
+	health_changed.emit(current, maximum)

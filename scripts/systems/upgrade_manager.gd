@@ -54,6 +54,7 @@ func select_upgrade(upgrade_id: String) -> void:
 	if selected == null:
 		return
 	_offer_active = false
+	player.apply_upgrade(selected)
 	owned_counts[upgrade_id] = get_acquired_count(upgrade_id) + 1
 	run_manager.consume_pending_level_up()
 	upgrade_selected.emit(upgrade_id)

@@ -14,9 +14,9 @@ O design oficial do MVP 0.1 está em [docs/GDD.md](docs/GDD.md). A organização
 
 ## Estado atual
 
-COD-001 a COD-008 estão disponíveis para teste. A arena de 110 tiles isométricos (128 × 64 px) tem limites e pilares com colisão. O arqueiro move-se com WASD, mira com o mouse, dispara flechas ao manter o clique esquerdo e usa dash com Espaço. Perseguidor, atirador e tanque usam formas e cores provisórias originais. Três ondas configuradas em recursos `.tres` aparecem em sequência.
+COD-001 a COD-009 estão disponíveis para teste. A arena de 110 tiles isométricos (128 × 64 px) tem limites e pilares com colisão. O arqueiro move-se com WASD, mira com o mouse, dispara flechas ao manter o clique esquerdo e usa dash com Espaço. Perseguidor, atirador e tanque usam formas e cores provisórias originais. Três ondas configuradas em recursos `.tres` aparecem em sequência.
 
-A cena principal está em `scenes/main.tscn`; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores, evita pontos próximos ao arqueiro e sinaliza a conclusão após a terceira onda. O RunManager acumula o XP das derrotas e calcula níveis. Ao evoluir, três cartas diferentes aparecem e pausam o combate; escolhas pendentes são feitas em sequência. Os efeitos das cartas, HUD e resultados de partida pertencem às próximas etapas.
+A cena principal está em `scenes/main.tscn`; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores, evita pontos próximos ao arqueiro e sinaliza a conclusão após a terceira onda. O RunManager acumula XP e calcula níveis. Ao evoluir, três cartas diferentes aparecem e pausam o combate; escolhas pendentes são feitas em sequência. As oito cartas já alteram atributos, disparos, queimadura ou dash. HUD e resultados de partida pertencem à próxima etapa.
 
 ## Começar a desenvolver
 
@@ -37,6 +37,8 @@ Na raiz do projeto, os comandos de verificação são:
     godot --headless --path . --script res://tests/run_manager_smoke.gd
     godot --headless --path . --script res://tests/experience_integration_smoke.gd
     godot --headless --path . --script res://tests/upgrade_selection_smoke.gd
+    godot --headless --path . --script res://tests/upgrade_effects_smoke.gd
+    godot --headless --path . --script res://tests/projectile_effects_smoke.gd
     godot --headless --path . --quit-after 2
 
 Substitua godot pelo caminho do executável instalado, se necessário. A verificação visual no editor continua necessária para alterações de controles, colisões ou apresentação.
@@ -46,7 +48,7 @@ Substitua godot pelo caminho do executável instalado, se necessário. A verific
 1. Inicie a cena principal com F5. O arqueiro aparece no centro da arena ampliada; a primeira onda cria quatro perseguidores.
 2. Use WASD para mover, aponte com o mouse e mantenha o clique esquerdo para disparar. Tente acertar o inimigo e os pilares; as flechas desaparecem no impacto.
 3. Pressione Espaço para usar o dash. Teste o contato com o inimigo durante e após a esquiva, assim como as colisões com obstáculos e limites.
-4. Derrote todos os inimigos de cada onda. A segunda traz atiradores; a terceira acrescenta um tanque. Ao subir de nível, clique em uma das três cartas. A arena permanece pausada até todas as escolhas pendentes terminarem. Os efeitos das cartas serão implementados em COD-009.
+4. Derrote todos os inimigos de cada onda. A segunda traz atiradores; a terceira acrescenta um tanque. Ao subir de nível, clique em uma das três cartas. A arena permanece pausada até todas as escolhas pendentes terminarem. Compare dano, cadência, movimento, vida e as habilidades especiais depois de cada escolha.
 
 Esc está mapeado para uma pausa futura, sem interface nesta etapa. Não há tela de derrota ou reinício; para repetir o teste, execute novamente a cena.
 
@@ -63,4 +65,4 @@ Esc está mapeado para uma pausa futura, sem interface nesta etapa. Não há tel
 | Cenas/cena01.tscn | Cena 1 preservada, que herda a arena atual. |
 | addons/ | Funplay MCP e GdUnit4 já existentes. |
 
-O backlog COD-001 a COD-011 e os critérios de conclusão do MVP estão no GDD. A próxima etapa é COD-009: aplicação das oito melhorias.
+O backlog COD-001 a COD-011 e os critérios de conclusão do MVP estão no GDD. A próxima etapa é COD-010: HUD e resultado da partida.

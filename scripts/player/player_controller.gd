@@ -18,6 +18,7 @@ var _dash_time_left: float = 0.0
 var _dash_cooldown_left: float = 0.0
 var _animation_time: float = 0.0
 var _attack_time_left: float = 0.0
+var runtime_stats: PlayerRuntimeStats
 
 
 func _ready() -> void:
@@ -26,6 +27,7 @@ func _ready() -> void:
 		push_error("Player precisa de PlayerStats.")
 		set_physics_process(false)
 		return
+	runtime_stats = PlayerRuntimeStats.new(stats)
 	health.configure(stats.max_health, stats.hurt_invulnerability)
 	health.died.connect(_on_died)
 	$Camera2D.make_current()
@@ -44,9 +46,9 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("dash") and can_dash():
 		_dash_direction = _move_direction if not _move_direction.is_zero_approx() else _aim_direction
 		_dash_time_left = stats.dash_duration
-		_dash_cooldown_left = stats.dash_cooldown
+		_dash_cooldown_left = runtime_stats.effective_dash_cooldown()
 
-	velocity = _dash_direction * stats.dash_speed if is_dashing() else _move_direction * stats.move_speed
+	velocity = _dash_direction * stats.dash_speed if is_dashing() else _move_direction * runtime_stats.effective_move_speed()
 	move_and_slide()
 
 	_dash_time_left = maxf(_dash_time_left - delta, 0.0)
@@ -58,15 +60,36 @@ func fire_at(world_position: Vector2) -> Projectile:
 	if health.current <= 0 or arrow_scene == null:
 		return null
 	aim_at(world_position)
-	var arrow: Projectile = arrow_scene.instantiate() as Projectile
-	if arrow == null:
-		return null
-	get_parent().add_child(arrow)
-	arrow.global_position = bow_origin.global_position
-	arrow.configure(_aim_direction, stats.arrow_speed, roundi(stats.base_damage))
-	_attack_time_left = stats.attack_interval
-	arrow_fired.emit(arrow)
-	return arrow
+	var directions: Array[Vector2] = [_aim_direction]
+	if runtime_stats.triple_shot:
+		directions.append(_aim_direction.rotated(deg_to_rad(-12.0)))
+		directions.append(_aim_direction.rotated(deg_to_rad(12.0)))
+	var first_arrow: Projectile
+	for shot_direction: Vector2 in directions:
+		var arrow: Projectile = arrow_scene.instantiate() as Projectile
+		if arrow == null:
+			continue
+		get_parent().add_child(arrow)
+		arrow.global_position = bow_origin.global_position
+		arrow.configure(
+			shot_direction,
+			stats.arrow_speed,
+			runtime_stats.effective_damage(),
+			runtime_stats.pierce_count,
+			runtime_stats.burn_damage_per_second if runtime_stats.fire_arrow else 0,
+			runtime_stats.burn_duration if runtime_stats.fire_arrow else 0.0
+		)
+		if first_arrow == null:
+			first_arrow = arrow
+		arrow_fired.emit(arrow)
+	_attack_time_left = runtime_stats.effective_attack_interval()
+	return first_arrow
+
+
+func apply_upgrade(definition: UpgradeDefinition) -> void:
+	runtime_stats.apply_upgrade(definition)
+	if definition.effect == UpgradeDefinition.Effect.VITALITY:
+		health.increase_max_health(roundi(definition.magnitude))
 
 
 func aim_at(world_position: Vector2) -> void:

@@ -6,8 +6,12 @@ class_name Projectile
 var direction: Vector2 = Vector2.RIGHT
 var speed: float = 700.0
 var damage: int = 10
+var remaining_pierces: int = 0
+var burn_damage_per_second: int = 0
+var burn_duration: float = 0.0
 var _lifetime_left: float = 0.0
 var _spent: bool = false
+var _hit_areas: Dictionary = {}
 
 
 func _ready() -> void:
@@ -17,10 +21,13 @@ func _ready() -> void:
 	rotation = direction.angle()
 
 
-func configure(aim_direction: Vector2, arrow_speed: float, arrow_damage: int) -> void:
+func configure(aim_direction: Vector2, arrow_speed: float, arrow_damage: int, extra_pierces: int = 0, burn_dps: int = 0, fire_duration: float = 0.0) -> void:
 	direction = aim_direction.normalized()
 	speed = arrow_speed
 	damage = arrow_damage
+	remaining_pierces = maxi(0, extra_pierces)
+	burn_damage_per_second = maxi(0, burn_dps)
+	burn_duration = maxf(0.0, fire_duration)
 	rotation = direction.angle()
 
 
@@ -36,7 +43,19 @@ func _physics_process(delta: float) -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if _spent or not area is HurtboxComponent:
 		return
-	if (area as HurtboxComponent).receive_damage(damage):
+	var area_id: int = area.get_instance_id()
+	if _hit_areas.has(area_id):
+		return
+	if not (area as HurtboxComponent).receive_damage(damage):
+		return
+	_hit_areas[area_id] = true
+	if burn_damage_per_second > 0 and burn_duration > 0.0:
+		var burn: BurnComponent = area.get_parent().get_node_or_null("BurnComponent") as BurnComponent
+		if burn != null:
+			burn.apply_burn(burn_damage_per_second, burn_duration)
+	if remaining_pierces > 0:
+		remaining_pierces -= 1
+	else:
 		_spend()
 
 

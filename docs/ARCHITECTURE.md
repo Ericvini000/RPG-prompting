@@ -9,7 +9,7 @@ Este documento descreve a arquitetura pretendida para o MVP 0.1. Os contratos de
 
 ## 1. Estado atual e estrutura de diretórios
 
-A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor. COD-006 acrescentou atirador, tanque e três ondas. COD-007 acrescentou XP, níveis e fila de escolhas pendentes. COD-008 acrescentou catálogo e seleção de cartas. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; os testes smoke em tests/ verificam a fundação, o combate, as ondas, a progressão e as cartas. Funplay MCP e GdUnit4 são addons existentes.
+A fundação COD-001/COD-002 já existe no repositório. COD-003 acrescentou o arqueiro controlável; COD-004/COD-005 acrescentaram flechas, vida, dano e um perseguidor. COD-006 acrescentou atirador, tanque e três ondas. COD-007 acrescentou XP, níveis e fila de escolhas pendentes. COD-008 acrescentou catálogo e seleção de cartas; COD-009 aplicou as oito melhorias. A cena principal atual é scenes/main.tscn; a arena atual é scenes/arena_01.tscn e instancia scenes/player/player.tscn no PlayerSpawn. Cenas/cena01.tscn preserva o caminho da antiga cena 1 como referência à arena. assets/tiles/arena_floor.svg fornece arte provisória; os testes smoke em tests/ verificam a fundação, o combate, as ondas, a progressão e as cartas. Funplay MCP e GdUnit4 são addons existentes.
 
 O GDD propõe esta organização para o MVP:
 
@@ -126,7 +126,7 @@ A arena atual habilita Y-sort e mantém o piso em z_index inferior. Uma futura S
 - Para alterações de cenas e recursos, importar o projeto, validar scripts e carregamento em Godot 4.7.2 e executar a cena visualmente quando controles, colisões ou apresentação forem afetados.
 - Cobrir os casos mínimos do GDD: dano e cadência acumulados, XP excedente, múltiplos níveis pendentes, cartas diferentes por oferta, exclusão de habilidades únicas e reset da partida.
 
-Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-009 a COD-011.
+Esta arquitetura documenta o plano e o estado atual. Os sistemas restantes dependem das tarefas COD-010 e COD-011.
 
 ## 10. Implementação de combate para COD-004/COD-005
 
@@ -159,4 +159,12 @@ Cada nível ganho incrementa `pending_level_ups` e emite `level_up_requested()` 
 
 As oito cartas são `UpgradeDefinition` imutáveis em `data/upgrades/`, com identificação, texto, ícone SVG original, efeito, magnitude e limite. `UpgradeManager` sorteia três definições distintas entre as elegíveis e mantém a contagem adquirida em estado de execução. Disparo Triplo e Flecha Flamejante têm limite de uma aquisição; as cartas de atributos básicos continuam elegíveis. `UpgradeScreen` apenas apresenta opções e emite a escolha feita pelo mouse.
 
-UpgradeManager consome exatamente uma evolução pendente por escolha e apresenta outra oferta se necessário. RunManager pausa a árvore no estado UPGRADE_SELECTION; a tela e o gerenciador continuam processando. A próxima onda espera o término da seleção antes de criar novos inimigos. A aplicação dos efeitos ao combate permanece em COD-009.
+UpgradeManager consome exatamente uma evolução pendente por escolha e apresenta outra oferta se necessário. RunManager pausa a árvore no estado UPGRADE_SELECTION; a tela e o gerenciador continuam processando. A próxima onda espera o término da seleção antes de criar novos inimigos. COD-009 conectou a escolha aos atributos efetivos do arqueiro.
+
+## 15. Efeitos das cartas de COD-009
+
+`PlayerRuntimeStats` contém bônus numéricos e habilidades adquiridas, separado do `PlayerStats` compartilhado. O dano e o movimento usam bônus percentuais acumulados; o intervalo entre ataques usa o divisor `1 + bônus de velocidade de ataque`. Vitalidade aumenta a vida máxima e atual de `HealthComponent`. O dash aplica uma redução multiplicativa de 15% à recarga efetiva por aquisição.
+
+O arqueiro cria três flechas quando possui Disparo Triplo, mantendo o dano efetivo em cada uma. `Projectile` acompanha os inimigos já atingidos e atravessa um alvo adicional por carta de perfuração. `BurnComponent` aplica 3 de dano a cada segundo por 3 segundos. Novo acerto flamejante renova a duração sem criar efeitos paralelos; a contagem do próximo segundo é preservada. As três cenas inimigas recebem esse componente reutilizável.
+
+**Parâmetros provisórios não fixados pelo GDD:** dispersão do tiro triplo de 12° para cada lado; reduções sucessivas da recarga do dash são multiplicativas; queimaduras repetidas renovam a duração sem acumular dano. São escolhas técnicas para o MVP, sujeitas a ajuste após teste de sensação de combate.
