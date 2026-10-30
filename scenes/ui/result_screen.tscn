@@ -100,6 +100,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "ENCERRAR COM VITÓRIA"
 
+[node name="MainMenu" type="Button" parent="Overlay/Panel/Content"]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "MENU PRINCIPAL"
+
 [node name="PauseDashboard" type="VBoxContainer" parent="Overlay/Panel/Content"]
 visible = false
 layout_mode = 2

@@ -12,14 +12,20 @@ func _ready() -> void:
 	hud.bind(player, director, run_manager)
 	results.bind(run_manager, player, upgrade_manager, director)
 	player.health.died.connect(run_manager.request_game_over)
-	director.arena_completed.connect(run_manager.request_endless_choice)
+	director.arena_completed.connect(run_manager.complete_initial_waves)
 	results.restart_requested.connect(_restart_run)
 	results.resume_requested.connect(run_manager.toggle_pause)
 	results.endless_requested.connect(run_manager.choose_endless_mode)
 	results.victory_requested.connect(run_manager.choose_victory)
+	results.main_menu_requested.connect(_return_to_menu)
 	run_manager.begin_combat()
 
 
 func _restart_run() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+
+func _return_to_menu() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
