@@ -479,3 +479,11 @@ Após estabilizar a versão 0.1, acrescentaremos:
 - Introdução de raridades.
 - Identidade artística própria.
 - Primeira estrutura de progressão permanente entre partidas.
+
+## 18. Modo de ondas infinitas opcional — GAME-001
+
+Após derrotar todos os inimigos das três ondas do MVP e concluir as escolhas de cartas pendentes, o jogador escolhe entre **Encerrar com Vitória** e **Continuar no Modo Infinito**. A primeira opção conserva o encerramento normal. A segunda inicia a onda 4 e mantém a mesma partida até a morte ou o reinício. A escolha aparece uma única vez; novas ondas não concedem vitória por conclusão.
+
+As ondas 1 a 3 conservam as composições da seção 5. Da onda 4 em diante, as composições usam perseguidor, atirador e tanque, com um inimigo planejado adicional a cada onda: 6 na onda 4, 7 na onda 5 e assim por diante. Vida e dano dos inimigos recebem, respectivamente, bônus aditivos de 5% e 2% por onda após a terceira, aplicados sobre seus valores básicos e arredondados para inteiros. No máximo 12 inimigos permanecem ativos ao mesmo tempo; quantidades maiores entram em lotes. A onda seguinte só começa quando todos os inimigos planejados surgirem e forem derrotados.
+
+Experiência, níveis e cartas seguem as regras existentes. A build continua entre ondas, e seleções de cartas interrompem spawns e transições até a escolha. A morte encerra a partida e cancela spawns pendentes. O reinício restaura o estado inicial, inclusive a opção de escolher o modo após a terceira onda. Intervalos e demais parâmetros operacionais são provisórios e configuráveis, conforme `docs/ARCHITECTURE.md`.
