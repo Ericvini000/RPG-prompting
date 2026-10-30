@@ -86,6 +86,20 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "REINICIAR PARTIDA"
 
+[node name="Endless" type="Button" parent="Overlay/Panel/Content"]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "CONTINUAR NO MODO INFINITO"
+
+[node name="Finish" type="Button" parent="Overlay/Panel/Content"]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ENCERRAR COM VITÓRIA"
+
 [node name="PauseDashboard" type="VBoxContainer" parent="Overlay/Panel/Content"]
 visible = false
 layout_mode = 2

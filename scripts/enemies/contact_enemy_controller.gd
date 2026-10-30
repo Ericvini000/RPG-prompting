@@ -18,6 +18,6 @@ func _physics_process(delta: float) -> void:
 		return
 	for area: Area2D in attack_area.get_overlapping_areas():
 		if area is HurtboxComponent and area.get_parent() == target:
-			if (area as HurtboxComponent).receive_damage(data.contact_damage):
+			if (area as HurtboxComponent).receive_damage(effective_contact_damage()):
 				_attack_time_left = data.attack_interval
 			break

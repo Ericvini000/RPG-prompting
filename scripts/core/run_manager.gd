@@ -6,14 +6,16 @@ signal level_up_requested()
 signal state_changed(new_state: int)
 signal pause_changed(is_paused: bool)
 
-enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER }
+enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER, ENDLESS_CHOICE }
 
 var level: int = 1
 var experience: int = 0
 var pending_level_ups: int = 0
 var state: RunState = RunState.READY
 var normal_paused: bool = false
+var endless_mode: bool = false
 var _victory_pending: bool = false
+var _endless_choice_pending: bool = false
 
 
 func _ready() -> void:
@@ -29,6 +31,8 @@ func reset_run() -> void:
 	experience = 0
 	pending_level_ups = 0
 	_victory_pending = false
+	_endless_choice_pending = false
+	endless_mode = false
 	normal_paused = false
 	set_state(RunState.READY)
 	pause_changed.emit(false)
@@ -45,8 +49,33 @@ func finish_upgrade_selection() -> void:
 	if _victory_pending:
 		_victory_pending = false
 		set_state(RunState.VICTORY)
+	elif _endless_choice_pending:
+		_endless_choice_pending = false
+		set_state(RunState.ENDLESS_CHOICE)
 	else:
 		begin_combat()
+
+
+func request_endless_choice() -> void:
+	if endless_mode or state == RunState.GAME_OVER or state == RunState.VICTORY or state == RunState.ENDLESS_CHOICE:
+		return
+	if pending_level_ups > 0 or state == RunState.UPGRADE_SELECTION:
+		_endless_choice_pending = true
+	else:
+		set_state(RunState.ENDLESS_CHOICE)
+
+
+func choose_endless_mode() -> void:
+	if state != RunState.ENDLESS_CHOICE:
+		return
+	endless_mode = true
+	begin_combat()
+
+
+func choose_victory() -> void:
+	if state != RunState.ENDLESS_CHOICE:
+		return
+	set_state(RunState.VICTORY)
 
 
 func request_victory() -> void:
@@ -62,6 +91,7 @@ func request_game_over() -> void:
 	if state == RunState.VICTORY or state == RunState.GAME_OVER:
 		return
 	_victory_pending = false
+	_endless_choice_pending = false
 	set_state(RunState.GAME_OVER)
 
 
@@ -79,7 +109,7 @@ func set_state(new_state: RunState) -> void:
 	if state != RunState.COMBAT and normal_paused:
 		normal_paused = false
 		pause_changed.emit(false)
-	get_tree().paused = normal_paused or state == RunState.UPGRADE_SELECTION or state == RunState.VICTORY or state == RunState.GAME_OVER
+	get_tree().paused = normal_paused or state == RunState.UPGRADE_SELECTION or state == RunState.ENDLESS_CHOICE or state == RunState.VICTORY or state == RunState.GAME_OVER
 	if changed:
 		state_changed.emit(state)
 

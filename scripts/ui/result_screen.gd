@@ -3,11 +3,15 @@ class_name ResultScreen
 
 signal restart_requested()
 signal resume_requested()
+signal endless_requested()
+signal victory_requested()
 
 @onready var _title: Label = $Overlay/Panel/Content/Title
 @onready var _detail: Label = $Overlay/Panel/Content/Detail
 @onready var _resume_button: Button = $Overlay/Panel/Content/Resume
 @onready var _restart_button: Button = $Overlay/Panel/Content/Restart
+@onready var _endless_button: Button = $Overlay/Panel/Content/Endless
+@onready var _finish_button: Button = $Overlay/Panel/Content/Finish
 @onready var _panel: PanelContainer = $Overlay/Panel
 @onready var _content: VBoxContainer = $Overlay/Panel/Content
 @onready var _dashboard: VBoxContainer = $Overlay/Panel/Content/PauseDashboard
@@ -26,6 +30,8 @@ func _ready() -> void:
 	visible = false
 	_resume_button.pressed.connect(func() -> void: resume_requested.emit())
 	_restart_button.pressed.connect(func() -> void: restart_requested.emit())
+	_endless_button.pressed.connect(func() -> void: endless_requested.emit())
+	_finish_button.pressed.connect(func() -> void: victory_requested.emit())
 
 
 func bind(run_manager: RunProgress, player: PlayerController, upgrade_manager: UpgradeManager, wave_director: WaveDirector) -> void:
@@ -46,6 +52,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_state_changed(new_state: int) -> void:
 	match new_state:
+		RunProgress.RunState.ENDLESS_CHOICE:
+			_show_message("ARENA CONCLUÍDA", "Você superou as três ondas. Como deseja continuar?", false)
+			_restart_button.visible = false
+			_endless_button.visible = true
+			_finish_button.visible = true
 		RunProgress.RunState.VICTORY:
 			_show_message("VITÓRIA", "Você concluiu as três ondas da arena.", false)
 		RunProgress.RunState.GAME_OVER:
@@ -70,6 +81,9 @@ func _on_pause_changed(is_paused: bool) -> void:
 
 
 func _show_message(heading: String, description: String, can_resume: bool) -> void:
+	_endless_button.visible = false
+	_finish_button.visible = false
+	_restart_button.visible = true
 	_dashboard.visible = can_resume
 	_detail.visible = not can_resume
 	_content.add_theme_constant_override("separation", 12 if can_resume else 22)
