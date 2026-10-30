@@ -15,14 +15,13 @@ func _verify() -> void:
 	var results: ResultScreen = main.get_node("ResultScreen") as ResultScreen
 	await physics_frame
 	await _clear_fixed_waves(director, manager, run, errors)
-	_check(run.state == RunProgress.RunState.ENDLESS_CHOICE and results.visible and paused, "Terceira onda deve oferecer decisão uma vez após as cartas", errors)
-	_check((results.get_node("Overlay/Panel/Content/Endless") as Button).visible and (results.get_node("Overlay/Panel/Content/Finish") as Button).visible, "As duas opções devem ser exibidas", errors)
-	_check(director.current_wave == 3, "Quarta onda deve esperar a escolha", errors)
-	(results.get_node("Overlay/Panel/Content/Finish") as Button).pressed.emit()
-	_check(run.state == RunProgress.RunState.VICTORY and not run.endless_mode, "Encerrar deve manter a vitória normal", errors)
+	_check(run.state == RunProgress.RunState.VICTORY and results.visible and paused, "Modo Ondas deve vencer após as cartas da terceira onda", errors)
+	_check(not (results.get_node("Overlay/Panel/Content/Endless") as Button).visible and not (results.get_node("Overlay/Panel/Content/Finish") as Button).visible, "Modo Ondas não deve oferecer escolha extra", errors)
+	_check(director.current_wave == 3 and not run.endless_mode, "Modo Ondas deve terminar na terceira onda", errors)
 	main.queue_free()
 	await process_frame
 
+	run.select_mode(RunProgress.GameMode.ENDLESS)
 	var endless_main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(endless_main)
 	var endless_run: RunProgress = root.get_node("RunManager") as RunProgress
@@ -35,19 +34,20 @@ func _verify() -> void:
 	endless_director.endless_wave_interval = 0.0
 	endless_director.invalid_spawn_retry_interval = 0.0
 	endless_director.spawn_fallback_after = 0.1
-	await physics_frame
-	await _clear_fixed_waves(endless_director, endless_manager, endless_run, errors)
-	var acquired_before: Dictionary = endless_manager.owned_counts.duplicate()
-	var damage_before: int = player.runtime_stats.effective_damage()
 	var spawned: Array[int] = [0]
 	(endless_main.get_node("Arena01") as Node2D).child_entered_tree.connect(func(child: Node) -> void:
 		if child is EnemyController:
 			spawned[0] += 1
 	)
-	(endless_results.get_node("Overlay/Panel/Content/Endless") as Button).pressed.emit()
+	await physics_frame
+	await _clear_fixed_waves(endless_director, endless_manager, endless_run, errors)
+	var acquired_before: Dictionary = endless_manager.owned_counts.duplicate()
+	var damage_before: int = player.runtime_stats.effective_damage()
+	spawned[0] = endless_director.active_enemies.size()
 	for frame: int in range(10):
 		await process_frame
 	_check(endless_run.endless_mode and endless_run.state == RunProgress.RunState.COMBAT, "Continuar deve retomar o combate", errors)
+	_check(not (endless_results.get_node("Overlay/Panel/Content/Endless") as Button).visible and not (endless_results.get_node("Overlay/Panel/Content/Finish") as Button).visible, "Modo Infinito não deve mostrar a escolha antiga", errors)
 	_check(endless_director.current_wave == 4 and endless_director.active_enemies.size() == 3, "Onda 4 deve usar o primeiro lote de três inimigos", errors)
 	_check(spawned[0] == 3, "Limite simultâneo deve impedir spawns extras", errors)
 	var initial_types: Dictionary = {}
@@ -128,7 +128,7 @@ func _verify() -> void:
 	var fresh: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(fresh)
 	await physics_frame
-	_check(not endless_run.endless_mode and (fresh.get_node("WaveDirector") as WaveDirector).current_wave == 1, "Reinício deve limpar modo infinito", errors)
+	_check(not endless_run.endless_mode and endless_run.selected_mode == RunProgress.GameMode.ENDLESS and (fresh.get_node("WaveDirector") as WaveDirector).current_wave == 1, "Reinício deve limpar progresso e preservar modo infinito", errors)
 	_finish(errors)
 
 

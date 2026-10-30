@@ -49,9 +49,7 @@ func _verify() -> void:
 	_check(manager.get("level") == 5 and manager.get("experience") == 35, "Três ondas devem conceder 175 XP no total", errors)
 	_check(manager.get("pending_level_ups") == 0 and level_requests[0] == 4, "Quatro evolucoes devem ser solicitadas e resolvidas", errors)
 	_check(not progress_events.is_empty() and progress_events.back() == Vector2i(35, 60), "Sinal final deve informar 35 de 60 XP", errors)
-	_check(manager.get("state") == RunProgress.RunState.ENDLESS_CHOICE, "Conclusao da terceira onda deve aguardar a escolha final", errors)
-	(manager as RunProgress).choose_victory()
-	_check(manager.get("state") == RunProgress.RunState.VICTORY, "Encerrar deve exibir vitoria", errors)
+	_check(manager.get("state") == RunProgress.RunState.VICTORY, "Modo Ondas deve vencer após a terceira onda", errors)
 	_finish(errors)
 
 

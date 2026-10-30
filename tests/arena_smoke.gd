@@ -12,7 +12,7 @@ func _verify() -> void:
 		ProjectSettings.get_setting("display/window/size/viewport_height", 0)
 	)
 	_check(viewport_size == Vector2i(1280, 720), "Viewport deve ser 1280x720", errors)
-	_check(ProjectSettings.get_setting("application/run/main_scene", "") == "res://scenes/main.tscn", "main.tscn deve ser a cena principal", errors)
+	_check(ProjectSettings.get_setting("application/run/main_scene", "") == "res://scenes/ui/main_menu.tscn", "Menu deve ser a cena principal", errors)
 	_check(load("res://Cenas/cena01.tscn") is PackedScene, "Cena 1 preservada deve carregar", errors)
 
 	for action: String in ["move_up", "move_down", "move_left", "move_right", "attack", "dash", "pause"]:

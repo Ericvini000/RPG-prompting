@@ -5,6 +5,7 @@ signal restart_requested()
 signal resume_requested()
 signal endless_requested()
 signal victory_requested()
+signal main_menu_requested()
 
 @onready var _title: Label = $Overlay/Panel/Content/Title
 @onready var _detail: Label = $Overlay/Panel/Content/Detail
@@ -12,6 +13,7 @@ signal victory_requested()
 @onready var _restart_button: Button = $Overlay/Panel/Content/Restart
 @onready var _endless_button: Button = $Overlay/Panel/Content/Endless
 @onready var _finish_button: Button = $Overlay/Panel/Content/Finish
+@onready var _main_menu_button: Button = $Overlay/Panel/Content/MainMenu
 @onready var _panel: PanelContainer = $Overlay/Panel
 @onready var _content: VBoxContainer = $Overlay/Panel/Content
 @onready var _dashboard: VBoxContainer = $Overlay/Panel/Content/PauseDashboard
@@ -32,6 +34,7 @@ func _ready() -> void:
 	_restart_button.pressed.connect(func() -> void: restart_requested.emit())
 	_endless_button.pressed.connect(func() -> void: endless_requested.emit())
 	_finish_button.pressed.connect(func() -> void: victory_requested.emit())
+	_main_menu_button.pressed.connect(func() -> void: main_menu_requested.emit())
 
 
 func bind(run_manager: RunProgress, player: PlayerController, upgrade_manager: UpgradeManager, wave_director: WaveDirector) -> void:
@@ -59,8 +62,10 @@ func _on_state_changed(new_state: int) -> void:
 			_finish_button.visible = true
 		RunProgress.RunState.VICTORY:
 			_show_message("VITÓRIA", "Você concluiu as três ondas da arena.", false)
+			_main_menu_button.visible = true
 		RunProgress.RunState.GAME_OVER:
 			_show_message("DERROTA", "O arqueiro caiu. Tente outra combinação de cartas.", false)
+			_main_menu_button.visible = true
 		_:
 			visible = false
 
@@ -83,6 +88,7 @@ func _on_pause_changed(is_paused: bool) -> void:
 func _show_message(heading: String, description: String, can_resume: bool) -> void:
 	_endless_button.visible = false
 	_finish_button.visible = false
+	_main_menu_button.visible = false
 	_restart_button.visible = true
 	_dashboard.visible = can_resume
 	_detail.visible = not can_resume

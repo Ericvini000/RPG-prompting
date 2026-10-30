@@ -16,7 +16,7 @@ O design oficial do MVP 0.1 está em [docs/GDD.md](docs/GDD.md). A organização
 
 O MVP 0.1, de COD-001 a COD-011, está disponível para teste. A arena de 110 tiles isométricos (128 × 64 px) tem limites e pilares com colisão. O arqueiro move-se com WASD, mira com o mouse, dispara flechas ao manter o clique esquerdo e usa dash com Espaço. Perseguidor, atirador e tanque usam formas e cores provisórias originais. Três ondas configuradas em recursos `.tres` aparecem em sequência.
 
-A cena principal está em `scenes/main.tscn`; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores, evita pontos próximos ao arqueiro e sinaliza a conclusão após a terceira onda. O RunManager acumula XP e calcula níveis. Ao evoluir, três cartas diferentes aparecem e pausam o combate; escolhas pendentes são feitas em sequência. As oito cartas alteram atributos, disparos, queimadura ou dash. O HUD mostra vida, XP, nível, onda e recarga do dash. Esc pausa e retoma o combate; vitória ou derrota oferecem reinício.
+A cena de entrada está em `scenes/ui/main_menu.tscn`. Jogar permite escolher Modo Ondas, que termina em vitória após as três ondas originais, ou Modo Infinito, que continua automaticamente a partir da onda 4. `scenes/main.tscn` contém a partida; `scenes/arena_01.tscn` contém a arena e `Cenas/cena01.tscn` continua como referência herdada. O WaveDirector cria os inimigos nos marcadores e evita pontos próximos ao arqueiro. O RunManager acumula XP e calcula níveis. Ao evoluir, três cartas diferentes aparecem e pausam o combate; escolhas pendentes são feitas em sequência. As oito cartas alteram atributos, disparos, queimadura ou dash. O HUD mostra vida, XP, nível, onda e recarga do dash. Esc pausa e retoma o combate; vitória ou derrota oferecem reinício no mesmo modo e retorno ao menu.
 
 ## Começar a desenvolver
 
@@ -41,18 +41,21 @@ Na raiz do projeto, os comandos de verificação são:
     godot --headless --path . --script res://tests/upgrade_effects_smoke.gd
     godot --headless --path . --script res://tests/projectile_effects_smoke.gd
     godot --headless --path . --script res://tests/run_flow_smoke.gd
+    godot --headless --path . --script res://tests/main_menu_smoke.gd
+    godot --headless --path . --script res://tests/endless_waves_smoke.gd
+    godot --headless --path . --script res://tests/pause_menu_smoke.gd
     godot --headless --path . --quit-after 2
 
 Substitua godot pelo caminho do executável instalado, se necessário. A última validação automatizada e seus limites estão em [docs/VALIDATION_MVP_0.1.md](docs/VALIDATION_MVP_0.1.md). Uma partida jogada no editor continua necessária para avaliar precisão da mira, colisões e sensação de combate.
 
 ### Testar o combate manualmente
 
-1. Inicie a cena principal com F5. O arqueiro aparece no centro da arena ampliada; a primeira onda cria quatro perseguidores.
+1. Inicie a cena principal com F5. Clique em Jogar e escolha Modo Ondas ou Modo Infinito. O arqueiro aparece no centro da arena ampliada; a primeira onda cria quatro perseguidores.
 2. Use WASD para mover, aponte com o mouse e mantenha o clique esquerdo para disparar. Tente acertar o inimigo e os pilares; as flechas desaparecem no impacto.
 3. Pressione Espaço para usar o dash. Teste o contato com o inimigo durante e após a esquiva, assim como as colisões com obstáculos e limites.
 4. Derrote todos os inimigos de cada onda. A segunda traz atiradores; a terceira acrescenta um tanque. Ao subir de nível, clique em uma das três cartas. A arena permanece pausada até todas as escolhas pendentes terminarem. Compare dano, cadência, movimento, vida e as habilidades especiais depois de cada escolha.
 5. Confira no HUD as alterações de vida, XP, nível, onda e recarga do dash. Pressione Esc durante o combate para pausar e retomar.
-6. Termine as três ondas para ver a vitória; deixe a vida chegar a zero para ver a derrota. Use Reiniciar partida para começar do nível 1, sem cartas ou entidades da sessão anterior.
+6. Termine as três ondas: Modo Ondas exibe a vitória; Modo Infinito avança automaticamente à onda 4. Deixe a vida chegar a zero para ver a derrota. Use Reiniciar partida para começar do nível 1 no mesmo modo, sem cartas ou entidades da sessão anterior. Menu Principal volta à escolha de modo.
 
 ## Organização
 
@@ -63,7 +66,7 @@ Substitua godot pelo caminho do executável instalado, se necessário. A última
 | scripts/ | Controladores, componentes de vida, projétil e dados tipados. |
 | data/ | Recursos de atributos, ondas e oito definições de cartas. |
 | assets/tiles/ e assets/icons/ | Atlas provisório do piso e ícones originais das cartas. |
-| tests/ | Doze verificações da arena, combate, ondas, progressão, cartas, pausa e reinício. |
+| tests/ | Verificações da arena, combate, ondas, progressão, cartas, pausa, menu e reinício. |
 | Cenas/cena01.tscn | Cena 1 preservada, que herda a arena atual. |
 | addons/ | Funplay MCP e GdUnit4 já existentes. |
 

@@ -5,8 +5,10 @@ signal experience_changed(xp: int, required: int)
 signal level_up_requested()
 signal state_changed(new_state: int)
 signal pause_changed(is_paused: bool)
+signal endless_mode_started()
 
 enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER, ENDLESS_CHOICE }
+enum GameMode { WAVES, ENDLESS }
 
 var level: int = 1
 var experience: int = 0
@@ -14,8 +16,10 @@ var pending_level_ups: int = 0
 var state: RunState = RunState.READY
 var normal_paused: bool = false
 var endless_mode: bool = false
+var selected_mode: GameMode = GameMode.WAVES
 var _victory_pending: bool = false
 var _endless_choice_pending: bool = false
+var _endless_start_pending: bool = false
 
 
 func _ready() -> void:
@@ -26,12 +30,23 @@ func required_experience_for_level(current_level: int) -> int:
 	return 20 + 10 * (maxi(1, current_level) - 1)
 
 
+func select_mode(mode: GameMode) -> void:
+	selected_mode = mode
+	reset_run()
+
+
+func return_to_menu() -> void:
+	selected_mode = GameMode.WAVES
+	reset_run()
+
+
 func reset_run() -> void:
 	level = 1
 	experience = 0
 	pending_level_ups = 0
 	_victory_pending = false
 	_endless_choice_pending = false
+	_endless_start_pending = false
 	endless_mode = false
 	normal_paused = false
 	set_state(RunState.READY)
@@ -52,8 +67,27 @@ func finish_upgrade_selection() -> void:
 	elif _endless_choice_pending:
 		_endless_choice_pending = false
 		set_state(RunState.ENDLESS_CHOICE)
+	elif _endless_start_pending:
+		_endless_start_pending = false
+		_start_endless_mode()
+		begin_combat()
 	else:
 		begin_combat()
+
+
+func complete_initial_waves() -> void:
+	if selected_mode == GameMode.WAVES:
+		request_victory()
+	elif not endless_mode and state != RunState.GAME_OVER and state != RunState.VICTORY:
+		if pending_level_ups > 0 or state == RunState.UPGRADE_SELECTION:
+			_endless_start_pending = true
+		else:
+			_start_endless_mode()
+
+
+func _start_endless_mode() -> void:
+	endless_mode = true
+	endless_mode_started.emit()
 
 
 func request_endless_choice() -> void:
@@ -92,6 +126,7 @@ func request_game_over() -> void:
 		return
 	_victory_pending = false
 	_endless_choice_pending = false
+	_endless_start_pending = false
 	set_state(RunState.GAME_OVER)
 
 
