@@ -1,0 +1,18 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/arena_01.tscn" id="1_arena"]
+[ext_resource type="Script" path="res://scripts/systems/wave_director.gd" id="2_director"]
+[ext_resource type="Resource" path="res://data/wave_01.tres" id="3_wave"]
+[ext_resource type="Resource" path="res://data/wave_02.tres" id="4_wave"]
+[ext_resource type="Resource" path="res://data/wave_03.tres" id="5_wave"]
+
+[node name="EndlessSession" type="Node2D"]
+
+[node name="Arena01" parent="." instance=ExtResource("1_arena")]
+position = Vector2(576, 344)
+y_sort_enabled = true
+
+[node name="WaveDirector" type="Node" parent="." node_paths=PackedStringArray("arena")]
+script = ExtResource("2_director")
+arena = NodePath("../Arena01")
+waves = Array[Resource]([ExtResource("3_wave"), ExtResource("4_wave"), ExtResource("5_wave")])

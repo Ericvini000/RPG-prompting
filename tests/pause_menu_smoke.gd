@@ -6,11 +6,12 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
 	var run: RunProgress = root.get_node("RunManager") as RunProgress
-	var player: PlayerController = main.get_node("Arena01/Player") as PlayerController
+	var player: PlayerController = main.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	var manager: UpgradeManager = main.get_node("UpgradeManager") as UpgradeManager
 	var results: ResultScreen = main.get_node("ResultScreen") as ResultScreen
 	await physics_frame
@@ -64,7 +65,7 @@ func _verify() -> void:
 	var second: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(second)
 	var second_results: ResultScreen = second.get_node("ResultScreen") as ResultScreen
-	var second_player: PlayerController = second.get_node("Arena01/Player") as PlayerController
+	var second_player: PlayerController = second.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	await physics_frame
 	_check(second_player.runtime_stats.effective_damage() == 10 and (second.get_node("UpgradeManager") as UpgradeManager).get_acquired_upgrades().is_empty(), "Nova partida deve limpar melhorias", errors)
 	second_player.health.apply_damage(second_player.health.current)

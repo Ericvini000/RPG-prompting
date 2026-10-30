@@ -13,7 +13,7 @@
 - Leia `docs/GDD.md` e `docs/ARCHITECTURE.md` antes de implementar qualquer funcionalidade.
 - Verifique `git status`, a branch atual e sua relação com o remoto antes de editar ou implementar. Preserve alterações não commitadas de outras tarefas.
 - Não faça alterações diretas nas branches `main` ou `develop`. Crie uma branch específica para cada tarefa (`feature/*`, `release/*`, `hotfix/*` ou `docs/*`, conforme a política da Seção 18 de `docs/ARCHITECTURE.md`).
-- Trate o GDD v0.1 como fonte das regras e dos parâmetros de gameplay. Propostas identificadas na arquitetura não são decisões aprovadas.
+- Trate `docs/GDD.md` como fonte das decisões aprovadas da especificação 0.2 e dos parâmetros preservados do MVP 0.1. Propostas identificadas na arquitetura não são decisões aprovadas.
 - Confirme o escopo da tarefa e não implemente funcionalidades fora dele.
 - Preserve o trabalho e as funcionalidades existentes. Não altere mecânicas definidas sem informar o usuário e registrar a decisão aprovada na documentação.
 

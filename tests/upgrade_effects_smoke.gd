@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var world: Node2D = Node2D.new()
 	root.add_child(world)
@@ -60,7 +61,7 @@ func _verify() -> void:
 	_check(base.max_health == 100 and base.base_damage == 10.0 and base.move_speed == 230.0 and base.dash_cooldown == 1.2, "Cartas nao devem modificar o Resource básico", errors)
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
-	var game_player: PlayerController = main.get_node("Arena01/Player") as PlayerController
+	var game_player: PlayerController = main.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	var manager: UpgradeManager = main.get_node("UpgradeManager") as UpgradeManager
 	var before: Array = _combat_signature(game_player)
 	(root.get_node("RunManager") as RunProgress).add_experience(20)

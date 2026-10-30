@@ -6,12 +6,13 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
-	var arena: Node2D = main.get_node("Arena01") as Node2D
+	var arena: Node2D = main.get_node("SessionRoot/EndlessSession/Arena01") as Node2D
 	var player: PlayerController = arena.get_node("Player") as PlayerController
-	var director: Node = main.get_node_or_null("WaveDirector")
+	var director: Node = main.get_node_or_null("SessionRoot/EndlessSession/WaveDirector")
 	if director == null:
 		_finish(["Main precisa de WaveDirector"])
 		return

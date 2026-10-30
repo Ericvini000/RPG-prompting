@@ -1,13 +1,13 @@
 # Arquitetura — Arqueiro Roguelite
 
 **Versão:** Consolidação 0.2 — COD-012<br>
-**Status:** MVP 0.1 com UI-001, GAME-001 e UI-002 implementados; Aventura e migração de modos pendentes<br>
+**Status:** Fundação COD-013 implementada; Infinito preservado; mapa e ciclo da Aventura pendentes<br>
 **Referência de gameplay:** docs/GDD.md<br>
 **Engine:** Godot 4.7.2, GDScript tipado
 
-Este documento distingue **histórico**, **implementação existente**, **nova decisão aprovada**, **arquitetura proposta** e **funcionalidade futura**. Os contratos de gameplay e os valores numéricos vêm do GDD. Escolhas técnicas ainda não aprovadas estão marcadas como **proposta**, sem aprovação implícita. A auditoria de código usa `origin/develop` em `e6e3dd8`, de 30/10/2026; COD-012 altera somente documentação.
+Este documento distingue **histórico**, **implementação existente**, **nova decisão aprovada**, **arquitetura proposta** e **funcionalidade futura**. Os contratos de gameplay e os valores numéricos vêm do GDD. Escolhas técnicas ainda não aprovadas estão marcadas como **proposta**, sem aprovação implícita. A seção 21 preserva a auditoria anterior de COD-012 (`e6e3dd8`); a seção 23 descreve a fundação implementada em COD-013 a partir de `origin/develop` em `9234f9e`.
 
-**Nova decisão aprovada:** a versão 0.2 terá somente Aventura e Infinito. Aventura substitui Ondas e usa um mapa manual com seis salas físicas em cinco etapas, dentro de uma única cena de mapa. Essa decisão ainda não está refletida nos enums, cenas ou scripts atuais. A seção 21 audita a migração e a seção 22 propõe sua arquitetura. O backlog está em [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md).
+**Decisão aprovada:** a versão 0.2 terá somente Aventura e Infinito. A identificação e o menu foram migrados em COD-013; Aventura ainda aguarda o mapa manual de seis salas físicas em cinco etapas, dentro de uma única cena de mapa. A seção 22 propõe os sistemas futuros e a seção 23 delimita o que já existe. O backlog está em [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md).
 
 ## 1. Estado atual e estrutura de diretórios
 
@@ -36,21 +36,22 @@ Criar diretórios e arquivos apenas quando uma tarefa precisar deles. Alguns cam
 
 | Cena | Papel atual |
 | --- | --- |
-| MainMenu | Entrada do projeto; navegação e seleção dos modos implementados em UI-002, ainda sem Aventura. |
-| Main | Instancia a arena e coordena WaveDirector, UpgradeManager, HUD, UpgradeScreen e ResultScreen. |
+| MainMenu | Entrada do projeto; seleciona Aventura ou Infinito, com Aventura ainda em preparação. |
+| Main | Compõe a sessão por modo e conecta Player, diretor opcional, UpgradeManager e interfaces. |
 | Arena | Contém piso, limites, obstáculos, pontos de spawn e raiz para entidades ordenadas por Y. |
 | Player | CharacterBody2D com colisão, visuais, origem do arco, vida, hurtbox e câmera. |
 | Arrow | Projétil com Area2D, movimento, duração máxima e resolução de colisão. |
 | Chaser, RangedEnemy, Tank | Cenas de inimigo configuradas por EnemyData. |
 | HUD, UpgradeScreen, ResultScreen | Apresentação; recebem eventos sem controlar diretamente atributos de entidades. |
 
-Atualmente, Main contém fundo, Arena01, WaveDirector, UpgradeScreen, UpgradeManager, HUD e ResultScreen. Main reinicia o RunManager ao começar uma partida, conecta vitória e derrota e recarrega a cena ao reiniciar. A arena usa Floor como TileMapLayer, limites e pilares com StaticBody2D/CollisionPolygon2D, oito marcadores de spawn inimigo e Player. Player contém colisão, formas provisórias, BowOrigin, Camera2D, HealthComponent e Hurtbox. O arqueiro cria flechas em tempo de execução. WaveDirector instancia inimigos na arena a partir de WaveData e conecta suas recompensas de XP ao RunManager.
+Em COD-013, Main contém `SessionRoot`, UpgradeScreen, UpgradeManager, HUD, ResultScreen e o aviso de Aventura em preparação. Seleciona `scenes/main/endless_session.tscn` ou `scenes/main/adventure_session.tscn`. Infinito possui Arena01 e WaveDirector; Aventura possui Player persistente e MapRoot vazio. Main reinicia RunManager uma vez por tentativa e fornece referências explícitas às interfaces e ao UpgradeManager. A arena antiga conserva Floor/TileMapLayer, colisões, oito marcadores e Player; seus dados e os três WaveData não foram removidos. Os caminhos atuais e o contrato de montagem do mapa estão na seção 23.
 
 ## 3. Scripts principais e responsabilidades
 
 | Script ou componente | Responsabilidade atual |
 | --- | --- |
 | RunManager | Estado da partida, modo selecionado, XP, nível, vitória e derrota. |
+| AdventureSession | Player persistente, MapRoot e montagem inicial de mapa em READY; sem progressão de salas. |
 | PlayerController | Movimento em oito direções, mira, ataque e dash. |
 | HealthComponent | Vida, dano, cura e morte. |
 | HurtboxComponent | Recepção de acertos e integração com vida. |
@@ -65,11 +66,11 @@ Os nomes acima seguem os contratos de responsabilidade do GDD. `PlayerRuntimeSta
 
 ## 4. Autoload e estados
 
-**RunManager é o único Autoload definido pelo GDD.** Seu script usa `class_name RunProgress`, sem constituir um segundo gerenciador. Ele mantém nível, XP, evoluções pendentes e controla READY, COMBAT, UPGRADE_SELECTION, VICTORY e GAME_OVER, além do legado ENDLESS_CHOICE. Guarda `selected_mode` e dados transitórios da sessão. WaveDirector e UpgradeManager pertencem às cenas e se comunicam por referências explícitas e sinais. A seção 21 distingue os estados usados dos resíduos históricos; a seção 22 propõe continuidade entre salas.
+**RunManager é o único Autoload definido pelo GDD.** Seu script usa `class_name RunProgress`, sem constituir um segundo gerenciador. Ele mantém nível, XP, evoluções pendentes e controla READY, COMBAT, UPGRADE_SELECTION, VICTORY e GAME_OVER. COD-013 removeu ENDLESS_CHOICE e migrou `selected_mode` para ADVENTURE/ENDLESS. WaveDirector e UpgradeManager pertencem às cenas e se comunicam por referências explícitas e sinais. EXPLORATION e estados locais de salas continuam propostos para COD-014.
 
 Ao subir de nível, o combate pausa e a tela de cartas continua recebendo entrada. Se houver várias evoluções pendentes, cada escolha é apresentada em sequência; só depois o combate retoma. Vitória, derrota e reinício passam pelo controlador de estados, evitando que vários scripts alterem pausa ou término independentemente.
 
-RunManager centraliza `set_state()` e a pausa da árvore. UpgradeScreen, UpgradeManager e ResultScreen usam `PROCESS_MODE_ALWAYS` para receber escolhas e botões durante a pausa. A seleção de cartas retorna ao estado COMBAT após a última escolha pendente, conclui a vitória aguardada ou ativa a continuação infinita pendente. Para Aventura, retornar ao contexto anterior de exploração ou combate é uma mudança proposta, ainda não implementada.
+RunManager centraliza `set_state()` e a pausa da árvore. UpgradeScreen, UpgradeManager e ResultScreen usam `PROCESS_MODE_ALWAYS` para receber escolhas e botões durante a pausa. COD-013 introduz `begin_upgrade_selection()` para lembrar READY ou COMBAT e restaurar o contexto após a última escolha, ou concluir vitória/continuação infinita pendente. Uma conclusão de escolha tardia não pode substituir GAME_OVER. O futuro contexto EXPLORATION ainda não existe.
 
 ## 5. Comunicação por sinais
 
@@ -176,7 +177,7 @@ O arqueiro cria três flechas quando possui Disparo Triplo, mantendo o dano efet
 
 `GameHUD` observa os sinais de vida, experiência e onda e consulta a recarga atual do dash. O jogador recebe um breve flash de cor ao sofrer dano. `ResultScreen` permanece ativo durante a pausa e apresenta pausa normal, vitória ou derrota; somente a pausa normal pode ser retomada com Esc. Os botões de reinício recarregam Main, que recria entidades e atributos de execução e restaura o nível inicial.
 
-RunManager é o único controlador da pausa e dos estados; COD-010 usava os cinco estados originais do GDD, e GAME-001 acrescentou o legado ENDLESS_CHOICE. A pausa normal é uma variável separada, atualmente válida apenas durante COMBAT. A conclusão da arena fica pendente até que todas as escolhas de cartas sejam feitas. A morte cancela essa conclusão pendente e bloqueia novas ondas. HUD e telas apenas apresentam eventos e emitem ações; não alteram diretamente atributos do arqueiro. A auditoria atual e a adaptação proposta à Aventura estão nas seções 21 e 22.
+RunManager é o único controlador da pausa e dos estados; COD-010 usava os cinco estados originais do GDD, GAME-001 acrescentou ENDLESS_CHOICE e COD-013 removeu esse legado. A pausa normal continua válida apenas durante COMBAT. A morte cancela conclusão pendente e bloqueia novas ondas. HUD e telas apenas apresentam eventos e emitem ações; não alteram diretamente atributos do arqueiro. A preparação da Aventura usa READY, e seu mapa completo continua pendente.
 
 ## 17. Estabilização de COD-011
 
@@ -223,11 +224,11 @@ A migração começa pela auditoria dos commits locais ainda não publicados e d
 
 `PauseStatsPanel` apresenta vida de `HealthComponent` e atributos efetivos de `PlayerRuntimeStats`: dano, intervalo de ataque convertido em ataques por segundo, movimento, recarga do dash, flechas por disparo, perfuração e habilidade elemental. Não calcula bônus nem modifica recursos de configuração. `PauseCardsPanel` consulta `UpgradeManager.get_acquired_upgrades()` e `get_acquired_count()`; mostra ícone, nome, descrição, efeito e quantidade por definição, em lista com rolagem. Nenhuma carta exibe uma mensagem vazia.
 
-Ao receber `pause_changed(true)`, `ResultScreen` lê o jogador, `UpgradeManager`, `RunManager` e `WaveDirector`, atualiza os dois painéis e o progresso (nível, XP e onda) e só então exibe o menu. Os componentes visuais recebem essas referências por `bind()` em Main. Fechar e reabrir a pausa provoca uma nova leitura; nenhuma consulta altera o estado da partida. A recriação de Main em Recomeçar restaura os atributos e a lista de cartas da sessão inicial.
+Ao receber `pause_changed(true)`, `ResultScreen` lê o jogador, UpgradeManager e RunManager, atualiza os painéis e o progresso e só então exibe o menu. Com WaveDirector, mostra a onda; sem ele, mostra Aventura. As referências chegam por `bind()` em Main. Fechar e reabrir a pausa provoca nova leitura; nenhuma consulta altera a partida. Recomeçar recria Main, atributos e cartas da sessão inicial.
 
 ## 20. GAME-001 — histórico de seleção e geração vigente do Infinito
 
-**Histórico substituído por UI-002:** depois da terceira onda, `arena_completed()` conduzia a `ENDLESS_CHOICE`, após cartas pendentes. `ResultScreen` apresentava duas ações e Main conectava seus sinais a `choose_endless_mode()` ou `choose_victory()`. Hoje `complete_initial_waves()` trata a conclusão pelo modo já selecionado no menu. O enum legado, seus métodos, flags, sinais e botões ainda existem no código, mas a partida normal não solicita essa escolha. A seção 21 detalha os pontos a migrar; não se deve reintroduzir esse estado como fluxo da Aventura.
+**Histórico substituído por UI-002:** depois da terceira onda, `arena_completed()` conduzia a `ENDLESS_CHOICE`, após cartas pendentes. `ResultScreen` apresentava duas ações e Main conectava seus sinais a `choose_endless_mode()` ou `choose_victory()`. UI-002 deixou de solicitar a escolha e COD-013 removeu enum, métodos, flags, sinais e botões legados. Hoje `complete_initial_waves()` trata somente a continuação automática do Infinito. A seção 21 preserva a auditoria anterior; não se deve reintroduzir esse estado como fluxo da Aventura.
 
 **Implementação vigente da geração:** `WaveDirector` conserva os três `WaveData` originais. No Infinito, avança automaticamente para a onda 4 após as escolhas de cartas pendentes. As regras abaixo permanecem, independentemente da substituição de Ondas por Aventura no menu.
 
@@ -237,7 +238,9 @@ No modo infinito, o diretor monta cada composição em memória a partir das tr�
 
 **Parâmetros provisórios exportados em `WaveDirector`:** máximo de 12 inimigos ativos; 0,3 s entre spawns; 1,5 s entre ondas; nova tentativa após 0,5 s sem ponto válido; recuperação após 3,0 s sem ponto ideal; distância mínima normal de 128 px do jogador e 80 px entre inimigos; distância mínima de recuperação de 64 px. Esses valores, a composição embaralhada e o arredondamento aditivo precisam de avaliação jogável antes de serem fixados para balanceamento.
 
-## 21. Menu, auditoria de modos e migração para Aventura
+## 21. Auditoria histórica de COD-012 e plano de migração
+
+**Registro anterior à implementação de COD-013.** As tabelas desta seção descrevem o código em `e6e3dd8` e a migração então planejada; não descrevem o estado atual da branch. A migração da identificação e a separação das sessões estão implementadas conforme seção 23. O mapa e os sistemas da seção 22 continuam futuros.
 
 ### 21.1. Nova decisão aprovada e diferença para o código
 
@@ -279,6 +282,8 @@ ResultScreen atualmente emite `main_menu_requested` em vitória/derrota. Main re
 `tests/main_menu_smoke.gd` cobre o fluxo UI-002 existente, não Aventura. A validação documental COD-012 não substitui executar os testes da futura migração. O estilo e os textos visuais continuam provisórios.
 
 ## 22. Arquitetura proposta do Modo Aventura — não implementada
+
+Esta seção descreve a arquitetura do mapa completo, ainda pendente de COD-014 em diante. A sessão vazia e o contrato mínimo de montagem já implementados em COD-013 estão na seção 23. A distribuição de salas, o ramo exclusivo e a cura configurável do descanso foram aprovados no novo prompt e registrados no GDD; os valores de balanceamento continuam pendentes.
 
 ### 22.1. Limites e alternativas avaliadas
 
@@ -326,7 +331,7 @@ Cruzar portas conserva a mesma instância de Player, HealthComponent e PlayerRun
 
 **Contratos propostos:** `RoomDirector.try_enter_room(room_id: StringName) -> bool`; `RoomController.begin_encounter(player: PlayerController) -> void`; sinais `room_entered(room_id: StringName)` e `room_completed(room_id: StringName)`. O diretor valida transição e registra a sala antes de iniciar seu conteúdo. Gatilhos repetidos, múltiplos shapes do jogador e retorno a sala concluída não podem reiniciar encontro, XP ou recompensa.
 
-**Proposta de portas:** manter saídas de progressão bloqueadas durante encontros e escolhas de recompensa; abri-las depois da conclusão local. A política de retorno à sala anterior e de acesso ao ramo não escolhido precisa de aprovação em COD-015. A implementação deve distinguir fechamento de acesso e gatilho de início para não prender o jogador na colisão da porta. Gatilhos monitoram o corpo do Player e não projéteis/inimigos; novas camadas só serão atribuídas quando necessárias.
+**Proposta de implementação das portas:** manter saídas de progressão bloqueadas durante encontros e escolhas de recompensa; abri-las depois da conclusão local. O novo prompt aprovou escolher somente um ramo da etapa 2 por tentativa, sem obter ambas as recompensas. A política de retorno a salas anteriores ainda precisa de definição em COD-015. A implementação deve distinguir fechamento e gatilho de início para não prender o jogador na colisão da porta. Gatilhos monitoram o corpo do Player, não projéteis/inimigos; novas camadas só serão atribuídas quando necessárias.
 
 RoomController reutiliza EnemyController, suas cenas e WaveData para encontros finitos, mantendo contagem de inimigos e fila de spawns separadas da geração infinita. Pode-se extrair uma rotina pequena de spawn compartilhada se houver duplicação comprovada; não se deve instanciar o WaveDirector atual sem desativar seu início automático e sua progressão global. Cada derrota concede XP exatamente uma vez ao RunManager, usando o mesmo sinal existente.
 
@@ -338,7 +343,7 @@ Concluir o encontro produz `room_completed`, não VICTORY. RoomDirector autoriza
 
 **Proposta para COD-017:** adicionar `request_reward_choice(source_id: StringName) -> void` e sinal `reward_choice_resolved(source_id: StringName)`, usando a mesma elegibilidade, oferta de três cartas distintas, aplicação e contagem. Uma fila distingue pedidos de nível e recompensa; a escolha de recompensa não aumenta nível, não cria XP artificial e não consome `pending_level_ups`. O identificador de origem impede concessão duplicada da mesma recompensa de sala.
 
-Proposta de ordenação: resolver evoluções já pendentes e depois recompensas de sala, sem abrir duas telas simultâneas. RunManager permanece dono de UPGRADE_SELECTION e restaura o contexto anterior depois de toda a fila; RoomDirector só libera progressão após o pedido resolvido. Antes de implementar, aprovar quantidade de ofertas por sala, quais salas recompensam e benefício do descanso. O descanso pode usar `HealthComponent.heal()` se a cura for aprovada; valores e repetição não estão definidos.
+O novo prompt aprovou resolver evoluções por XP pendentes antes de oferecer recompensa configurada, com três cartas elegíveis e uma escolha por oferta. A fila que implementará essa ordem continua proposta de COD-017. RunManager permanece dono de UPGRADE_SELECTION e RoomDirector aguarda resolução para liberar progressão. Descanso com cura configurável também foi aprovado; `HealthComponent.heal()` poderá aplicá-la. Valores, repetição e configuração de recompensa por sala continuam pendentes.
 
 ### 22.6. Estados, reinício e conclusão da tentativa
 
@@ -360,4 +365,40 @@ Novos tipos de sala podem ampliar RoomDefinition e fornecer componentes locais d
 
 COD-013 a COD-021 devem cobrir modo selecionado, grafo de salas, passagem física, identidade do jogador, vida/build, uma ativação por sala, XP e recompensa únicos, seleção de cartas na pausa, prioridade da morte, elite, chefe e limpeza de reinício. A matriz de testes e os critérios por tarefa estão em PLAN_MVP_0.2.md.
 
-Antes de suas respectivas implementações, decidir e registrar: distribuição final de salas e política de retorno/bifurcação (COD-015); composições e limpeza de projéteis (COD-016); benefícios de descanso, ofertas e valores de recompensa (COD-017); composição/escala de elite (COD-018); identidade, padrões, atributos e recompensas do chefe (COD-019). Os contratos e caminhos propostos podem ser ajustados ao implementar, mantendo GDD e plano coerentes.
+Antes de suas respectivas implementações, definir a geometria e política de retorno das salas (COD-015), as composições e limpeza de projéteis (COD-016), os valores/repetição de cura e recompensas (COD-017), a composição/escala de elite (COD-018) e identidade/padrões/atributos do chefe (COD-019). Distribuição lógica, exclusividade da bifurcação e cura configurável já estão aprovadas no GDD. Contratos propostos podem ser ajustados mantendo os documentos coerentes.
+
+## 23. Fundação implementada em COD-013
+
+### 23.1. Composição por modalidade
+
+`RunProgress.GameMode` contém somente `ADVENTURE` e `ENDLESS`; Aventura é o padrão. Main continua em `res://scenes/main.tscn`, com os sistemas de UI/cartas compartilhados e um `SessionRoot` para a sessão selecionada. `reset_run()` é chamado uma vez ao criar Main, nunca ao montar o mapa. Reiniciar recria Main e preserva o modo; entrar no menu limpa a tentativa e restaura o padrão Aventura.
+
+| Cena ou script | Contrato implementado |
+| --- | --- |
+| `scenes/main/endless_session.tscn` | Contém Arena01 e WaveDirector com os três WaveData originais. Inicia em COMBAT, passa automaticamente à onda 4 e conserva a geração existente. |
+| `scenes/main/adventure_session.tscn` | Contém GameplayRoot com Y-sort, um Player e um MapRoot vazio. Não contém WaveDirector, encontros nem salas. |
+| `scripts/main/adventure_session.gd` | `AdventureSession` possui `player`, `map_root`, `current_map`, método `mount_map(scene: PackedScene) -> Error` e sinal `map_loaded(map: Node2D)`. |
+| `scripts/main/main_controller.gd` | Expõe `player`, `wave_director` opcional e `adventure_session` opcional; compõe e conecta os sistemas após escolher a sessão. |
+| `scenes/ui/adventure_notice.tscn` | Informa que o mapa ainda não está disponível e oferece Menu Principal. Não apresenta a preparação como aventura jogável. |
+
+Sem mapa, Aventura permanece em READY, com Player oculto e processamento desativado. A árvore não fica pausada e o menu de retorno funciona. Não se instancia a arena antiga sob outro nome. O Infinito usa os caminhos `SessionRoot/EndlessSession/Arena01` e `SessionRoot/EndlessSession/WaveDirector`; consumidores comuns usam as referências fornecidas por Main.
+
+### 23.2. Contrato mínimo para a futura cena de mapa
+
+`AdventureSession.mount_map()` aceita uma PackedScene cuja raiz seja Node2D e tenha um Marker2D chamado `PlayerSpawn` diretamente na raiz. A cena inteira é instanciada em MapRoot. O método posiciona e ativa o Player existente, sem reconfigurar HealthComponent, PlayerRuntimeStats, UpgradeManager ou RunManager. Só então emite `map_loaded`; Main oculta o aviso e ativa COMBAT como contexto inicial provisório. EXPLORATION e progressão por salas pertencem a COD-014 em diante.
+
+O contrato aceita um mapa por sessão, somente no modo ADVENTURE em READY. Segunda montagem retorna `ERR_ALREADY_IN_USE`; cena nula retorna `ERR_INVALID_PARAMETER`; PackedScene vazia ou estrutura inválida retorna `ERR_INVALID_DATA`. Tentativa de montar em outro modo ou estado retorna `ERR_BUSY`, preservando seleção de cartas, pausa e derrota. Isso prepara a composição sem antecipar MapDefinition, RoomDefinition, RoomController, RoomDirector ou carregador de mapas futuros. Nenhum mapa de gameplay foi criado em COD-013; o mapa mínimo dos testes é uma fixture em memória.
+
+### 23.3. UI, cartas e estados
+
+UpgradeManager recebe o jogador selecionado por `bind(player_ref: PlayerController, screen_ref: UpgradeScreen)`, após a composição da sessão. Sua lógica de nível e catálogo permanece a mesma; não há recompensas de sala neste incremento. HUD e ResultScreen aceitam `WaveDirector` nulo: mostram Aventura como contexto e não tentam ler uma onda ausente. O dashboard de atributos/cartas é preservado.
+
+`RunManager.begin_upgrade_selection()` registra o contexto anterior; `finish_upgrade_selection()` restaura READY/COMBAT ou conclui uma ação pendente, somente se ainda estiver em UPGRADE_SELECTION. Essa proteção impede que uma escolha tardia retire a derrota. A pausa normal ainda funciona apenas durante COMBAT; na preparação sem mapa há apenas o aviso e retorno ao menu. O texto genérico de vitória não depende mais de três ondas; o futuro dono do encontro final solicitará a vitória.
+
+ENDLESS_CHOICE, seus métodos/flags e os sinais/botões de escolha antiga foram removidos. WaveDirector inicia automaticamente apenas quando o modo selecionado é ENDLESS. A fórmula de geração, os limites de inimigos, os Resources e as recompensas de XP do Infinito foram preservados.
+
+### 23.4. Verificações e limites da entrega
+
+`tests/game_mode_smoke.gd` verifica os identificadores, preparação sem ondas, montagem de fixture, identidade do jogador, vida/build/XP preservados, rejeição de mapas inválidos/duplicados, pausa sem WaveDirector, morte, reinício e retorno ao menu. Os testes existentes de arena, XP, cartas, pausa e ondas agora selecionam Infinito explicitamente e usam os caminhos da sessão. A vitória pendente é verificada isoladamente em `run_manager_smoke.gd`, sem conservar um modo Ondas oculto.
+
+A importação e os testes headless devem ser registrados na entrega. Avisos ambientais de acesso a `user://`, certificados e sockets do addon Funplay não devem ser confundidos com erros de script. Aventura completa não foi entregue: mapa, seis salas, portas, encontros, recompensas, descanso, elite, chefe e conclusão jogável permanecem para as próximas tarefas. COD-014 prepara as definições e a coordenação do primeiro mapa; COD-015 constrói sua geometria.
