@@ -25,31 +25,19 @@ func _verify() -> void:
 	(menu.get_node("Margin/Layout/Center/MenuPanel/Content/ModeChoices/Back") as Button).pressed.emit()
 	_check(home.visible and not choices.visible, "Voltar deve restaurar o menu inicial", errors)
 	(menu.get_node("Margin/Layout/Center/MenuPanel/Content/Home/Play") as Button).pressed.emit()
-	(menu.get_node("Margin/Layout/Center/MenuPanel/Content/ModeChoices/Waves") as Button).pressed.emit()
+	(menu.get_node("Margin/Layout/Center/MenuPanel/Content/ModeChoices/Adventure") as Button).pressed.emit()
 	await process_frame
 	await process_frame
 	var game: Node = current_scene
-	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.WAVES, "Modo Ondas deve iniciar a partida", errors)
-	var player: PlayerController = game.get_node("Arena01/Player") as PlayerController
+	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.ADVENTURE, "Modo Aventura deve iniciar a partida", errors)
+	var player: PlayerController = game.get("player") as PlayerController
 	var manager: UpgradeManager = game.get_node("UpgradeManager") as UpgradeManager
 	var results: ResultScreen = game.get_node("ResultScreen") as ResultScreen
 	_check(run.level == 1 and run.experience == 0 and player.health.current == 100 and manager.get_acquired_upgrades().is_empty(), "Nova partida deve começar limpa", errors)
 	run.add_experience(20)
 	manager.select_upgrade(manager.current_offer[0].upgrade_id)
-	player.health.configure(100)
-	player.health.apply_damage(100)
-	_check(run.state == RunProgress.RunState.GAME_OVER and (results.get_node("Overlay/Panel/Content/MainMenu") as Button).visible, "Derrota deve oferecer Menu Principal", errors)
-	(results.get_node("Overlay/Panel/Content/Restart") as Button).pressed.emit()
-	await process_frame
-	await process_frame
-	game = current_scene
-	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.WAVES and run.level == 1, "Recomeçar deve preservar Modo Ondas e limpar progresso", errors)
-	manager = game.get_node("UpgradeManager") as UpgradeManager
-	_check(manager.get_acquired_upgrades().is_empty(), "Recomeçar deve limpar cartas", errors)
-	await _clear_fixed_waves(game)
-	results = game.get_node("ResultScreen") as ResultScreen
-	_check(run.state == RunProgress.RunState.VICTORY and (results.get_node("Overlay/Panel/Content/MainMenu") as Button).visible, "Modo Ondas deve vencer após três ondas", errors)
-	(results.get_node("Overlay/Panel/Content/MainMenu") as Button).pressed.emit()
+	_check(run.state == RunProgress.RunState.READY and game.get("wave_director") == null, "Fundação Aventura deve aguardar mapa sem ondas", errors)
+	(game.get_node("AdventureNotice/Center/Panel/Content/MainMenu") as Button).pressed.emit()
 	await process_frame
 	await process_frame
 	menu = current_scene as MainMenu
@@ -59,8 +47,8 @@ func _verify() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.ENDLESS and run.level == 1, "Modo Infinito deve iniciar uma partida limpa", errors)
-	var director: WaveDirector = game.get_node("WaveDirector") as WaveDirector
+	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.ENDLESS and run.level == 1 and (game.get_node("UpgradeManager") as UpgradeManager).get_acquired_upgrades().is_empty() and (game.get("player") as PlayerController).runtime_stats.effective_damage() == 10, "Modo Infinito deve iniciar uma partida limpa", errors)
+	var director: WaveDirector = game.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
 	director.endless_wave_interval = 0.0
 	await _clear_fixed_waves(game)
 	for frame: int in range(10):
@@ -68,7 +56,7 @@ func _verify() -> void:
 	results = game.get_node("ResultScreen") as ResultScreen
 	_check(run.endless_mode and run.state == RunProgress.RunState.COMBAT and director.current_wave == 4, "Modo Infinito deve passar automaticamente à onda 4", errors)
 	_check(not results.visible, "Modo Infinito não deve exibir escolha após onda 3", errors)
-	player = game.get_node("Arena01/Player") as PlayerController
+	player = game.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	player.health.configure(100)
 	player.health.apply_damage(100)
 	_check(run.state == RunProgress.RunState.GAME_OVER, "Morte deve encerrar Modo Infinito", errors)
@@ -78,20 +66,20 @@ func _verify() -> void:
 	game = current_scene
 	_check(game != null and game.name == "Main" and run.selected_mode == RunProgress.GameMode.ENDLESS and not run.endless_mode and run.level == 1, "Recomeçar deve manter Modo Infinito e limpar a sessão", errors)
 	_check((game.get_node("UpgradeManager") as UpgradeManager).get_acquired_upgrades().is_empty(), "Recomeçar Modo Infinito deve limpar cartas", errors)
-	player = game.get_node("Arena01/Player") as PlayerController
+	player = game.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	results = game.get_node("ResultScreen") as ResultScreen
 	player.health.configure(100)
 	player.health.apply_damage(100)
 	(results.get_node("Overlay/Panel/Content/MainMenu") as Button).pressed.emit()
 	await process_frame
 	await process_frame
-	_check(current_scene is MainMenu and not paused and run.selected_mode == RunProgress.GameMode.WAVES and run.level == 1, "Menu Principal deve descartar o modo e o estado transitório", errors)
+	_check(current_scene is MainMenu and not paused and run.selected_mode == RunProgress.GameMode.ADVENTURE and run.level == 1, "Menu Principal deve descartar o modo e o estado transitório", errors)
 	_finish(errors)
 
 
 func _clear_fixed_waves(game: Node) -> void:
 	var run: RunProgress = root.get_node("RunManager") as RunProgress
-	var director: WaveDirector = game.get_node("WaveDirector") as WaveDirector
+	var director: WaveDirector = game.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
 	var manager: UpgradeManager = game.get_node("UpgradeManager") as UpgradeManager
 	for wave_number: int in range(1, 4):
 		while director.current_wave < wave_number:

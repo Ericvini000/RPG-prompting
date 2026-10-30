@@ -7,8 +7,8 @@ signal state_changed(new_state: int)
 signal pause_changed(is_paused: bool)
 signal endless_mode_started()
 
-enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER, ENDLESS_CHOICE }
-enum GameMode { WAVES, ENDLESS }
+enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER }
+enum GameMode { ADVENTURE, ENDLESS }
 
 var level: int = 1
 var experience: int = 0
@@ -16,10 +16,10 @@ var pending_level_ups: int = 0
 var state: RunState = RunState.READY
 var normal_paused: bool = false
 var endless_mode: bool = false
-var selected_mode: GameMode = GameMode.WAVES
+var selected_mode: GameMode = GameMode.ADVENTURE
 var _victory_pending: bool = false
-var _endless_choice_pending: bool = false
 var _endless_start_pending: bool = false
+var _upgrade_return_state: RunState = RunState.READY
 
 
 func _ready() -> void:
@@ -36,7 +36,7 @@ func select_mode(mode: GameMode) -> void:
 
 
 func return_to_menu() -> void:
-	selected_mode = GameMode.WAVES
+	selected_mode = GameMode.ADVENTURE
 	reset_run()
 
 
@@ -45,8 +45,8 @@ func reset_run() -> void:
 	experience = 0
 	pending_level_ups = 0
 	_victory_pending = false
-	_endless_choice_pending = false
 	_endless_start_pending = false
+	_upgrade_return_state = RunState.READY
 	endless_mode = false
 	normal_paused = false
 	set_state(RunState.READY)
@@ -58,27 +58,28 @@ func begin_combat() -> void:
 	set_state(RunState.COMBAT)
 
 
+func begin_upgrade_selection() -> void:
+	if state != RunState.UPGRADE_SELECTION:
+		_upgrade_return_state = state
+	set_state(RunState.UPGRADE_SELECTION)
+
+
 func finish_upgrade_selection() -> void:
-	if pending_level_ups > 0:
+	if state != RunState.UPGRADE_SELECTION or pending_level_ups > 0:
 		return
 	if _victory_pending:
 		_victory_pending = false
 		set_state(RunState.VICTORY)
-	elif _endless_choice_pending:
-		_endless_choice_pending = false
-		set_state(RunState.ENDLESS_CHOICE)
 	elif _endless_start_pending:
 		_endless_start_pending = false
 		_start_endless_mode()
 		begin_combat()
 	else:
-		begin_combat()
+		set_state(_upgrade_return_state)
 
 
 func complete_initial_waves() -> void:
-	if selected_mode == GameMode.WAVES:
-		request_victory()
-	elif not endless_mode and state != RunState.GAME_OVER and state != RunState.VICTORY:
+	if selected_mode == GameMode.ENDLESS and not endless_mode and state != RunState.GAME_OVER and state != RunState.VICTORY:
 		if pending_level_ups > 0 or state == RunState.UPGRADE_SELECTION:
 			_endless_start_pending = true
 		else:
@@ -88,28 +89,6 @@ func complete_initial_waves() -> void:
 func _start_endless_mode() -> void:
 	endless_mode = true
 	endless_mode_started.emit()
-
-
-func request_endless_choice() -> void:
-	if endless_mode or state == RunState.GAME_OVER or state == RunState.VICTORY or state == RunState.ENDLESS_CHOICE:
-		return
-	if pending_level_ups > 0 or state == RunState.UPGRADE_SELECTION:
-		_endless_choice_pending = true
-	else:
-		set_state(RunState.ENDLESS_CHOICE)
-
-
-func choose_endless_mode() -> void:
-	if state != RunState.ENDLESS_CHOICE:
-		return
-	endless_mode = true
-	begin_combat()
-
-
-func choose_victory() -> void:
-	if state != RunState.ENDLESS_CHOICE:
-		return
-	set_state(RunState.VICTORY)
 
 
 func request_victory() -> void:
@@ -125,7 +104,6 @@ func request_game_over() -> void:
 	if state == RunState.VICTORY or state == RunState.GAME_OVER:
 		return
 	_victory_pending = false
-	_endless_choice_pending = false
 	_endless_start_pending = false
 	set_state(RunState.GAME_OVER)
 
@@ -144,7 +122,7 @@ func set_state(new_state: RunState) -> void:
 	if state != RunState.COMBAT and normal_paused:
 		normal_paused = false
 		pause_changed.emit(false)
-	get_tree().paused = normal_paused or state == RunState.UPGRADE_SELECTION or state == RunState.ENDLESS_CHOICE or state == RunState.VICTORY or state == RunState.GAME_OVER
+	get_tree().paused = normal_paused or state == RunState.UPGRADE_SELECTION or state == RunState.VICTORY or state == RunState.GAME_OVER
 	if changed:
 		state_changed.emit(state)
 

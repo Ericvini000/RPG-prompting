@@ -3,16 +3,12 @@ class_name ResultScreen
 
 signal restart_requested()
 signal resume_requested()
-signal endless_requested()
-signal victory_requested()
 signal main_menu_requested()
 
 @onready var _title: Label = $Overlay/Panel/Content/Title
 @onready var _detail: Label = $Overlay/Panel/Content/Detail
 @onready var _resume_button: Button = $Overlay/Panel/Content/Resume
 @onready var _restart_button: Button = $Overlay/Panel/Content/Restart
-@onready var _endless_button: Button = $Overlay/Panel/Content/Endless
-@onready var _finish_button: Button = $Overlay/Panel/Content/Finish
 @onready var _main_menu_button: Button = $Overlay/Panel/Content/MainMenu
 @onready var _panel: PanelContainer = $Overlay/Panel
 @onready var _content: VBoxContainer = $Overlay/Panel/Content
@@ -32,8 +28,6 @@ func _ready() -> void:
 	visible = false
 	_resume_button.pressed.connect(func() -> void: resume_requested.emit())
 	_restart_button.pressed.connect(func() -> void: restart_requested.emit())
-	_endless_button.pressed.connect(func() -> void: endless_requested.emit())
-	_finish_button.pressed.connect(func() -> void: victory_requested.emit())
 	_main_menu_button.pressed.connect(func() -> void: main_menu_requested.emit())
 
 
@@ -55,13 +49,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_state_changed(new_state: int) -> void:
 	match new_state:
-		RunProgress.RunState.ENDLESS_CHOICE:
-			_show_message("ARENA CONCLUÍDA", "Você superou as três ondas. Como deseja continuar?", false)
-			_restart_button.visible = false
-			_endless_button.visible = true
-			_finish_button.visible = true
 		RunProgress.RunState.VICTORY:
-			_show_message("VITÓRIA", "Você concluiu as três ondas da arena.", false)
+			_show_message("VITÓRIA", "A aventura foi concluída.", false)
 			_main_menu_button.visible = true
 		RunProgress.RunState.GAME_OVER:
 			_show_message("DERROTA", "O arqueiro caiu. Tente outra combinação de cartas.", false)
@@ -75,10 +64,11 @@ func _on_pause_changed(is_paused: bool) -> void:
 		if is_paused:
 			_stats_panel.refresh(_player)
 			_cards_panel.refresh(_upgrade_manager)
-			_progress.text = "Nível %d  |  XP %d / %d  |  Onda %d" % [
+			var progress_text: String = "Onda %d" % _wave_director.current_wave if _wave_director != null else "Aventura"
+			_progress.text = "Nível %d  |  XP %d / %d  |  %s" % [
 				_run_manager.level, _run_manager.experience,
 				_run_manager.required_experience_for_level(_run_manager.level),
-				_wave_director.current_wave,
+				progress_text,
 			]
 			_show_message("PAUSA", "A arena está aguardando.", true)
 		else:
@@ -86,8 +76,6 @@ func _on_pause_changed(is_paused: bool) -> void:
 
 
 func _show_message(heading: String, description: String, can_resume: bool) -> void:
-	_endless_button.visible = false
-	_finish_button.visible = false
 	_main_menu_button.visible = false
 	_restart_button.visible = true
 	_dashboard.visible = can_resume

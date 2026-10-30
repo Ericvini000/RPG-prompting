@@ -15,10 +15,14 @@ func bind(player: PlayerController, director: WaveDirector, run_manager: RunProg
 	_player = player
 	player.health.health_changed.connect(_update_health)
 	run_manager.experience_changed.connect(_update_experience)
-	director.wave_changed.connect(_update_wave)
+	if director != null:
+		director.wave_changed.connect(_update_wave)
 	_update_health(player.health.current, player.health.maximum)
 	_update_experience(run_manager.experience, run_manager.required_experience_for_level(run_manager.level))
-	_update_wave(director.current_wave)
+	if director != null:
+		_update_wave(director.current_wave)
+	else:
+		_wave_label.text = "AVENTURA"
 
 
 func _process(_delta: float) -> void:
