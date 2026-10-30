@@ -211,3 +211,13 @@ O alvo dos Pull Requests é `develop` para `feature/*` e `docs/*`, e `main` para
 ### 18.4. Migração inicial
 
 A migração começa pela auditoria dos commits locais ainda não publicados e das alterações não commitadas. Preservar ambos antes de trocar de branch. A publicação única da `main` estável do MVP 0.1 é uma exceção de bootstrap, anterior à proteção e dependente de aprovação explícita; ela não autoriza novos pushes diretos. Criar `develop` exatamente a partir desse commit e publicá-la. Depois, configurar as proteções e criar `docs/gitflow-workflow` a partir de `develop` para integrar esta política e as instruções de `AGENTS.md` por Pull Request. Nenhuma branch, tag, proteção ou configuração remota deve ser criada ou alterada sem aprovação explícita da execução da migração.
+
+**Estado histórico:** a migração GIT-001 foi concluída. `develop` foi criada a partir da `main` estável, a política entrou por Pull Request e os rulesets ativos protegem `main` e `develop` com Pull Request obrigatório, bloqueio de force push e de exclusão. O texto acima registra a sequência de bootstrap, não uma etapa pendente.
+
+## 19. Interface de pausa de UI-001
+
+`ResultScreen` continua responsável pelas telas de pausa normal, vitória e derrota. Apenas durante `COMBAT` com pausa normal ativa ele expande o painel e mostra `PauseDashboard`; vitória e derrota conservam o layout e os botões anteriores. `RunManager` permanece como único controlador de estado e pausa. A tela emite pedidos para continuar ou recomeçar, tratados por Main.
+
+`PauseStatsPanel` apresenta vida de `HealthComponent` e atributos efetivos de `PlayerRuntimeStats`: dano, intervalo de ataque convertido em ataques por segundo, movimento, recarga do dash, flechas por disparo, perfuração e habilidade elemental. Não calcula bônus nem modifica recursos de configuração. `PauseCardsPanel` consulta `UpgradeManager.get_acquired_upgrades()` e `get_acquired_count()`; mostra ícone, nome, descrição, efeito e quantidade por definição, em lista com rolagem. Nenhuma carta exibe uma mensagem vazia.
+
+Ao receber `pause_changed(true)`, `ResultScreen` lê o jogador, `UpgradeManager`, `RunManager` e `WaveDirector`, atualiza os dois painéis e o progresso (nível, XP e onda) e só então exibe o menu. Os componentes visuais recebem essas referências por `bind()` em Main. Fechar e reabrir a pausa provoca uma nova leitura; nenhuma consulta altera o estado da partida. A recriação de Main em Recomeçar restaura os atributos e a lista de cartas da sessão inicial.

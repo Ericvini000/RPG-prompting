@@ -1,6 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/result_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://scripts/ui/pause_stats_panel.gd" id="2_stats"]
+[ext_resource type="Script" path="res://scripts/ui/pause_cards_panel.gd" id="3_cards"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.075, 0.13, 0.18, 0.98)
@@ -83,3 +85,66 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "REINICIAR PARTIDA"
+
+[node name="PauseDashboard" type="VBoxContainer" parent="Overlay/Panel/Content"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Columns" type="HBoxContainer" parent="Overlay/Panel/Content/PauseDashboard"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="StatsFrame" type="PanelContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Stats" type="VBoxContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns/StatsFrame"]
+layout_mode = 2
+theme_override_constants/separation = 12
+script = ExtResource("2_stats")
+
+[node name="Heading" type="Label" parent="Overlay/Panel/Content/PauseDashboard/Columns/StatsFrame/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ATRIBUTOS DO ARQUEIRO"
+
+[node name="Values" type="Label" parent="Overlay/Panel/Content/PauseDashboard/Columns/StatsFrame/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = ""
+
+[node name="CardsFrame" type="PanelContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Cards" type="VBoxContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns/CardsFrame"]
+layout_mode = 2
+theme_override_constants/separation = 12
+script = ExtResource("3_cards")
+
+[node name="Heading" type="Label" parent="Overlay/Panel/Content/PauseDashboard/Columns/CardsFrame/Cards"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "CARTAS ADQUIRIDAS"
+
+[node name="Scroll" type="ScrollContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns/CardsFrame/Cards"]
+custom_minimum_size = Vector2(0, 270)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Overlay/Panel/Content/PauseDashboard/Columns/CardsFrame/Cards/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Progress" type="Label" parent="Overlay/Panel/Content/PauseDashboard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Nível 1  |  XP 0 / 20  |  Onda 1"
+horizontal_alignment = 1

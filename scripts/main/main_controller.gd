@@ -5,11 +5,12 @@ func _ready() -> void:
 	var run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
 	var player: PlayerController = $Arena01/Player as PlayerController
 	var director: WaveDirector = $WaveDirector as WaveDirector
+	var upgrade_manager: UpgradeManager = $UpgradeManager as UpgradeManager
 	var hud: GameHUD = $HUD as GameHUD
 	var results: ResultScreen = $ResultScreen as ResultScreen
 	run_manager.reset_run()
 	hud.bind(player, director, run_manager)
-	results.bind(run_manager)
+	results.bind(run_manager, player, upgrade_manager, director)
 	player.health.died.connect(run_manager.request_game_over)
 	director.arena_completed.connect(run_manager.request_victory)
 	results.restart_requested.connect(_restart_run)

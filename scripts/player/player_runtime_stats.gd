@@ -54,3 +54,7 @@ func effective_move_speed() -> float:
 
 func effective_dash_cooldown() -> float:
 	return base_stats.dash_cooldown * dash_cooldown_multiplier
+
+
+func arrows_per_shot() -> int:
+	return 3 if triple_shot else 1

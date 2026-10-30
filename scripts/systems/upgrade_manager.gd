@@ -27,6 +27,14 @@ func get_acquired_count(upgrade_id: String) -> int:
 	return int(owned_counts.get(upgrade_id, 0))
 
 
+func get_acquired_upgrades() -> Array[UpgradeDefinition]:
+	var acquired: Array[UpgradeDefinition] = []
+	for definition: UpgradeDefinition in definitions:
+		if definition != null and get_acquired_count(definition.upgrade_id) > 0:
+			acquired.append(definition)
+	return acquired
+
+
 func is_eligible(definition: UpgradeDefinition) -> bool:
 	return definition.max_stacks <= 0 or get_acquired_count(definition.upgrade_id) < definition.max_stacks
 
