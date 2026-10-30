@@ -54,6 +54,7 @@ func _ready() -> void:
 			if scene != null and not _endless_pool.has(scene):
 				_endless_pool.append(scene)
 	run_manager.state_changed.connect(_on_run_state_changed)
+	run_manager.endless_mode_started.connect(_on_endless_mode_started)
 	call_deferred("_start_next_wave")
 
 
@@ -216,3 +217,11 @@ func _on_run_state_changed(new_state: int) -> void:
 		_waiting_for_spawns = true
 	elif _waiting_for_spawns and new_state == RunProgress.RunState.COMBAT and _wave_wait <= 0.0:
 		call_deferred("_start_next_wave")
+
+
+func _on_endless_mode_started() -> void:
+	if not _completed:
+		return
+	_completed = false
+	_wave_wait = maxf(0.0, endless_wave_interval)
+	_waiting_for_spawns = true
