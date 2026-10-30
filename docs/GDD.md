@@ -1,8 +1,9 @@
 # Projeto Arqueiro Roguelite
 
-**Game Design Document — Versão 0.1**
+**Game Design Document — Especificação 0.2 em desenvolvimento**
 
-**Status:** Planejamento inicial<br>
+**Status:** Design do MVP 0.2 aprovado em COD-012; implementação pendente<br>
+**Base preservada:** MVP 0.1 e incrementos UI-001, GAME-001 e UI-002<br>
 **Engine:** Godot 4.7.2<br>
 **Linguagem:** GDScript<br>
 **Gênero:** Action Roguelite 2D Isométrico<br>
@@ -10,9 +11,19 @@
 
 ---
 
+### Como ler este documento
+
+- **Histórico:** escopo e ciclo originais do MVP 0.1, preservados para rastreabilidade.
+- **Implementação existente:** em `origin/develop` auditada em 30/10/2026, UI-002 ainda oferece Modo Ondas (`WAVES`) e Modo Infinito (`ENDLESS`). A escolha após a terceira onda já foi substituída pelo menu.
+- **Nova decisão aprovada:** a especificação 0.2 oferece somente **Modo Aventura** e **Modo Infinito**, conforme seções 19 e 20. Aventura substitui Ondas; ainda não está implementada.
+- **Proposta:** detalhes de arquitetura ou balanceamento explicitamente marcados aguardam decisão; não alteram os parâmetros aprovados.
+- **Futuro:** itens do roadmap ficam fora da entrega inicial do MVP 0.2.
+
+As regras de atributos, controles, inimigos comuns, XP e oito cartas das seções 4 a 7 continuam válidas. [ARCHITECTURE.md](ARCHITECTURE.md) distingue os contratos atuais dos propostos; [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md) organiza COD-013 a COD-021.
+
 ## 1. Visão geral
 
-O jogador controla um arqueiro em um mundo de fantasia sombria. Seu objetivo é enfrentar sucessivas ondas de inimigos, ganhar experiência, adquirir habilidades por meio de cartas e sobreviver a desafios cada vez mais difíceis.
+O jogador controla um arqueiro em um mundo de fantasia sombria. No Modo Aventura, percorre salas conectadas até um chefe final; no Modo Infinito, enfrenta ondas progressivas. Em ambos, ganha experiência, adquire habilidades por meio de cartas e enfrenta desafios cada vez mais difíceis.
 
 A principal experiência deve ser a sensação de evolução constante: o personagem começa com um arco simples, mas termina uma partida utilizando combinações poderosas de habilidades.
 
@@ -25,9 +36,9 @@ A principal experiência deve ser a sensação de evolução constante: o person
 
 A inspiração em Hades será concentrada no ritmo do combate, na estrutura roguelite e na evolução das habilidades. Personagens, cenários, identidade visual, história e recursos artísticos serão originais.
 
-## 2. Escopo do MVP 0.1
+## 2. Escopo histórico do MVP 0.1
 
-A primeira versão deve conter:
+A primeira versão foi especificada com os seguintes requisitos, preservados como base histórica:
 
 - Uma arena isométrica com obstáculos e limites.
 - Um arqueiro com movimentação em oito direções.
@@ -39,9 +50,11 @@ A primeira versão deve conter:
 - Interface de vida, experiência e informações do combate.
 - Tela de vitória, derrota e opção de reiniciar.
 
-**Fora do escopo inicial:** geração procedural, chefes, inventário, equipamentos, multiplayer, loja, progressão permanente, salvamento de partidas e narrativa avançada.
+**Fora do escopo do MVP 0.1:** geração procedural, chefes, inventário, equipamentos, multiplayer, loja, progressão permanente, salvamento de partidas e narrativa avançada. O chefe final passa a integrar o MVP 0.2; as exclusões da entrega 0.2 estão na seção 20.
 
-## 3. Ciclo de gameplay
+## 3. Ciclo histórico de gameplay do MVP 0.1
+
+**Comportamento original:** este ciclo descreve a arena de três ondas, posteriormente selecionável como Modo Ondas em UI-002. Não define o fluxo do Modo Aventura. O fluxo aprovado da Aventura está na seção 20; a continuidade do Infinito está nas seções 18 e 19.
 
 1. O jogador entra em uma arena.
 2. Uma onda de inimigos aparece.
@@ -54,7 +67,7 @@ A primeira versão deve conter:
 9. Após três ondas, a arena é concluída.
 10. O jogador vence a sessão de teste ou perde ao ficar sem vida.
 
-Na versão 0.2, a conclusão da arena permitirá avançar para outras salas.
+O plano inicial previa avançar entre salas na versão 0.2. COD-012 concretiza essa intenção como um único mapa com salas fisicamente conectadas, sem exigir três ondas por sala.
 
 ## 4. Personagem: Arqueiro
 
@@ -120,7 +133,7 @@ O ponto de referência visual do personagem ficará próximo aos pés, enquanto 
 
 Para o MVP, perseguidores e tanques usarão perseguição direta e colisões. Navegação avançada e desvio inteligente de obstáculos ficam para uma etapa posterior.
 
-### Ondas de teste
+### Ondas de teste do MVP 0.1 e abertura do Infinito
 
 | Onda | Composição |
 | --- | --- |
@@ -129,6 +142,8 @@ Para o MVP, perseguidores e tanques usarão perseguição direta e colisões. Na
 | 3 | 2 perseguidores, 2 atiradores e 1 tanque |
 
 Os inimigos aparecerão em pontos predeterminados, evitando posições muito próximas do jogador.
+
+Essas três composições são mantidas na abertura do Modo Infinito. Não são uma regra de quantidade ou composição dos encontros da Aventura; esses encontros precisarão de configuração e validação próprias.
 
 ## 6. Experiência e níveis
 
@@ -193,9 +208,11 @@ A interface principal terá:
 - Número da onda.
 - Indicador da recarga do dash.
 
+Essa lista descreve o HUD existente. Para a Aventura, o progresso deverá identificar etapa e sala; para o Infinito, continuará identificando a onda. A adaptação visual é trabalho planejado em COD-020.
+
 Quando uma carta aparecer, o jogo deverá pausar e apresentar três opções com nome, ícone, descrição, efeito numérico e quantidade de evoluções já adquiridas, quando aplicável. A seleção deverá funcionar com mouse.
 
-A interface de cartas continuará processando entradas durante a pausa. Após uma escolha, outra seleção pendente será apresentada ou o combate será retomado.
+A interface de cartas continua processando entradas durante a pausa. Na implementação existente, após uma escolha, outra seleção pendente é apresentada ou o combate é retomado, podendo concluir um resultado pendente. Na Aventura planejada, a última escolha deverá devolver o controle ao contexto de exploração ou combate pertinente, ou concluir a vitória pendente, conforme a proposta de estados em ARCHITECTURE.md, seção 22.
 
 ## 9. Arquitetura de software
 
@@ -322,19 +339,23 @@ A organização visual deve usar os pés dos personagens como referência para a
 
 A tela de cartas não poderá modificar diretamente o dano ou a velocidade do jogador. Ela informará qual carta foi escolhida e o sistema de evolução aplicará a mudança.
 
-## 13. Estados do jogo
+## 13. Estados do jogo: base histórica e continuidade
 
-O fluxo inicial terá cinco estados:
+O fluxo original do MVP 0.1 definiu cinco estados:
 
 - **READY:** arena preparada, antes do início do combate.
 - **COMBAT:** movimentação, ataques e inimigos ativos.
 - **UPGRADE_SELECTION:** combate pausado aguardando escolha.
-- **VICTORY:** todas as ondas concluídas.
+- **VICTORY:** todas as ondas concluídas no ciclo original. No design 0.2, representa a derrota do chefe final da Aventura; não ocorre ao concluir uma onda do Infinito.
 - **GAME_OVER:** vida do jogador chegou a zero.
 
 Mudanças de estado devem ter um controlador único, evitando múltiplos scripts tentando pausar ou finalizar o jogo simultaneamente.
 
-## 14. Backlog de implementação para Codex
+O código atual também contém `ENDLESS_CHOICE`, resíduo de GAME-001 sem uso no fluxo normal de UI-002. A migração e a distinção entre estado da partida e estado local de sala estão auditadas em ARCHITECTURE.md, seções 21 e 22. Nenhum estado novo foi implementado em COD-012.
+
+## 14. Backlog histórico de implementação para Codex — MVP 0.1
+
+COD-001 a COD-011 registram a sequência original. O backlog da versão 0.2 está em [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md), sem declarar essas novas tarefas implementadas.
 
 ### COD-001 — Fundação do projeto
 
@@ -450,7 +471,7 @@ Os sistemas de cálculo serão testados separadamente da interface visual. Casos
 
 Cada tarefa do Codex deverá incluir testes ou verificações proporcionais à funcionalidade implementada. Além dos testes automatizados, será necessário executar o jogo visualmente para avaliar controles, precisão da mira, colisões, perspectiva e sensação de combate.
 
-## 16. Critérios de conclusão do MVP
+## 16. Critérios históricos de conclusão do MVP 0.1
 
 O MVP 0.1 será considerado concluído somente quando:
 
@@ -467,34 +488,89 @@ O MVP 0.1 será considerado concluído somente quando:
 
 ---
 
-## 17. Próxima versão: MVP 0.2
+## 17. Roadmap e revisão de escopo para a versão 0.2
 
-Após estabilizar a versão 0.1, acrescentaremos:
+O planejamento original agrupava transições entre salas, caminhos e recompensas, dificuldade crescente, chefe, novas cartas, raridades, identidade artística e progressão permanente na próxima versão. COD-012 substitui esse agrupamento pelo escopo delimitado na seção 20.
 
-- Transições entre diferentes salas.
-- Seleção de caminhos ou recompensas.
-- Aumento de dificuldade entre salas.
-- Um chefe com padrões de ataque.
-- Novas cartas e possíveis sinergias.
-- Introdução de raridades.
-- Identidade artística própria.
-- Primeira estrutura de progressão permanente entre partidas.
+**Entrega inicial aprovada:** Modo Aventura, um mapa manual com seis salas em cinco etapas, combate e descanso, elite, recompensas e chefe final. Modo Infinito permanece independente com sua progressão existente.
 
-## 18. Modo de ondas infinitas opcional — GAME-001
+**Roadmap futuro, sem compromisso de entrega nesta etapa:** novos mapas completos, tipos adicionais de sala, armadilhas funcionais, inimigos, chefes, novas cartas e sinergias, raridades, acabamento artístico e progressão permanente. Chefes periódicos no Infinito ficam como proposta COD-022 e não encerram a partida ao morrer. Geração procedural continua fora da entrega inicial e sem requisito de implementação aprovado.
 
-Após derrotar todos os inimigos das três ondas do MVP e concluir as escolhas de cartas pendentes, o jogador escolhe entre **Encerrar com Vitória** e **Continuar no Modo Infinito**. A primeira opção conserva o encerramento normal. A segunda inicia a onda 4 e mantém a mesma partida até a morte ou o reinício. A escolha aparece uma única vez; novas ondas não concedem vitória por conclusão.
+## 18. Modo Infinito — regras vigentes e histórico GAME-001
+
+### Histórico substituído
+
+GAME-001 apresentava **Encerrar com Vitória** ou **Continuar no Modo Infinito** após três ondas e depois das cartas pendentes. UI-002 substituiu essa escolha pela seleção do modo antes da partida. Essa escolha antiga é apenas histórico; não deve reaparecer no fluxo aprovado da versão 0.2.
+
+### Continuidade e escalonamento vigentes
+
+Ao selecionar o Infinito no menu, o jogador começa nas três ondas originais e continua automaticamente na onda 4 após resolver cartas pendentes. Não há vitória pela conclusão de ondas.
 
 As ondas 1 a 3 conservam as composições da seção 5. Da onda 4 em diante, as composições usam perseguidor, atirador e tanque, com um inimigo planejado adicional a cada onda: 6 na onda 4, 7 na onda 5 e assim por diante. Vida e dano dos inimigos recebem, respectivamente, bônus aditivos de 5% e 2% por onda após a terceira, aplicados sobre seus valores básicos e arredondados para inteiros. No máximo 12 inimigos permanecem ativos ao mesmo tempo; quantidades maiores entram em lotes. A onda seguinte só começa quando todos os inimigos planejados surgirem e forem derrotados.
 
-Experiência, níveis e cartas seguem as regras existentes. A build continua entre ondas, e seleções de cartas interrompem spawns e transições até a escolha. A morte encerra a partida e cancela spawns pendentes. O reinício restaura o estado inicial, inclusive a opção de escolher o modo após a terceira onda. Intervalos e demais parâmetros operacionais são provisórios e configuráveis, conforme `docs/ARCHITECTURE.md`.
+Experiência, níveis e cartas seguem as regras existentes. A build continua entre ondas, e seleções de cartas interrompem spawns e transições até a escolha. A morte encerra a partida e cancela spawns pendentes. O reinício restaura a onda 1 e limpa a build, preservando o Modo Infinito selecionado; não reapresenta a escolha histórica. Intervalos e demais parâmetros operacionais são provisórios e configuráveis, conforme `docs/ARCHITECTURE.md`.
 
-## 19. Menu principal e seleção de modo — UI-002
+**Funcionalidade futura:** chefes reutilizáveis poderão aparecer periodicamente no Infinito. A derrota de um chefe não encerra esse modo. Frequência, escalonamento e recompensas de chefes serão definidos em outra tarefa, proposta como COD-022.
 
-O jogo abre no menu principal, com o título provisório **ARQUEIRO ROGUELITE** e o botão **Jogar**. Jogar apresenta **Modo Ondas**, **Modo Infinito** e **Voltar**. A escolha acontece antes de começar a partida. Voltar retorna à tela inicial do menu.
+## 19. Menu principal e modalidades aprovadas — MVP 0.2
 
-- **Modo Ondas:** usa as três ondas originais e termina em vitória ao concluir a terceira, depois de resolver as escolhas de cartas pendentes.
-- **Modo Infinito:** começa com as mesmas três ondas e avança automaticamente para a onda 4, seguindo a progressão e os limites de GAME-001. Continua até derrota ou reinício.
+**Nova decisão aprovada; migração de código pendente.** O jogo deve abrir no menu principal, com o título provisório **ARQUEIRO ROGUELITE** e o botão **Jogar**. Jogar deverá apresentar somente **Modo Aventura**, **Modo Infinito** e **Voltar**. A modalidade é escolhida antes de começar; Voltar retorna à tela inicial do menu.
 
-Esta seleção substitui a escolha após a terceira onda descrita na seção 18. A regra de geração, escala e composição das ondas infinitas daquela seção permanece. Nenhum dos modos apresenta a escolha antiga durante o fluxo normal.
+| Modalidade | Progressão | Conclusão |
+| --- | --- | --- |
+| Modo Aventura | Mapa manual com salas ligadas por corredores e portas, cartas e recompensas. | Derrotar o chefe final conclui a aventura; vida zero causa derrota. |
+| Modo Infinito | Três ondas originais, depois ondas geradas com dificuldade crescente, conforme seção 18. | Vida zero causa derrota; reiniciar inicia outra partida. Ondas e futuros chefes não concedem vitória final. |
 
-Nas telas de vitória e derrota, **Recomeçar** inicia uma partida limpa no modo selecionado, sem conservar XP, cartas ou atributos adquiridos. **Menu Principal** encerra a partida, retira a pausa e volta ao menu para escolher um modo novamente. A interface de pausa e a seleção de cartas continuam com suas regras anteriores.
+O antigo Modo Ondas é substituído pela Aventura e não deverá permanecer selecionável. **Implementação existente de UI-002:** o menu e o enum ainda usam Ondas/`WAVES`; a substituição efetiva exige COD-013 e a entrega das tarefas da Aventura. Renomear o botão não equivale a implementar o modo.
+
+Nas telas de vitória da Aventura e derrota de ambos os modos, **Recomeçar** deverá iniciar uma partida limpa no modo selecionado, sem conservar XP, cartas ou atributos adquiridos. **Menu Principal** encerra a partida, retira a pausa e permite escolher novamente. UI-002 já fornece essa navegação para suas modalidades atuais; a adaptação à Aventura é planejada. A interface de pausa de UI-001 e a seleção de cartas devem ser preservadas.
+
+## 20. Escopo aprovado do MVP 0.2 — Modo Aventura
+
+### 20.1. Requisitos da entrega inicial
+
+- Modo Aventura como modalidade principal, independente do Infinito.
+- Um mapa inicial construído manualmente, com todas as salas na mesma cena de mapa.
+- Várias salas fisicamente conectadas, com deslocamento por corredores e portas; sem troca de cena a cada sala.
+- Cinco etapas de progressão; a segunda bifurca entre combate e descanso. São seis salas físicas no total.
+- Combates que reutilizam perseguidor, atirador e tanque; cartas oferecidas por experiência e por recompensas.
+- Preservação da build, vida atual e máxima, XP e nível ao avançar. Cruzar uma porta não reinicia nem cura o jogador automaticamente.
+- Uma sala de elite e um chefe final cuja derrota conclui a aventura.
+- Estrutura capaz de receber outros mapas, tipos de sala, armadilhas, inimigos e chefes no futuro, sem exigir a implementação desses conteúdos agora.
+
+### 20.2. Topologia e ciclo da aventura
+
+As duas alternativas da segunda etapa voltam a conectar-se à terceira. As seis salas existem fisicamente no mapa; uma rota normal percorre uma alternativa na bifurcação e segue até a quinta etapa. O posicionamento isométrico, as distâncias e a política de revisitar ou bloquear o ramo não escolhido ainda precisam de aprovação.
+
+| Etapa | Salas físicas | Papel |
+| --- | --- | --- |
+| 1 | R01 | Início do mapa; encontro de combate proposto. |
+| 2 | R02A e R02B | Bifurcação aprovada: combate ou descanso. |
+| 3 | R03 | Continuidade após a bifurcação; combate proposto. |
+| 4 | R04 | Alocação proposta para a sala de elite obrigatória. |
+| 5 | R05 | Chefe final e conclusão da aventura. |
+
+**Proposta de distribuição:** combate inicial → combate ou descanso → combate → elite → chefe. A quantidade de etapas, as seis salas, a bifurcação na segunda etapa e o chefe final são aprovados; a alocação da elite na quarta etapa e dos outros encontros é proposta para COD-015.
+
+O fluxo aprovado é entrar no mapa, atravessar salas conectadas, enfrentar encontros, receber XP/cartas/recompensas, escolher entre combate e descanso e avançar até o chefe final. Concluir uma sala permite progressão local; não conclui a partida. Vida e build persistem entre salas. A derrota encerra a tentativa; Recomeçar limpa toda a tentativa e mantém Aventura selecionada.
+
+### 20.3. Recompensas, descanso e elite
+
+A progressão por experiência conserva a fórmula e as oito cartas existentes. Recompensas também devem permitir obter cartas usando o mesmo sistema de elegibilidade e aplicação; não justificam duplicar a lógica de upgrades. A forma de conceder a recompensa de sala, sua quantidade e a ordem em relação às evoluções pendentes são propostas de arquitetura detalhadas em ARCHITECTURE.md, seção 22.
+
+**Pendências de design:** cura ou outro benefício do descanso, valor e repetição desse benefício, composição dos encontros, atributos da elite, recompensas por tipo de sala e identidade/padrões/atributos do chefe. Nenhum valor numérico adicional é aprovado nesta consolidação. Esses parâmetros deverão ser decididos e registrados antes de implementar suas tarefas; os atributos básicos existentes não serão sobrescritos.
+
+### 20.4. Exclusões e critérios de aceite
+
+Geração procedural, novos mapas completos, armadilhas funcionais e progressão permanente não integram a entrega inicial. Novas cartas e raridades permanecem no roadmap futuro. Inventário, equipamentos, multiplayer, loja, salvamento de partidas e narrativa avançada continuam fora deste escopo. Arte provisória original é suficiente.
+
+O MVP 0.2 só poderá ser declarado concluído quando:
+
+1. O menu oferecer somente Aventura e Infinito, com reinício no mesmo modo e retorno funcional ao menu.
+2. O primeiro mapa manual tiver seis salas físicas em cinco etapas, com a bifurcação de combate/descanso na segunda, corredores e portas utilizáveis.
+3. Toda a travessia entre salas acontecer dentro da mesma cena de mapa e conservar a instância do jogador, sua vida e build.
+4. Os três inimigos existentes, XP, cartas por nível e recompensas funcionarem sem duplicações ao reentrar em gatilhos ou salas.
+5. Descanso e elite produzirem os efeitos posteriormente aprovados; somente o chefe final concluir a Aventura.
+6. Pausa, cartas, derrota, vitória, reinício e menu funcionarem sem perder escolhas pendentes ou conservar dados da tentativa anterior.
+7. O Infinito conservar as regras da seção 18, sem escolha extra na terceira onda e sem vitória por chefe.
+8. Testes automatizados e uma travessia manual completa validarem colisões, portas, Y-sort, câmera, persistência e conclusão, conforme PLAN_MVP_0.2.md.
