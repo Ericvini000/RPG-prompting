@@ -23,7 +23,7 @@
 - Mantenha código modular, organizado e documentado onde a explicação ajudar a manutenção.
 - Separe configuração de estado em execução, prefira `TileMapLayer` para novos mapas e siga os contratos de sinais do GDD.
 - Preserve `addons/funplay_mcp/` e `addons/gdUnit4/`; evite dependências novas sem necessidade.
-- A cena principal atual é `res://scenes/main.tscn`; a arena atual é `res://scenes/arena_01.tscn`. A reorganização proposta no GDD ainda não foi aplicada.
+- A cena de entrada é `res://scenes/ui/main_menu.tscn`; a cena da partida é `res://scenes/main.tscn` e a arena atual é `res://scenes/arena_01.tscn`. A reorganização proposta no GDD ainda não foi aplicada.
 
 ### Validação e entrega
 

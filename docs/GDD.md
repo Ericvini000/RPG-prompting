@@ -487,3 +487,14 @@ Após derrotar todos os inimigos das três ondas do MVP e concluir as escolhas d
 As ondas 1 a 3 conservam as composições da seção 5. Da onda 4 em diante, as composições usam perseguidor, atirador e tanque, com um inimigo planejado adicional a cada onda: 6 na onda 4, 7 na onda 5 e assim por diante. Vida e dano dos inimigos recebem, respectivamente, bônus aditivos de 5% e 2% por onda após a terceira, aplicados sobre seus valores básicos e arredondados para inteiros. No máximo 12 inimigos permanecem ativos ao mesmo tempo; quantidades maiores entram em lotes. A onda seguinte só começa quando todos os inimigos planejados surgirem e forem derrotados.
 
 Experiência, níveis e cartas seguem as regras existentes. A build continua entre ondas, e seleções de cartas interrompem spawns e transições até a escolha. A morte encerra a partida e cancela spawns pendentes. O reinício restaura o estado inicial, inclusive a opção de escolher o modo após a terceira onda. Intervalos e demais parâmetros operacionais são provisórios e configuráveis, conforme `docs/ARCHITECTURE.md`.
+
+## 19. Menu principal e seleção de modo — UI-002
+
+O jogo abre no menu principal, com o título provisório **ARQUEIRO ROGUELITE** e o botão **Jogar**. Jogar apresenta **Modo Ondas**, **Modo Infinito** e **Voltar**. A escolha acontece antes de começar a partida. Voltar retorna à tela inicial do menu.
+
+- **Modo Ondas:** usa as três ondas originais e termina em vitória ao concluir a terceira, depois de resolver as escolhas de cartas pendentes.
+- **Modo Infinito:** começa com as mesmas três ondas e avança automaticamente para a onda 4, seguindo a progressão e os limites de GAME-001. Continua até derrota ou reinício.
+
+Esta seleção substitui a escolha após a terceira onda descrita na seção 18. A regra de geração, escala e composição das ondas infinitas daquela seção permanece. Nenhum dos modos apresenta a escolha antiga durante o fluxo normal.
+
+Nas telas de vitória e derrota, **Recomeçar** inicia uma partida limpa no modo selecionado, sem conservar XP, cartas ou atributos adquiridos. **Menu Principal** encerra a partida, retira a pausa e volta ao menu para escolher um modo novamente. A interface de pausa e a seleção de cartas continuam com suas regras anteriores.

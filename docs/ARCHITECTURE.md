@@ -231,3 +231,15 @@ No modo infinito, o diretor monta cada composição em memória a partir das tr�
 `EnemyController` recebe multiplicadores por instância antes de entrar na árvore. `HealthComponent` recebe vida máxima escalada, e controladores de contato e distância consultam dano efetivo escalado. Os recursos `EnemyData` compartilhados permanecem imutáveis. Para a onda `n ≥ 4`, os multiplicadores são `1 + 0,05 × (n − 3)` para vida e `1 + 0,02 × (n − 3)` para dano; o resultado é arredondado ao inteiro mais próximo. XP e demais atributos do inimigo conservam os dados originais. `GameHUD` mostra a numeração sem limite de três a partir da onda 4.
 
 **Parâmetros provisórios exportados em `WaveDirector`:** máximo de 12 inimigos ativos; 0,3 s entre spawns; 1,5 s entre ondas; nova tentativa após 0,5 s sem ponto válido; recuperação após 3,0 s sem ponto ideal; distância mínima normal de 128 px do jogador e 80 px entre inimigos; distância mínima de recuperação de 64 px. Esses valores, a composição embaralhada e o arredondamento aditivo precisam de avaliação jogável antes de serem fixados para balanceamento.
+
+## 21. Menu principal e modos de jogo — UI-002
+
+`project.godot` inicia `res://scenes/ui/main_menu.tscn`. A cena usa containers para apresentar o título, um único botão Jogar na abertura e as escolhas Modo Ondas, Modo Infinito e Voltar depois do clique. `scripts/ui/main_menu.gd` cuida apenas da navegação e solicita a seleção do modo ao `RunManager`; a partida continua em `res://scenes/main.tscn`.
+
+`RunManager` é o Autoload existente e conserva `selected_mode` por meio do enum tipado `GameMode`. `reset_run()` limpa XP, nível, estado de combate, escolhas pendentes e modo infinito em execução, mas preserva `selected_mode`, permitindo que Recomeçar recarregue a partida no mesmo modo. Ao entrar no menu, `return_to_menu()` limpa a partida e restaura o modo padrão; ao selecionar um modo, `select_mode()` prepara uma partida nova. Estado dos inimigos, jogador e cartas pertence à cena da partida e é recriado ao carregá-la.
+
+Após a terceira onda, Main encaminha `WaveDirector.arena_completed()` a `RunManager.complete_initial_waves()`. No Modo Ondas, ele conclui a vitória depois das seleções de cartas pendentes. No Modo Infinito, ativa a continuação automaticamente, emitindo `endless_mode_started()` para que `WaveDirector` agende a onda 4 com a lógica GAME-001 existente. Caso haja cartas pendentes, a continuação espera todas as escolhas. A antiga escolha de GAME-001, descrita na seção 20, deixa de ser apresentada no fluxo normal.
+
+`ResultScreen` mantém pausa, vitória e derrota e acrescenta **Menu Principal** somente nas duas telas de resultado. O botão emite `main_menu_requested`; Main remove a pausa e carrega a cena do menu. Recomeçar continua recarregando Main. A interface não altera diretamente o estado da partida.
+
+`tests/main_menu_smoke.gd` verifica a navegação, os dois modos, a terceira onda, retorno, derrota e reinício. Os testes de arena, experiência e ondas infinitas foram alinhados ao novo ponto de entrada e à seleção antecipada do modo. O estilo e o texto do menu são provisórios e podem evoluir na etapa de identidade visual.
