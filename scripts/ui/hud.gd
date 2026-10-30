@@ -42,4 +42,9 @@ func _update_experience(xp: int, required: int) -> void:
 
 
 func _update_wave(number: int) -> void:
-	_wave_label.text = "ONDA  %d / 3" % number if number > 0 else "ARENA"
+	if number <= 0:
+		_wave_label.text = "ARENA"
+	elif number <= 3:
+		_wave_label.text = "ONDA  %d / 3" % number
+	else:
+		_wave_label.text = "ONDA  %d  ·  INFINITO" % number

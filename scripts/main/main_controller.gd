@@ -12,9 +12,11 @@ func _ready() -> void:
 	hud.bind(player, director, run_manager)
 	results.bind(run_manager, player, upgrade_manager, director)
 	player.health.died.connect(run_manager.request_game_over)
-	director.arena_completed.connect(run_manager.request_victory)
+	director.arena_completed.connect(run_manager.request_endless_choice)
 	results.restart_requested.connect(_restart_run)
 	results.resume_requested.connect(run_manager.toggle_pause)
+	results.endless_requested.connect(run_manager.choose_endless_mode)
+	results.victory_requested.connect(run_manager.choose_victory)
 	run_manager.begin_combat()
 
 

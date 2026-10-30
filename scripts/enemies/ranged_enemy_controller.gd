@@ -36,6 +36,6 @@ func _fire_at_player() -> void:
 		return
 	get_parent().add_child(projectile)
 	projectile.global_position = projectile_origin.global_position
-	projectile.configure(target.global_position - projectile.global_position, data.projectile_speed, data.projectile_damage)
+	projectile.configure(target.global_position - projectile.global_position, data.projectile_speed, effective_projectile_damage())
 	_attack_time_left = data.attack_interval
 	projectile_fired.emit(projectile)

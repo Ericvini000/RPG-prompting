@@ -9,6 +9,8 @@ signal enemy_defeated(xp_reward: int)
 @onready var health: HealthComponent = $HealthComponent
 
 var _defeated: bool = false
+var health_multiplier: float = 1.0
+var damage_multiplier: float = 1.0
 
 
 func _ready() -> void:
@@ -17,7 +19,7 @@ func _ready() -> void:
 		push_error("Inimigo precisa de EnemyData.")
 		set_physics_process(false)
 		return
-	health.configure(data.max_health)
+	health.configure(maxi(1, roundi(data.max_health * health_multiplier)))
 	health.died.connect(_on_died)
 	if target == null:
 		target = get_tree().get_first_node_in_group("player") as PlayerController
@@ -25,6 +27,14 @@ func _ready() -> void:
 
 func can_act() -> bool:
 	return not _defeated and target != null and target.health.current > 0
+
+
+func effective_contact_damage() -> int:
+	return maxi(1, roundi(data.contact_damage * damage_multiplier))
+
+
+func effective_projectile_damage() -> int:
+	return maxi(1, roundi(data.projectile_damage * damage_multiplier))
 
 
 func _on_died() -> void:
