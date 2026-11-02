@@ -15,6 +15,7 @@ var _hit_areas: Dictionary = {}
 
 
 func _ready() -> void:
+	add_to_group("projectiles")
 	_lifetime_left = maximum_lifetime
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)

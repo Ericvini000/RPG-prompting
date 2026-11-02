@@ -15,6 +15,7 @@
 
 - COD-014: Resources MapDefinition/RoomDefinition, validação de grafo e primeiro mapa, RoomController, RoomDirector e estado EXPLORATION. `room_graph_smoke.gd` passou após falhar pela ausência dos componentes. Nenhuma geometria ou encontro entregue nesta etapa.
 - COD-015: cena única Map01 com seis salas, seis portas, corredores, piso TileMapLayer 128×64 e colisão no contorno. Layout fixo autoral em coordenadas de tiles, sem geração aleatória. `adventure_map_smoke.gd` verifica passagem, bifurcação e identidade/vida/build; a montagem permanece explícita até a integração COD-020.
+- COD-016: encontros finitos com inimigos existentes e XP único, espera por cartas, portas bloqueadas e cancelamento após morte. Projéteis remanescentes são removidos ao concluir a sala. Distância operacional mínima de spawn: 80 px, configurável por código de encontro para o mapa compacto; parâmetros comuns do Infinito foram preservados. Testes de encontro, mapa, grafo, arena e Infinito passaram.
 
 ## Decisões de implementação
 

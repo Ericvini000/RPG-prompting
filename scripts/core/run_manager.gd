@@ -86,7 +86,7 @@ func finish_upgrade_selection() -> void:
 	elif _endless_start_pending:
 		_endless_start_pending = false
 		_start_endless_mode()
-		begin_combat()
+		set_state(RunState.COMBAT)
 	else:
 		set_state(_upgrade_return_state)
 
@@ -141,7 +141,7 @@ func set_state(new_state: RunState) -> void:
 
 
 func add_experience(amount: int) -> void:
-	if amount <= 0:
+	if amount <= 0 or state == RunState.GAME_OVER or state == RunState.VICTORY:
 		return
 	experience += amount
 	while experience >= required_experience_for_level(level):

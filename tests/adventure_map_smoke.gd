@@ -26,14 +26,22 @@ func _verify() -> void:
 	var director: RoomDirector = game.room_director
 	var door: Node = map.get_node("Doors/Door01")
 	assert(not door.is_open)
-	director.controllers[&"R01"].complete_encounter()
+	await process_frame
+	for enemy: EnemyController in director.controllers[&"R01"].active_enemies.duplicate():
+		enemy.health.apply_damage(enemy.health.current)
+	var upgrades: UpgradeManager = game.get_node("UpgradeManager") as UpgradeManager
+	while upgrades.run_manager.pending_level_ups > 0:
+		upgrades.select_upgrade(upgrades.current_offer[0].upgrade_id)
+	await process_frame
 	await physics_frame
 	assert(door.is_open)
+	var health_before: int = player.health.current
+	var damage_before: int = player.runtime_stats.effective_damage()
 	player.global_position = director.controllers[&"R02A"].global_position
 	await physics_frame
 	await physics_frame
 	assert(director.current_room_id == &"R02A")
-	assert(player.get_instance_id() == identity and player.health.current == 90 and player.runtime_stats.effective_damage() == 12)
+	assert(player.get_instance_id() == identity and player.health.current == health_before and player.runtime_stats.effective_damage() == damage_before)
 	assert(not map.get_node("Doors/Door02").is_open)
 	print("Adventure map smoke: OK")
 	quit()
