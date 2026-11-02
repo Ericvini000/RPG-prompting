@@ -27,6 +27,9 @@ func _verify() -> void:
 		map.rooms.append(room)
 	assert(map.validate().is_empty())
 	assert(map.validate_first_map().is_empty())
+	map.rooms[2].room_type = 0
+	assert(not map.validate_first_map().is_empty(), "Bifurcação deve conter combate e descanso")
+	map.rooms[2].room_type = 1
 	map.rooms[1].room_id = &"R01"
 	assert(not map.validate().is_empty())
 	map.rooms[1].room_id = &"R02A"

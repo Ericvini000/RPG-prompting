@@ -7,10 +7,13 @@ func _verify() -> void:
 	root.add_child(game)
 	game.adventure_session.mount_definition(load("res://data/maps/map_01.tres") as MapDefinition)
 	await _clear(game)
+	game.player.global_position = game.room_director.controllers[&"R02A"].global_position
 	assert(game.room_director.try_enter_room(&"R02A"))
 	await _clear(game)
+	game.player.global_position = game.room_director.controllers[&"R03"].global_position
 	assert(game.room_director.try_enter_room(&"R03"))
 	await _clear(game)
+	game.player.global_position = game.room_director.controllers[&"R04"].global_position
 	assert(game.room_director.try_enter_room(&"R04"))
 	await process_frame
 	var elite: RoomController = game.room_director.controllers[&"R04"] as RoomController

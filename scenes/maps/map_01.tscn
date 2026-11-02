@@ -92,6 +92,8 @@ polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R01"]
 
+z_index = 5
+
 offset_left = -170.0
 
 offset_top = -150.0
@@ -187,6 +189,8 @@ collision_mask = 2
 polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R02A"]
+
+z_index = 5
 
 offset_left = -170.0
 
@@ -284,6 +288,8 @@ polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R02B"]
 
+z_index = 5
+
 offset_left = -170.0
 
 offset_top = -150.0
@@ -379,6 +385,8 @@ collision_mask = 2
 polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R03"]
+
+z_index = 5
 
 offset_left = -170.0
 
@@ -476,6 +484,8 @@ polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R04"]
 
+z_index = 5
+
 offset_left = -170.0
 
 offset_top = -150.0
@@ -571,6 +581,8 @@ collision_mask = 2
 polygon = PackedVector2Array(0, -145, 290, 0, 0, 145, -290, 0)
 
 [node name="Label" type="Label" parent="Rooms/R05"]
+
+z_index = 5
 
 offset_left = -170.0
 

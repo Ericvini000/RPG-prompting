@@ -58,4 +58,20 @@ func validate_first_map() -> PackedStringArray:
 			stages[room.stage] = int(stages.get(room.stage, 0)) + 1
 	if rooms.size() != 6 or stages != {1: 1, 2: 2, 3: 1, 4: 1, 5: 1}:
 		errors.append("Primeiro mapa requer seis salas em cinco etapas e bifurcação na etapa 2.")
+	var branch_types: Array[int] = []
+	var branch_group: StringName
+	for room: RoomDefinition in rooms:
+		if room == null:
+			continue
+		if room.stage == 2:
+			branch_types.append(room.room_type)
+			if branch_group.is_empty():
+				branch_group = room.exclusive_group
+			if room.exclusive_group.is_empty() or room.exclusive_group != branch_group:
+				errors.append("Bifurcação requer o mesmo grupo exclusivo.")
+		elif (room.stage in [1, 3] and room.room_type != RoomDefinition.RoomType.COMBAT) or (room.stage == 4 and room.room_type != RoomDefinition.RoomType.ELITE) or (room.stage == 5 and room.room_type != RoomDefinition.RoomType.BOSS):
+			errors.append("Tipo de sala incompatível com etapa.")
+	branch_types.sort()
+	if branch_types != [RoomDefinition.RoomType.COMBAT, RoomDefinition.RoomType.REST]:
+		errors.append("Bifurcação requer combate e descanso.")
 	return errors

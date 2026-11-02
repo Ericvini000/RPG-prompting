@@ -12,15 +12,25 @@ var player: PlayerController
 var active_enemies: Array[EnemyController] = []
 var _wave_index: int = 0
 var _waiting: bool = false
+var _entry_shape: CollisionPolygon2D
+var _entry_polygon: PackedVector2Array
 @onready var _run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
 
 func _ready() -> void:
 	var entry: Area2D = get_node_or_null("Entry") as Area2D
 	if entry != null:
+		_entry_shape = entry.get_node_or_null("Collision") as CollisionPolygon2D
+		if _entry_shape != null:
+			var expanded: Array[PackedVector2Array] = Geometry2D.offset_polygon(_entry_shape.polygon, 16.0)
+			if not expanded.is_empty():
+				_entry_polygon = expanded[0]
 		entry.body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is PlayerController and definition != null:
+		# Pausing or fast movement can deliver an overlap event after leaving.
+		if _entry_shape != null and not Geometry2D.is_point_in_polygon(_entry_shape.to_local(body.global_position), _entry_polygon):
+			return
 		entry_requested.emit(definition.room_id)
 
 func begin_encounter(target: PlayerController) -> void:
@@ -56,7 +66,7 @@ func _start_next_wave() -> void:
 	if spawns == null:
 		return
 	for child: Node in spawns.get_children():
-		if child is Marker2D and (child as Marker2D).global_position.distance_to(player.global_position) >= 80.0:
+		if child is Marker2D and (child as Marker2D).global_position.distance_to(player.global_position) >= definition.minimum_spawn_distance:
 			points.append(child as Marker2D)
 	if points.size() < wave.enemy_scenes.size():
 		return

@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		_volley_wait = maxf(0.0, _volley_wait - delta)
 		if _volley_wait <= 0.0:
-			_aim = (target.global_position - global_position).normalized()
+			_aim = (target.global_position - ($ProjectileOrigin as Marker2D).global_position).normalized()
 			_warning_left = warning_duration
 			queue_redraw()
 

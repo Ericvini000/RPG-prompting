@@ -14,6 +14,7 @@ func _verify() -> void:
 	root.add_child(player)
 	var boss: EnemyController = packed.instantiate() as EnemyController
 	boss.target = player
+	boss.position = Vector2(300, 0)
 	root.add_child(boss)
 	boss.set_physics_process(false)
 	assert(boss.health.maximum == 450 and boss.effective_contact_damage() == 15)
@@ -23,6 +24,7 @@ func _verify() -> void:
 	assert(shots.is_empty())
 	boss.call("_physics_process", 0.61)
 	assert(shots.size() == 3)
+	assert(shots[1].direction.is_equal_approx((player.global_position - shots[1].global_position).normalized()), "Leque deve mirar a partir da origem visual do projétil")
 	boss.call("_physics_process", 2.5)
 	boss.call("_physics_process", 0.61)
 	assert(shots.size() == 11)
@@ -43,6 +45,7 @@ func _verify() -> void:
 	game.adventure_session.mount_definition(load("res://data/maps/map_01.tres") as MapDefinition)
 	for id: StringName in [&"R01", &"R02A", &"R03", &"R04", &"R05"]:
 		if id != &"R01":
+			game.player.global_position = game.room_director.controllers[id].global_position
 			assert(game.room_director.try_enter_room(id))
 		var room: RoomController = game.room_director.controllers[id] as RoomController
 		var upgrades: UpgradeManager = game.get_node("UpgradeManager") as UpgradeManager

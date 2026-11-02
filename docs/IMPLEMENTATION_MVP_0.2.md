@@ -20,6 +20,7 @@
 - COD-018: elite com tanque e dois atiradores, vida ×1,6/dano ×1,2 por instância, destaque âmbar e recompensa única. `elite_room_smoke.gd` passou; Resources básicos permanecem inalterados. Regressões de recompensas, arena e Infinito passaram.
 - COD-019: Sentinela do Umbral reutilizável, 450 HP, contato 15, projétil 9 e 50 XP, leque de três e radial de oito projéteis com aviso de 0,6 s. Somente RoomDirector solicita vitória após concluir a sala final e suas escolhas. Teste isolado preserva COMBAT no Infinito; integração completa da rota de combate passou. Parâmetros operacionais provisórios: chefe estacionário, intervalo 2,4 s, projétil 360 px/s e dispersão do leque 0,25 rad.
 - COD-020: mapa carregado automaticamente em Aventura; HUD e pausa exibem etapa/sala, chefe tem indicador de vida. Testes atravessam as duas rotas com gatilhos físicos e validam vitória, derrota, reinício e menu. Fixtures de preparação definem adventure_map como nulo explicitamente. Suíte: 23/23 smoke passaram.
+- COD-021: travessia física das duas rotas com colisão de portas/ramo bloqueado, inspeção visual de combate/pausa/chefe, mira corrigida na origem do projétil e eventos atrasados de entrada rejeitados pela posição atual. Importação saída 0 e 25/25 smoke passaram. Relatório em VALIDATION_MVP_0.2.md; avaliação humana de dificuldade continua pendente.
 
 ## Decisões de implementação
 

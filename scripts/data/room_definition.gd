@@ -14,3 +14,4 @@ enum RoomType { COMBAT, REST, ELITE, BOSS }
 @export var rest_heal: int = 0
 @export var health_multiplier: float = 1.0
 @export var damage_multiplier: float = 1.0
+@export var minimum_spawn_distance: float = 80.0
