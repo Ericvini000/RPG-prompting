@@ -10,3 +10,5 @@ stage = 2
 room_type = 1
 next_room_ids = Array[StringName]([&"R03"])
 exclusive_group = &"fork"
+
+rest_heal = 30

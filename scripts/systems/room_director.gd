@@ -12,7 +12,15 @@ var current_room_id: StringName
 var _map_root: Node2D
 var _completed: Dictionary = {}
 var _locked: Dictionary = {}
+var upgrades: UpgradeManager
+var _pending_room_id: StringName
+var _reward_sources: Dictionary = {}
 @onready var run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
+
+func bind_upgrades(manager: UpgradeManager) -> void:
+	upgrades = manager
+	manager.reward_choice_resolved.connect(_on_reward_resolved)
+	manager.all_choices_resolved.connect(_finish_pending_room)
 
 func configure(map_data: MapDefinition, map_root: Node2D, target: PlayerController) -> Error:
 	if map_data == null or not map_data.validate().is_empty() or map_root.get_node_or_null("Rooms") == null:
@@ -74,6 +82,29 @@ func try_enter_room(id: StringName) -> bool:
 func _on_encounter_completed(id: StringName) -> void:
 	if id != current_room_id or is_completed(id) or run_manager.state == RunProgress.RunState.GAME_OVER:
 		return
+	_pending_room_id = id
+	run_manager.begin_exploration()
+	var room: RoomDefinition = definition.get_room(id)
+	for index: int in range(room.reward_choices):
+		var source: StringName = StringName("%s:%s:%d" % [definition.map_id, id, index])
+		_reward_sources[source] = true
+	for source: StringName in _reward_sources:
+		if upgrades != null:
+			upgrades.request_reward_choice(source)
+	_finish_pending_room()
+	_refresh_doors()
+
+func _on_reward_resolved(source: StringName) -> void:
+	_reward_sources.erase(source)
+	_finish_pending_room()
+
+func _finish_pending_room() -> void:
+	if _pending_room_id.is_empty() or not _reward_sources.is_empty() or run_manager.state == RunProgress.RunState.GAME_OVER:
+		return
+	if upgrades != null and upgrades.has_pending_choices():
+		return
+	var id: StringName = _pending_room_id
+	_pending_room_id = &""
 	_completed[id] = true
 	run_manager.begin_exploration()
 	room_completed.emit(id)

@@ -47,6 +47,7 @@ func _on_adventure_map_loaded(_map: Node2D) -> void:
 	if adventure_session.definition != null:
 		room_director = RoomDirector.new()
 		add_child(room_director)
+		room_director.bind_upgrades($UpgradeManager as UpgradeManager)
 		if room_director.configure(adventure_session.definition, _map, player) == OK:
 			room_director.try_enter_room(adventure_session.definition.entry_room_id)
 	else:

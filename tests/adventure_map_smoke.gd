@@ -30,9 +30,10 @@ func _verify() -> void:
 	for enemy: EnemyController in director.controllers[&"R01"].active_enemies.duplicate():
 		enemy.health.apply_damage(enemy.health.current)
 	var upgrades: UpgradeManager = game.get_node("UpgradeManager") as UpgradeManager
-	while upgrades.run_manager.pending_level_ups > 0:
-		upgrades.select_upgrade(upgrades.current_offer[0].upgrade_id)
-	await process_frame
+	for frame: int in range(10):
+		if upgrades.has_pending_choices():
+			upgrades.select_upgrade(upgrades.current_offer[0].upgrade_id)
+		await process_frame
 	await physics_frame
 	assert(door.is_open)
 	var health_before: int = player.health.current

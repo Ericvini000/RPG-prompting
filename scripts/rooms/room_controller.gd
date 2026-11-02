@@ -28,6 +28,10 @@ func begin_encounter(target: PlayerController) -> void:
 		return
 	started = true
 	player = target
+	if definition.room_type == RoomDefinition.RoomType.REST:
+		player.health.heal(definition.rest_heal)
+		call_deferred("complete_encounter")
+		return
 	_waiting = not definition.encounters.is_empty()
 	call_deferred("_start_next_wave")
 

@@ -14,3 +14,5 @@ next_room_ids = Array[StringName]([&"R03"])
 exclusive_group = &"fork"
 
 encounters = Array[Resource]([ExtResource("2")])
+
+reward_choices = 1

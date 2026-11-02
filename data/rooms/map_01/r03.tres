@@ -13,3 +13,5 @@ room_type = 0
 next_room_ids = Array[StringName]([&"R04"])
 
 encounters = Array[Resource]([ExtResource("2")])
+
+reward_choices = 1

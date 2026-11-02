@@ -17,10 +17,10 @@ func _verify() -> void:
 	for enemy: EnemyController in room.active_enemies.duplicate():
 		enemy.health.apply_damage(enemy.health.current)
 		enemy.health.apply_damage(10)
-	while run.pending_level_ups > 0:
-		manager.select_upgrade(manager.current_offer[0].upgrade_id)
-	await process_frame
-	await process_frame
+	for frame: int in range(10):
+		if manager.has_pending_choices():
+			manager.select_upgrade(manager.current_offer[0].upgrade_id)
+		await process_frame
 	assert(game.room_director.is_completed(&"R01"))
 	assert(run.level == 2 and run.experience == 10)
 	assert(not game.room_director.try_enter_room(&"R01"))
