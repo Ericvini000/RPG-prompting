@@ -2,6 +2,8 @@ extends Node
 class_name UpgradeManager
 
 signal upgrade_selected(upgrade_id: String)
+signal reward_choice_resolved(source_id: StringName)
+signal all_choices_resolved()
 
 @export var player: PlayerController
 @export var screen: UpgradeScreen
@@ -12,6 +14,9 @@ signal upgrade_selected(upgrade_id: String)
 var owned_counts: Dictionary = {}
 var current_offer: Array[UpgradeDefinition] = []
 var _offer_active: bool = false
+var _reward_queue: Array[StringName] = []
+var _known_rewards: Dictionary = {}
+var _active_reward: StringName
 
 
 func _ready() -> void:
@@ -27,6 +32,29 @@ func bind(player_ref: PlayerController, screen_ref: UpgradeScreen) -> void:
 		run_manager.level_up_requested.connect(_on_level_up_requested)
 	if not screen.upgrade_chosen.is_connected(select_upgrade):
 		screen.upgrade_chosen.connect(select_upgrade)
+	if not run_manager.state_changed.is_connected(_on_state_changed):
+		run_manager.state_changed.connect(_on_state_changed)
+
+func has_pending_choices() -> bool:
+	if run_manager.state in [RunProgress.RunState.GAME_OVER, RunProgress.RunState.VICTORY]:
+		return false
+	return _offer_active or run_manager.pending_level_ups > 0 or not _reward_queue.is_empty()
+
+func request_reward_choice(source_id: StringName) -> void:
+	if source_id.is_empty() or _known_rewards.has(source_id) or run_manager.state in [RunProgress.RunState.GAME_OVER, RunProgress.RunState.VICTORY]:
+		return
+	_known_rewards[source_id] = true
+	_reward_queue.append(source_id)
+	if not _offer_active:
+		_show_next_offer()
+
+func _on_state_changed(state: int) -> void:
+	if state in [RunProgress.RunState.GAME_OVER, RunProgress.RunState.VICTORY]:
+		_offer_active = false
+		_reward_queue.clear()
+		_active_reward = &""
+		current_offer.clear()
+		screen.hide_offer()
 
 
 func get_acquired_count(upgrade_id: String) -> int:
@@ -58,7 +86,7 @@ func roll_offer() -> Array[UpgradeDefinition]:
 
 
 func select_upgrade(upgrade_id: String) -> void:
-	if not _offer_active:
+	if not _offer_active or run_manager.state != RunProgress.RunState.UPGRADE_SELECTION:
 		return
 	var selected: UpgradeDefinition
 	for definition: UpgradeDefinition in current_offer:
@@ -70,14 +98,21 @@ func select_upgrade(upgrade_id: String) -> void:
 	_offer_active = false
 	player.apply_upgrade(selected)
 	owned_counts[upgrade_id] = get_acquired_count(upgrade_id) + 1
-	run_manager.consume_pending_level_up()
+	var resolved_reward: StringName = _active_reward
+	_active_reward = &""
+	if resolved_reward.is_empty():
+		run_manager.consume_pending_level_up()
 	upgrade_selected.emit(upgrade_id)
-	if run_manager.pending_level_ups > 0:
+	if run_manager.pending_level_ups > 0 or not _reward_queue.is_empty():
 		_show_next_offer()
 	else:
 		current_offer.clear()
 		screen.hide_offer()
 		run_manager.finish_upgrade_selection()
+	if not resolved_reward.is_empty():
+		reward_choice_resolved.emit(resolved_reward)
+	if not has_pending_choices():
+		all_choices_resolved.emit()
 
 
 func _on_level_up_requested() -> void:
@@ -86,6 +121,12 @@ func _on_level_up_requested() -> void:
 
 
 func _show_next_offer() -> void:
+	if run_manager.pending_level_ups > 0:
+		_active_reward = &""
+	elif not _reward_queue.is_empty():
+		_active_reward = _reward_queue.pop_front()
+	else:
+		return
 	current_offer = roll_offer()
 	if current_offer.size() != 3:
 		push_error("Não há três cartas elegíveis para a evolução.")

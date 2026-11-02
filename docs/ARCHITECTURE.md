@@ -1,13 +1,13 @@
 # Arquitetura — Arqueiro Roguelite
 
-**Versão:** Consolidação 0.2 — COD-012<br>
-**Status:** Fundação COD-013 implementada; Infinito preservado; mapa e ciclo da Aventura pendentes<br>
+**Versão:** MVP 0.2 — COD-014 a COD-022<br>
+**Status:** COD-014 a COD-022 implementadas e testadas; avaliação humana de dificuldade pendente<br>
 **Referência de gameplay:** docs/GDD.md<br>
 **Engine:** Godot 4.7.2, GDScript tipado
 
 Este documento distingue **histórico**, **implementação existente**, **nova decisão aprovada**, **arquitetura proposta** e **funcionalidade futura**. Os contratos de gameplay e os valores numéricos vêm do GDD. Escolhas técnicas ainda não aprovadas estão marcadas como **proposta**, sem aprovação implícita. A seção 21 preserva a auditoria anterior de COD-012 (`e6e3dd8`); a seção 23 descreve a fundação implementada em COD-013 a partir de `origin/develop` em `9234f9e`.
 
-**Decisão aprovada:** a versão 0.2 terá somente Aventura e Infinito. A identificação e o menu foram migrados em COD-013; Aventura ainda aguarda o mapa manual de seis salas físicas em cinco etapas, dentro de uma única cena de mapa. A seção 22 propõe os sistemas futuros e a seção 23 delimita o que já existe. O backlog está em [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md).
+**Decisão aprovada e implementada:** Aventura e Infinito são as únicas modalidades. Aventura usa seis salas físicas em cinco etapas em uma cena de mapa; Infinito inclui chefes periódicos de COD-022. A seção 24 descreve o estado atual. As seções 21–23 preservam auditoria e desenho das etapas anteriores, com seus limites históricos. O backlog está em [PLAN_MVP_0.2.md](PLAN_MVP_0.2.md).
 
 ## 1. Estado atual e estrutura de diretórios
 
@@ -44,14 +44,15 @@ Criar diretórios e arquivos apenas quando uma tarefa precisar deles. Alguns cam
 | Chaser, RangedEnemy, Tank | Cenas de inimigo configuradas por EnemyData. |
 | HUD, UpgradeScreen, ResultScreen | Apresentação; recebem eventos sem controlar diretamente atributos de entidades. |
 
-Em COD-013, Main contém `SessionRoot`, UpgradeScreen, UpgradeManager, HUD, ResultScreen e o aviso de Aventura em preparação. Seleciona `scenes/main/endless_session.tscn` ou `scenes/main/adventure_session.tscn`. Infinito possui Arena01 e WaveDirector; Aventura possui Player persistente e MapRoot vazio. Main reinicia RunManager uma vez por tentativa e fornece referências explícitas às interfaces e ao UpgradeManager. A arena antiga conserva Floor/TileMapLayer, colisões, oito marcadores e Player; seus dados e os três WaveData não foram removidos. Os caminhos atuais e o contrato de montagem do mapa estão na seção 23.
+Main contém SessionRoot, UpgradeScreen, UpgradeManager, HUD e ResultScreen. Seleciona `scenes/main/endless_session.tscn` ou `scenes/main/adventure_session.tscn`. Infinito possui Arena01 e WaveDirector; Aventura preserva Player e carrega `data/maps/map_01.tres` em MapRoot. RoomDirector coordena as seis salas. Main reinicia RunManager uma vez por tentativa e fornece referências explícitas aos sistemas. A arena antiga, seus dados e os três WaveData foram preservados. O aviso de preparação só aparece se nenhuma definição de mapa estiver configurada.
 
 ## 3. Scripts principais e responsabilidades
 
 | Script ou componente | Responsabilidade atual |
 | --- | --- |
 | RunManager | Estado da partida, modo selecionado, XP, nível, vitória e derrota. |
-| AdventureSession | Player persistente, MapRoot e montagem inicial de mapa em READY; sem progressão de salas. |
+| AdventureSession | Player persistente, MapRoot e montagem da definição de mapa em READY. |
+| RoomDirector / RoomController | Estado de salas/ramo, entrada física, encontros locais, recompensas e progressão até o chefe. |
 | PlayerController | Movimento em oito direções, mira, ataque e dash. |
 | HealthComponent | Vida, dano, cura e morte. |
 | HurtboxComponent | Recepção de acertos e integração com vida. |
@@ -66,11 +67,11 @@ Os nomes acima seguem os contratos de responsabilidade do GDD. `PlayerRuntimeSta
 
 ## 4. Autoload e estados
 
-**RunManager é o único Autoload definido pelo GDD.** Seu script usa `class_name RunProgress`, sem constituir um segundo gerenciador. Ele mantém nível, XP, evoluções pendentes e controla READY, COMBAT, UPGRADE_SELECTION, VICTORY e GAME_OVER. COD-013 removeu ENDLESS_CHOICE e migrou `selected_mode` para ADVENTURE/ENDLESS. WaveDirector e UpgradeManager pertencem às cenas e se comunicam por referências explícitas e sinais. EXPLORATION e estados locais de salas continuam propostos para COD-014.
+**RunManager é o único Autoload.** Seu script usa `class_name RunProgress`. Mantém XP, nível, evoluções e READY, COMBAT, EXPLORATION, UPGRADE_SELECTION, VICTORY e GAME_OVER. `selected_mode` usa ADVENTURE/ENDLESS. RoomDirector guarda estado de salas por tentativa. WaveDirector e UpgradeManager continuam locais à sessão; não há Autoload novo.
 
 Ao subir de nível, o combate pausa e a tela de cartas continua recebendo entrada. Se houver várias evoluções pendentes, cada escolha é apresentada em sequência; só depois o combate retoma. Vitória, derrota e reinício passam pelo controlador de estados, evitando que vários scripts alterem pausa ou término independentemente.
 
-RunManager centraliza `set_state()` e a pausa da árvore. UpgradeScreen, UpgradeManager e ResultScreen usam `PROCESS_MODE_ALWAYS` para receber escolhas e botões durante a pausa. COD-013 introduz `begin_upgrade_selection()` para lembrar READY ou COMBAT e restaurar o contexto após a última escolha, ou concluir vitória/continuação infinita pendente. Uma conclusão de escolha tardia não pode substituir GAME_OVER. O futuro contexto EXPLORATION ainda não existe.
+RunManager centraliza estado e pausa. UpgradeScreen, UpgradeManager e ResultScreen continuam processando escolhas durante a pausa. `begin_upgrade_selection()` lembra READY, COMBAT ou EXPLORATION e restaura o contexto após a fila. Trocar a atividade durante uma seleção altera o contexto de retorno sem despausar. GAME_OVER cancela ofertas e impede XP, transições ou conclusões tardias.
 
 ## 5. Comunicação por sinais
 
@@ -96,7 +97,9 @@ As conexões ficam no dono da cena ou em um ponto de composição explícito. A 
 | PlayerStats | Vida máxima, dano, movimento, ataque, flecha, dash e invulnerabilidade iniciais da seção 4 do GDD. |
 | EnemyData | HP, velocidade, dano, intervalo de ataque e XP dos três tipos da seção 5. |
 | UpgradeDefinition | ID, nome, descrição, ícone, tipo de efeito, magnitude e limite das oito cartas da seção 7. |
-| WaveData | Composição e quantidade de inimigos de cada onda da seção 5. |
+| WaveData | Composição das ondas e dos encontros finitos. |
+| MapDefinition / RoomDefinition | Cena, grafo e configuração imutável das salas da Aventura. |
+| EndlessBossSchedule | Intervalo, cena e recompensa de chefes no Infinito. |
 
 Arquivos .tres são configuração imutável durante uma partida. Os atributos efetivos, bônus acumulados, vida atual, experiência e cartas adquiridas ficam em estado de execução separado. Isso evita que uma partida modifique dados compartilhados ou contamine o reinício.
 
@@ -181,7 +184,7 @@ RunManager é o único controlador da pausa e dos estados; COD-010 usava os cinc
 
 ## 17. Estabilização de COD-011
 
-A importação, os doze testes smoke originais, o carregamento headless da cena principal e as renderizações das interfaces estão registrados em [VALIDATION_MVP_0.1.md](VALIDATION_MVP_0.1.md). Esse relatório de 25/10/2026 cobre COD-001 a COD-011, não Aventura. O repositório agora contém quinze scripts smoke, incluindo pausa, Infinito e menu; sua existência não comprova validação do MVP 0.2. Uma partida jogada por uma pessoa permanece necessária para avaliar sensação de combate e os parâmetros provisórios.
+A importação e os doze testes originais estão em [VALIDATION_MVP_0.1.md](VALIDATION_MVP_0.1.md), relatório histórico de 25/10/2026 para COD-001 a COD-011. A auditoria COD-012 encontrou quinze smoke; a suíte atual e o resultado da Aventura estão em [VALIDATION_MVP_0.2.md](VALIDATION_MVP_0.2.md). A avaliação humana de sensação de combate continua necessária.
 
 ## 18. Política de versionamento, GitFlow e GitHub
 
@@ -281,9 +284,9 @@ ResultScreen atualmente emite `main_menu_requested` em vitória/derrota. Main re
 
 `tests/main_menu_smoke.gd` cobre o fluxo UI-002 existente, não Aventura. A validação documental COD-012 não substitui executar os testes da futura migração. O estilo e os textos visuais continuam provisórios.
 
-## 22. Arquitetura proposta do Modo Aventura — não implementada
+## 22. Desenho de referência do Modo Aventura — histórico de COD-012
 
-Esta seção descreve a arquitetura do mapa completo, ainda pendente de COD-014 em diante. A sessão vazia e o contrato mínimo de montagem já implementados em COD-013 estão na seção 23. A distribuição de salas, o ramo exclusivo e a cura configurável do descanso foram aprovados no novo prompt e registrados no GDD; os valores de balanceamento continuam pendentes.
+Esta seção preserva o desenho elaborado antes de COD-014, inclusive propostas e caminhos então considerados. A seção 24 registra os contratos efetivamente implementados e substitui as declarações de pendência deste registro. O carregador de múltiplos mapas e os conteúdos explicitamente futuros continuam fora da entrega.
 
 ### 22.1. Limites e alternativas avaliadas
 
@@ -369,6 +372,8 @@ Antes de suas respectivas implementações, definir a geometria e política de r
 
 ## 23. Fundação implementada em COD-013
 
+**Histórico da primeira entrega técnica:** esta seção registra a sessão vazia da COD-013. A configuração padrão atual carrega o mapa e os contratos posteriores estão na seção 24.
+
 ### 23.1. Composição por modalidade
 
 `RunProgress.GameMode` contém somente `ADVENTURE` e `ENDLESS`; Aventura é o padrão. Main continua em `res://scenes/main.tscn`, com os sistemas de UI/cartas compartilhados e um `SessionRoot` para a sessão selecionada. `reset_run()` é chamado uma vez ao criar Main, nunca ao montar o mapa. Reiniciar recria Main e preserva o modo; entrar no menu limpa a tentativa e restaura o padrão Aventura.
@@ -402,3 +407,35 @@ ENDLESS_CHOICE, seus métodos/flags e os sinais/botões de escolha antiga foram 
 `tests/game_mode_smoke.gd` verifica os identificadores, preparação sem ondas, montagem de fixture, identidade do jogador, vida/build/XP preservados, rejeição de mapas inválidos/duplicados, pausa sem WaveDirector, morte, reinício e retorno ao menu. Os testes existentes de arena, XP, cartas, pausa e ondas agora selecionam Infinito explicitamente e usam os caminhos da sessão. A vitória pendente é verificada isoladamente em `run_manager_smoke.gd`, sem conservar um modo Ondas oculto.
 
 A importação e os testes headless devem ser registrados na entrega. Avisos ambientais de acesso a `user://`, certificados e sockets do addon Funplay não devem ser confundidos com erros de script. Aventura completa não foi entregue: mapa, seis salas, portas, encontros, recompensas, descanso, elite, chefe e conclusão jogável permanecem para as próximas tarefas. COD-014 prepara as definições e a coordenação do primeiro mapa; COD-015 constrói sua geometria.
+
+## 24. Incrementos COD-014 a COD-022
+
+O progresso, parâmetros aprovados e decisões da execução iniciada em 01/11/2026 estão em [IMPLEMENTATION_MVP_0.2.md](IMPLEMENTATION_MVP_0.2.md). COD-014 implementa MapDefinition/RoomDefinition, validação de IDs/conexões e alcance, RoomController/RoomDirector e EXPLORATION. O estado da progressão é separado dos Resources; a pausa e a restauração após cartas aceitam exploração. As seções 21–23 são registros das etapas anteriores, não o estado final desta sequência.
+
+### 24.1. Mapa e transições físicas
+
+`MapDefinition` identifica PackedScene, entrada e lista de RoomDefinition. A validação detecta IDs repetidos, referências inválidas, ciclos de progressão e salas/chefe inacessíveis. `validate_first_map()` também verifica seis salas/cinco etapas, tipos e grupo exclusivo da bifurcação. `RoomDefinition` configura encontros WaveData, conexões, recompensa, cura, multiplicadores por instância e distância mínima de spawn.
+
+`AdventureSession.mount_definition()` monta a cena completa uma vez por tentativa. Main configura RoomDirector, liga UI/recompensas e inicia a entrada R01. MapRoot e Player permanecem vivos em todas as salas. A geometria em `manual_map.gd` usa coordenadas fixas autorais; não é um gerador aleatório. TileMapLayer mantém tiles 128×64. A origem local do TileMap (64,32) é compensada para alinhar piso/contorno aos marcadores e portas da cena.
+
+Cada RoomController possui área de entrada cobrindo o contorno navegável, marcadores e obstáculos. Eventos atrasados são ignorados quando o jogador já saiu da área. RoomDirector valida acesso e bloqueia o ramo não escolhido; revisitar salas concluídas não reinicia encontros. As seis portas são nós da própria Map01 com o script reutilizável RoomDoor, sem cena adicional por porta ou sala. Colisão só libera depois do encontro e de todas as escolhas.
+
+### 24.2. Encontros, cartas e estado
+
+RoomController instancia apenas inimigos do encontro local, aplica multiplicadores antes de `_ready()` e conecta XP uma vez por derrota. A próxima parte do encontro aguarda o fim das escolhas. Projéteis restantes são removidos ao concluir sala. O parâmetro operacional mínimo de spawn (80 px) pertence a RoomDefinition e pode ser ajustado sem alterar scripts.
+
+UpgradeManager usa a mesma elegibilidade, interface e aplicação de cartas para duas origens. Níveis consomem `pending_level_ups`; recompensas usam uma fila de `source_id` únicos. `request_reward_choice()`, `reward_choice_resolved()` e `all_choices_resolved()` permitem que RoomDirector só finalize a sala após todas as ofertas. A recompensa não cria XP nem consome nível. Descanso chama HealthComponent.heal(30) uma única vez; vida/build permanecem no jogador.
+
+Somente RoomDirector solicita vitória pela sala BOSS e após recompensas. HUD e pausa recebem referências do diretor de salas ou do diretor de ondas. Reinício recria a sessão e limpa entidades, cura já usada, ramo, filas, XP e melhorias, preservando a modalidade; Menu Principal limpa a tentativa e a pausa.
+
+### 24.3. Chefe e Infinito
+
+BossController reutiliza EnemyData, vida, hurtbox, queimadura, contato e Projectile. Não conhece o modo nem solicita vitória. Sua origem visual determina a mira do leque; o alvo é fixado no início do aviso para permitir esquiva. Leque e radial alternam, com parâmetros operacionais ajustáveis.
+
+`EndlessBossSchedule` em `data/endless_bosses.tres` configura intervalo 5, cena do chefe e uma recompensa. WaveDirector substitui a composição comum nas ondas múltiplas desse intervalo, conserva o número da onda e aplica a escala existente. O sinal de XP é conectado antes do sinal de derrota do diretor; assim, níveis pendentes precedem a recompensa do chefe. Main encaminha `boss_defeated(wave_number)` ao UpgradeManager com origem única por onda. Depois das escolhas, o diretor inicia a próxima onda sem vitória, reset ou troca de Player. O agendamento pode ser omitido em fixtures que verificam somente composições comuns.
+
+### 24.4. Extensão e validação
+
+Novos mapas poderão fornecer outra MapDefinition/PackedScene com salas e recursos próprios. O projeto entrega apenas Map01; ainda não há troca entre mapas durante uma tentativa. Novos inimigos/chefes podem reutilizar EnemyController e os componentes; armadilhas, raridades e progressão permanente continuam futuras.
+
+Testes cobrem ambos os ramos, travessia com Input/CharacterBody2D, retorno pela borda, ramo bloqueado fisicamente, XP, recompensas, descanso, elite, chefe, ondas 5/10, pausa, morte, reinício e menu. A revisão independente e os resultados estão em [VALIDATION_MVP_0.2.md](VALIDATION_MVP_0.2.md). A avaliação humana de sensação de combate permanece pendente.

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EndlessBossSchedule" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/endless_boss_schedule.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+wave_interval = 5
+boss_scene = ExtResource("2")
+reward_choices = 1

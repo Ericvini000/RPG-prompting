@@ -9,10 +9,22 @@ class_name GameHUD
 @onready var _dash_label: Label = $Overlay/Dash
 
 var _player: PlayerController
+var _rooms: RoomDirector
+var _waves: WaveDirector
+@onready var _boss_label: Label = $Overlay/Boss
+
+func bind_rooms(director: RoomDirector) -> void:
+	_rooms = director
+	director.progress_changed.connect(_update_room)
+	_wave_label.add_theme_font_size_override("font_size", 20)
+
+func _update_room(stage: int, room_name: String) -> void:
+	_wave_label.text = "ETAPA %d/%d\n%s" % [stage, _rooms.get_total_stages(), room_name]
 
 
 func bind(player: PlayerController, director: WaveDirector, run_manager: RunProgress) -> void:
 	_player = player
+	_waves = director
 	player.health.health_changed.connect(_update_health)
 	run_manager.experience_changed.connect(_update_experience)
 	if director != null:
@@ -28,6 +40,10 @@ func bind(player: PlayerController, director: WaveDirector, run_manager: RunProg
 func _process(_delta: float) -> void:
 	if _player == null:
 		return
+	var boss: BossController = get_tree().get_first_node_in_group("bosses") as BossController
+	_boss_label.visible = boss != null and boss.health.current > 0
+	if _boss_label.visible:
+		_boss_label.text = "SENTINELA DO UMBRAL   %d / %d" % [boss.health.current, boss.health.maximum]
 	var remaining: float = _player.dash_cooldown_remaining()
 	_dash_label.text = "DASH  PRONTO [ESPAÇO]" if remaining <= 0.0 else "DASH  %.1f s" % remaining
 
@@ -51,4 +67,4 @@ func _update_wave(number: int) -> void:
 	elif number <= 3:
 		_wave_label.text = "ONDA  %d / 3" % number
 	else:
-		_wave_label.text = "ONDA  %d  ·  INFINITO" % number
+		_wave_label.text = "ONDA  %d  ·  %s" % [number, "CHEFE" if _waves != null and _waves.is_boss_wave else "INFINITO"]

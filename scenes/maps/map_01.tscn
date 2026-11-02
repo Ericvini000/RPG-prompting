@@ -1,0 +1,795 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/manual_map.gd" id="1_map"]
+
+[ext_resource type="Script" path="res://scripts/rooms/room_controller.gd" id="2_room"]
+
+[ext_resource type="Script" path="res://scripts/rooms/room_door.gd" id="3_door"]
+
+[ext_resource type="Texture2D" path="res://assets/tiles/arena_floor.svg" id="4_floor"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r01.tres" id="room0"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r02a.tres" id="room1"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r02b.tres" id="room2"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r03.tres" id="room3"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r04.tres" id="room4"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r05.tres" id="room5"]
+
+[sub_resource type="TileSetAtlasSource" id="Atlas"]
+
+texture = ExtResource("4_floor")
+
+texture_region_size = Vector2i(128, 64)
+
+0:0/0 = 0
+
+1:0/0 = 0
+
+2:0/0 = 0
+
+3:0/0 = 0
+
+[sub_resource type="TileSet" id="Tiles"]
+
+tile_shape = 1
+
+tile_layout = 5
+
+tile_size = Vector2i(128, 64)
+
+sources/0 = SubResource("Atlas")
+
+[node name="Map01" type="Node2D"]
+
+y_sort_enabled = true
+
+script = ExtResource("1_map")
+
+[node name="Floor" type="TileMapLayer" parent="."]
+
+position = Vector2(-64, 0)
+
+z_index = -10
+
+tile_set = SubResource("Tiles")
+
+[node name="Walls" type="Node2D" parent="."]
+
+position = Vector2(-64, 0)
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+
+position = Vector2(0, 32)
+
+[node name="Rooms" type="Node2D" parent="."]
+
+y_sort_enabled = true
+
+[node name="Doors" type="Node2D" parent="."]
+
+y_sort_enabled = true
+
+[node name="R01" type="Node2D" parent="Rooms"]
+
+position = Vector2(0, 32)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room0")
+
+[node name="Entry" type="Area2D" parent="Rooms/R01"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R01/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R01"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "1 - Combate inicial"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R01"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R01/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R01/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R01"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R01/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R01/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R01"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R01/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="R02A" type="Node2D" parent="Rooms"]
+
+position = Vector2(640, 352)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room1")
+
+[node name="Entry" type="Area2D" parent="Rooms/R02A"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02A/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R02A"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "2 - Caminho de combate"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R02A"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02A/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R02A/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R02A"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02A/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R02A/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R02A"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R02A/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="R02B" type="Node2D" parent="Rooms"]
+
+position = Vector2(-640, 352)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room2")
+
+[node name="Entry" type="Area2D" parent="Rooms/R02B"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02B/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R02B"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "2 - Descanso"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R02B"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02B/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R02B/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R02B"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R02B/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R02B/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R02B"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R02B/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="R03" type="Node2D" parent="Rooms"]
+
+position = Vector2(0, 672)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room3")
+
+[node name="Entry" type="Area2D" parent="Rooms/R03"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R03/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R03"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "3 - Combate avancado"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R03"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R03/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R03/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R03"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R03/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R03/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R03"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R03/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="R04" type="Node2D" parent="Rooms"]
+
+position = Vector2(640, 992)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room4")
+
+[node name="Entry" type="Area2D" parent="Rooms/R04"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R04/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R04"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "4 - Elite"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R04"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R04/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R04/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R04"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R04/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R04/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R04"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R04/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="R05" type="Node2D" parent="Rooms"]
+
+position = Vector2(1280, 1312)
+
+y_sort_enabled = true
+
+script = ExtResource("2_room")
+
+definition = ExtResource("room5")
+
+[node name="Entry" type="Area2D" parent="Rooms/R05"]
+
+collision_layer = 0
+
+collision_mask = 2
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R05/Entry"]
+
+polygon = PackedVector2Array(0, -224, 448, 0, 0, 224, -448, 0)
+
+[node name="Label" type="Label" parent="Rooms/R05"]
+
+z_index = 5
+
+offset_left = -170.0
+
+offset_top = -150.0
+
+offset_right = 170.0
+
+theme_override_font_sizes/font_size = 22
+
+text = "5 - Sentinela do Umbral"
+
+horizontal_alignment = 1
+
+[node name="Pillar0" type="StaticBody2D" parent="Rooms/R05"]
+
+position = Vector2(0, -90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R05/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R05/Pillar0"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Rooms/R05"]
+
+position = Vector2(0, 90)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Rooms/R05/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, 0, -16, 28, 0, 0, 16)
+
+[node name="Visual" type="Polygon2D" parent="Rooms/R05/Pillar1"]
+
+polygon = PackedVector2Array(-28, 0, -28, -52, 0, -68, 28, -52, 28, 0, 0, 16)
+
+color = Color(0.3, 0.38, 0.42, 1)
+
+[node name="Spawns" type="Node2D" parent="Rooms/R05"]
+
+[node name="EnemySpawn1" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(-180, 0)
+
+[node name="EnemySpawn2" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(180, 0)
+
+[node name="EnemySpawn3" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(-90, -60)
+
+[node name="EnemySpawn4" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(90, 60)
+
+[node name="EnemySpawn5" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(90, -60)
+
+[node name="EnemySpawn6" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(-90, 60)
+
+[node name="EnemySpawn7" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(0, -130)
+
+[node name="EnemySpawn8" type="Marker2D" parent="Rooms/R05/Spawns"]
+
+position = Vector2(0, 130)
+
+[node name="Door01" type="Node2D" parent="Doors"]
+
+position = Vector2(320.0, 192.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R01"
+
+to_room_id = &"R02A"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door01"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door01/Body"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door01"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)
+
+[node name="Door02" type="Node2D" parent="Doors"]
+
+position = Vector2(-320.0, 192.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R01"
+
+to_room_id = &"R02B"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door02"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door02/Body"]
+
+polygon = PackedVector2Array(-80, -56, 112, 40, 80, 56, -112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door02"]
+
+polygon = PackedVector2Array(-80, -56, 112, 40, 80, 56, -112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)
+
+[node name="Door03" type="Node2D" parent="Doors"]
+
+position = Vector2(320.0, 512.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R02A"
+
+to_room_id = &"R03"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door03"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door03/Body"]
+
+polygon = PackedVector2Array(-80, -56, 112, 40, 80, 56, -112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door03"]
+
+polygon = PackedVector2Array(-80, -56, 112, 40, 80, 56, -112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)
+
+[node name="Door04" type="Node2D" parent="Doors"]
+
+position = Vector2(-320.0, 512.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R02B"
+
+to_room_id = &"R03"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door04"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door04/Body"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door04"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)
+
+[node name="Door05" type="Node2D" parent="Doors"]
+
+position = Vector2(320.0, 832.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R03"
+
+to_room_id = &"R04"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door05"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door05/Body"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door05"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)
+
+[node name="Door06" type="Node2D" parent="Doors"]
+
+position = Vector2(960.0, 1152.0)
+
+script = ExtResource("3_door")
+
+from_room_id = &"R04"
+
+to_room_id = &"R05"
+
+[node name="Body" type="StaticBody2D" parent="Doors/Door06"]
+
+[node name="Collision" type="CollisionPolygon2D" parent="Doors/Door06/Body"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+[node name="Visual" type="Polygon2D" parent="Doors/Door06"]
+
+polygon = PackedVector2Array(80, -56, -112, 40, -80, 56, 112, -40)
+
+color = Color(0.65, 0.35, 0.18, 0.95)

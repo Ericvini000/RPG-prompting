@@ -8,6 +8,18 @@ signal map_loaded(map: Node2D)
 @onready var _run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
 
 var current_map: Node2D
+var definition: MapDefinition
+
+func mount_definition(map_data: MapDefinition) -> Error:
+	if current_map != null:
+		return ERR_ALREADY_IN_USE
+	if map_data == null or not map_data.validate().is_empty():
+		return ERR_INVALID_DATA
+	definition = map_data
+	var result: Error = mount_map(map_data.scene)
+	if result != OK:
+		definition = null
+	return result
 
 
 func _ready() -> void:

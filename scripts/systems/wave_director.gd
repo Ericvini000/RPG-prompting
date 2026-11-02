@@ -3,9 +3,11 @@ class_name WaveDirector
 
 signal wave_changed(number: int)
 signal arena_completed()
+signal boss_defeated(wave_number: int)
 
 @export var arena: Node2D
 @export var waves: Array[WaveData] = []
+@export var boss_schedule: EndlessBossSchedule
 @export var minimum_player_distance: float = 128.0
 @export var minimum_spawn_separation: float = 80.0
 @export_range(1, 12, 1) var maximum_active_enemies: int = 12
@@ -21,6 +23,8 @@ signal arena_completed()
 
 var current_wave: int = 0
 var active_enemies: Array[EnemyController] = []
+var is_boss_wave: bool = false
+var _boss_reward_given: bool = false
 
 var _player: PlayerController
 var _spawn_points: Array[Marker2D] = []
@@ -118,8 +122,13 @@ func _start_endless_wave() -> void:
 	var pool: Array[PackedScene] = _endless_pool.duplicate()
 	pool.shuffle()
 	_pending_endless.clear()
-	for index: int in range(total):
-		_pending_endless.append(pool[index % pool.size()])
+	is_boss_wave = boss_schedule != null and boss_schedule.wave_interval > 0 and boss_schedule.boss_scene != null and next_wave % boss_schedule.wave_interval == 0
+	_boss_reward_given = false
+	if is_boss_wave:
+		_pending_endless.append(boss_schedule.boss_scene)
+	else:
+		for index: int in range(total):
+			_pending_endless.append(pool[index % pool.size()])
 	current_wave = next_wave
 	_waiting_for_spawns = false
 	_spawn_wait = 0.0
@@ -179,8 +188,8 @@ func _spawn_enemy(scene: PackedScene, marker: Marker2D, health_scale: float = 1.
 	enemy.damage_multiplier = damage_scale
 	arena.add_child(enemy)
 	enemy.global_position = marker.global_position
-	enemy.enemy_defeated.connect(_on_enemy_defeated.bind(enemy))
 	enemy.enemy_defeated.connect(run_manager.add_experience)
+	enemy.enemy_defeated.connect(_on_enemy_defeated.bind(enemy))
 	active_enemies.append(enemy)
 
 
@@ -203,7 +212,12 @@ func _choose_spawns(count: int) -> Array[Marker2D]:
 
 func _on_enemy_defeated(_xp_reward: int, enemy: EnemyController) -> void:
 	active_enemies.erase(enemy)
+	if run_manager.state == RunProgress.RunState.GAME_OVER:
+		return
 	if active_enemies.is_empty() and _pending_endless.is_empty():
+		if is_boss_wave and not _boss_reward_given:
+			_boss_reward_given = true
+			boss_defeated.emit(current_wave)
 		if run_manager.endless_mode:
 			_wave_wait = maxf(0.0, endless_wave_interval)
 			_waiting_for_spawns = true

@@ -1,11 +1,13 @@
 # Plano de implementação — MVP 0.2
 
-**Status:** fundação COD-013 implementada; COD-014 a COD-021 continuam planejadas.<br>
+**Status:** COD-013 a COD-022 implementadas; validação automatizada e visual executada, avaliação humana de dificuldade pendente.<br>
 **Data e base auditada:** 30/10/2026, `origin/develop` em `e6e3dd8`.<br>
 **Objetivo:** entregar Aventura em um mapa manual de seis salas conectadas, preservando o Infinito.<br>
 **Especificação:** [GDD.md](GDD.md), especialmente seções 18 a 20.<br>
 **Arquitetura proposta:** [ARCHITECTURE.md](ARCHITECTURE.md), seções 21 e 22.<br>
 **Tecnologias:** Godot 4.7.2, GDScript tipado, TileMapLayer, Resources e addons existentes.
+
+**Resultado da execução de 01/11/2026:** [IMPLEMENTATION_MVP_0.2.md](IMPLEMENTATION_MVP_0.2.md) registra decisões e entregas; [VALIDATION_MVP_0.2.md](VALIDATION_MVP_0.2.md) contém evidências e limites. Os requisitos de balanceamento antes pendentes foram aprovados pelo usuário. A inclusão explícita de COD-022 nesta execução substitui seu status anterior de proposta futura. As branches foram empilhadas para manter dependências sem fazer merges automáticos.
 
 O escopo de gameplay aprovado vem do GDD. A decomposição, os nomes de arquivos e as interfaces abaixo são propostas técnicas para orientar a execução; não são código existente. Antes de executar cada tarefa, ler AGENTS.md, GDD e arquitetura, conferir Git e abrir sua branch a partir de `origin/develop`. Implementar uma tarefa por vez, com commits atômicos, testes proporcionais e Pull Request; não integrar diretamente em main/develop. O plano não autoriza implementar todas as tarefas dentro da branch documental COD-012.
 
@@ -73,10 +75,10 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Interfaces propostas:** `MapDefinition` e `RoomDefinition` com os campos da arquitetura, seção 22.2; `RoomDirector.configure(definition: MapDefinition, map_root: Node2D, player: PlayerController) -> void`; `try_enter_room(room_id: StringName) -> bool`; sinais `room_entered(room_id: StringName)` e `room_completed(room_id: StringName)`. Estado de sala pertence ao diretor e não aos Resources.
 
-- [ ] Criar teste com seis IDs, cinco etapas, duas salas na etapa 2 e caminho das duas alternativas até o chefe. Testar ID duplicado, ligação inexistente, entrada inválida e chefe inacessível; confirmar falha antes da implementação.
-- [ ] Implementar os dados, validação da definição e transições locais com referências explícitas; não construir um gerador procedural ou Autoload por sala.
-- [ ] Propor EXPLORATION como contexto ativo separado de COMBAT; garantir que RoomDirector não altera diretamente a pausa global. Preservar prioridade de GAME_OVER e impedir reativação de salas concluídas.
-- [ ] Executar `room_graph_smoke.gd` e os testes de RunManager/modo; revisar recursos imutáveis e estado limpo ao iniciar nova tentativa; atualizar docs e fazer commit.
+- [x] Criar teste com seis IDs, cinco etapas, duas salas na etapa 2 e caminho das duas alternativas até o chefe. Testar ID duplicado, ligação inexistente, entrada inválida e chefe inacessível; confirmar falha antes da implementação.
+- [x] Implementar os dados, validação da definição e transições locais com referências explícitas; não construir um gerador procedural ou Autoload por sala.
+- [x] Propor EXPLORATION como contexto ativo separado de COMBAT; garantir que RoomDirector não altera diretamente a pausa global. Preservar prioridade de GAME_OVER e impedir reativação de salas concluídas.
+- [x] Executar `room_graph_smoke.gd` e os testes de RunManager/modo; revisar recursos imutáveis e estado limpo ao iniciar nova tentativa; atualizar docs e fazer commit.
 
 **Aceite:** uma definição válida pode ser carregada em teste; definições inválidas são diagnosticadas; cada entrada/conclusão ocorre uma vez; concluir sala não emite vitória global; reiniciar limpa o progresso local sem modificar a configuração.
 
@@ -86,10 +88,10 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Interfaces:** consumir MapDefinition/RoomDefinition e `try_enter_room()` de COD-014. Main instancia Map01 e Player uma vez por tentativa, fornece as referências e mantém Player fora do ciclo de criação/remoção local de salas.
 
-- [ ] Registrar aprovação da distribuição de salas e das regras de retorno/bifurcação antes de fixar o mapa e o acesso às portas.
-- [ ] Criar teste de contagem e conectividade física. Guardar `player.get_instance_id()`, vida 90/100 após dano de 10 e um upgrade UPG-001; atravessar uma porta e exigir a mesma instância, vida 90/100 e dano efetivo 12.
-- [ ] Construir piso 128 × 64, paredes, obstáculos, corredores, seis áreas de sala e portas no mesmo mapa; usar formas originais provisórias, TileMapLayer e Y-sort. Fazer gatilhos aceitarem somente o Player e tratarem entradas repetidas sem duplicação.
-- [ ] Importar e executar `adventure_map_smoke.gd` e `arena_smoke.gd`; inspecionar visualmente câmera, pés/Y-sort, paredes e travessia de ambas as alternativas em 1280 × 720. Documentar e fazer commit.
+- [x] Registrar aprovação da distribuição de salas e das regras de retorno/bifurcação antes de fixar o mapa e o acesso às portas.
+- [x] Criar teste de contagem e conectividade física. Guardar `player.get_instance_id()`, vida 90/100 após dano de 10 e um upgrade UPG-001; atravessar uma porta e exigir a mesma instância, vida 90/100 e dano efetivo 12.
+- [x] Construir piso 128 × 64, paredes, obstáculos, corredores, seis áreas de sala e portas no mesmo mapa; usar formas originais provisórias, TileMapLayer e Y-sort. Fazer gatilhos aceitarem somente o Player e tratarem entradas repetidas sem duplicação.
+- [x] Importar e executar `adventure_map_smoke.gd` e `arena_smoke.gd`; inspecionar visualmente câmera, pés/Y-sort, paredes e travessia de ambas as alternativas em 1280 × 720. Documentar e fazer commit.
 
 **Aceite:** cinco etapas e seis salas físicas navegáveis, bifurcação na segunda, nenhuma troca de cena por sala, colisões utilizáveis e jogador/vida/build preservados. Arte provisória é suficiente; encontros completos ainda dependem de COD-016.
 
@@ -99,10 +101,10 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Interfaces:** `RoomController.begin_encounter(player: PlayerController) -> void`, `room_completed(room_id: StringName)` e o sinal existente `EnemyController.enemy_defeated(xp_reward: int)`. RunManager recebe `add_experience(amount)` exatamente uma vez por derrota. Configurações de encontro podem reutilizar WaveData sem ativar a geração infinita.
 
-- [ ] Registrar composições e política de encerramento de projéteis locais; criar testes de encontro vazio/inválido diagnosticado, spawns válidos, múltiplos inimigos, última derrota e reentrada.
-- [ ] Implementar encontros com perseguidor, atirador e tanque existentes, alvo explícito e contagem local. Bloquear progressão durante encontro conforme política de portas aprovada.
-- [ ] Testar que uma derrota concede XP configurado uma vez, cartas pausam encontro/spawn e portas só liberam após conclusão válida. Morte do jogador cancela spawns e impede conclusão tardia de sala.
-- [ ] Executar `room_encounter_smoke.gd`, testes de inimigos/XP/Infinito e `arena_smoke.gd` após importação; revisar colisões e fazer commit com documentação atualizada.
+- [x] Registrar composições e política de encerramento de projéteis locais; testar spawns válidos, múltiplos inimigos, última derrota e reentrada. A validação de configuração cobre IDs/conexões do mapa; não foi criado um validador completo de cenas inimigas arbitrárias.
+- [x] Implementar encontros com perseguidor, atirador e tanque existentes, alvo explícito e contagem local. Bloquear progressão durante encontro conforme política de portas aprovada.
+- [x] Testar que uma derrota concede XP configurado uma vez, cartas pausam encontro/spawn e portas só liberam após conclusão válida. Morte do jogador cancela spawns e impede conclusão tardia de sala.
+- [x] Executar `room_encounter_smoke.gd`, testes de inimigos/XP/Infinito e `arena_smoke.gd` após importação; revisar colisões e fazer commit com documentação atualizada.
 
 **Aceite:** sala completa somente após todos os inimigos planejados serem derrotados; não reinicia ao cruzar o mesmo gatilho; recompensa de XP não duplica; finalizar combate comum não causa VICTORY e não altera o Infinito.
 
@@ -112,11 +114,11 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Interfaces propostas:** `UpgradeManager.request_reward_choice(source_id: StringName) -> void`, `reward_choice_resolved(source_id: StringName)` e `has_pending_choices() -> bool`. Distinguir origem nível/recompensa; usar identificador de mapa/sala para impedir concessão repetida.
 
-- [ ] Aprovar benefício de descanso, magnitude, repetição, salas que recompensam, quantidade de ofertas e ordem da fila; registrar no GDD sem apresentar valores provisórios como aprovados.
-- [ ] Criar testes com nível pendente e recompensa simultânea: uma tela por vez, três cartas distintas/elegíveis, uma escolha por oferta e nenhuma perda de pedidos. Uma recompensa isolada não altera nível/XP nem consome uma evolução pendente.
-- [ ] Ampliar a fila de ofertas mantendo elegibilidade/aplicação únicas. Conceder descanso pelo componente de vida apenas se cura for a decisão aprovada; limitar ao máximo de vida e impedir repetição indevida conforme regra definida.
-- [ ] Testar portas/transições bloqueadas durante ofertas, retorno ao contexto correto após a fila, vitória pendente aguardando também recompensas e GAME_OVER cancelando todas as escolhas. Reinício/menu limpam fila e fontes já recebidas.
-- [ ] Executar `room_rewards_smoke.gd`, testes de seleção/efeitos/XP e pausa, importar se houver recursos/cenas alterados, atualizar docs e fazer commit.
+- [x] Aprovar benefício de descanso, magnitude, repetição, salas que recompensam, quantidade de ofertas e ordem da fila; registrar no GDD sem apresentar valores provisórios como aprovados.
+- [x] Criar testes com nível pendente e recompensa simultânea: uma tela por vez, três cartas distintas/elegíveis, uma escolha por oferta e nenhuma perda de pedidos. Uma recompensa isolada não altera nível/XP nem consome uma evolução pendente.
+- [x] Ampliar a fila de ofertas mantendo elegibilidade/aplicação únicas. Conceder descanso pelo componente de vida apenas se cura for a decisão aprovada; limitar ao máximo de vida e impedir repetição indevida conforme regra definida.
+- [x] Testar portas/transições bloqueadas durante ofertas, retorno ao contexto correto após a fila, vitória pendente aguardando também recompensas e GAME_OVER cancelando todas as escolhas. Reinício/menu limpam fila e fontes já recebidas.
+- [x] Executar `room_rewards_smoke.gd`, testes de seleção/efeitos/XP e pausa, importar se houver recursos/cenas alterados, atualizar docs e fazer commit.
 
 **Aceite:** cartas por XP e recompensa usam os mesmos efeitos sem confundir contadores; descanso aplica somente o benefício aprovado; não há recompensa duplicada por reentrada; build persiste até o fim da tentativa.
 
@@ -124,10 +126,10 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Prioridade:** P1. **Arquivos previstos:** dados da sala de elite em `data/rooms/map_01/`, configuração de encontro em RoomController se necessária e `tests/elite_room_smoke.gd`. Usar EnemyData/cenas existentes e multiplicadores por instância, sem inventar um quarto inimigo comum.
 
-- [ ] Aprovar posição definitiva da elite, composição, atributos e recompensa; criar testes com os valores aprovados e falha inicial.
-- [ ] Configurar o encontro de elite, reutilizando vida/dano por instância e a fila de recompensa de COD-017; manter os Resources básicos inalterados.
-- [ ] Testar dano/vida efetivos, conclusão única, recompensa única, morte do jogador e avanço permitido sem vitória global. Inspecionar clareza visual da elite com formas provisórias.
-- [ ] Executar `elite_room_smoke.gd`, testes de encontro/recompensa e Infinito; atualizar docs e fazer commit.
+- [x] Aprovar posição definitiva da elite, composição, atributos e recompensa; criar testes com os valores aprovados e falha inicial.
+- [x] Configurar o encontro de elite, reutilizando vida/dano por instância e a fila de recompensa de COD-017; manter os Resources básicos inalterados.
+- [x] Testar dano/vida efetivos, conclusão única, recompensa única, morte do jogador e avanço permitido sem vitória global. Inspecionar clareza visual da elite com formas provisórias.
+- [x] Executar `elite_room_smoke.gd`, testes de encontro/recompensa e Infinito; atualizar docs e fazer commit.
 
 **Aceite:** a elite oferece o desafio e a recompensa aprovados, preserva os inimigos básicos e não conclui a Aventura.
 
@@ -135,11 +137,11 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Prioridade:** P1. **Arquivos propostos:** `scripts/enemies/boss_controller.gd`, `scenes/enemies/boss.tscn`, `data/boss.tres` e `tests/boss_encounter_smoke.gd`; modificar dados da sala final e integração de RoomDirector/RunManager. Estender EnemyData apenas quando o design aprovado exigir novos campos.
 
-- [ ] Aprovar identidade original, ataques/avisos visuais, atributos, XP e recompensa do chefe. Criar testes de dano, vida e derrota única de acordo com essa especificação.
-- [ ] Implementar o chefe com componentes existentes e referência explícita ao alvo. O chefe informa sua derrota; não chama RunManager para finalizar um modo.
-- [ ] Conectar a conclusão da sala final ao pedido de vitória da Aventura. Testar que cartas/recompensas pendentes são resolvidas antes do resultado e que morte do jogador prevalece sobre conclusão tardia.
-- [ ] Instanciar o chefe em um teste isolado de contexto Infinito e confirmar que sua derrota não causa VICTORY. Esse teste verifica reutilização; não adiciona agendamento periódico ao WaveDirector.
-- [ ] Importar, executar `boss_encounter_smoke.gd`, testes de dano/recompensa/estado e `arena_smoke.gd`; inspecionar ataques e colisões visualmente, atualizar docs e fazer commit.
+- [x] Aprovar identidade original, ataques/avisos visuais, atributos, XP e recompensa do chefe. Criar testes de dano, vida e derrota única de acordo com essa especificação.
+- [x] Implementar o chefe com componentes existentes e referência explícita ao alvo. O chefe informa sua derrota; não chama RunManager para finalizar um modo.
+- [x] Conectar a conclusão da sala final ao pedido de vitória da Aventura. Testar que cartas/recompensas pendentes são resolvidas antes do resultado e que morte do jogador prevalece sobre conclusão tardia.
+- [x] Instanciar o chefe em um teste isolado de contexto Infinito e confirmar que sua derrota não causa VICTORY. Esse teste verifica reutilização; não adiciona agendamento periódico ao WaveDirector.
+- [x] Importar, executar `boss_encounter_smoke.gd`, testes de dano/recompensa/estado e `arena_smoke.gd`; inspecionar ataques e colisões visualmente, atualizar docs e fazer commit.
 
 **Aceite:** um chefe funcional conclui Aventura pelo dono do encontro; não existe acoplamento do controlador do chefe à vitória global e não há chefes periódicos no Infinito nesta tarefa.
 
@@ -149,10 +151,10 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Interfaces:** UI recebe Player/UpgradeManager/RunManager e progresso de sala/etapa ou de onda por referências e sinais. Preservar `restart_requested`, `main_menu_requested` e controle de pausa no RunManager; não duplicar regras de progressão na interface.
 
-- [ ] Criar teste de ponta a ponta com as duas alternativas da segunda etapa, preservação de vida/build, elite e chefe final; testar HUD de sala/etapa na Aventura e onda no Infinito.
-- [ ] Integrar seleção exclusiva Aventura/Infinito, resultado pelo chefe e navegação. Remover dependência obrigatória de WaveDirector no HUD/dashboard quando a sessão for Aventura.
-- [ ] Testar pausa na exploração e combate, cartas com árvore pausada, reinício de ambos os modos e retorno ao menu. Alternar de modo após adquirir upgrades; exigir XP/vida/cartas/entidades/mapa/filas iniciais na nova tentativa.
-- [ ] Verificar visualmente 1280 × 720: menu, portas, cartas, pausa, progresso e resultados. Executar `adventure_flow_smoke.gd`, testes de menu/pausa/Infinito e `arena_smoke.gd`, atualizar README/AGENTS para o estado implementado e fazer commit.
+- [x] Criar teste de ponta a ponta com as duas alternativas da segunda etapa, preservação de vida/build, elite e chefe final; testar HUD de sala/etapa na Aventura e onda no Infinito.
+- [x] Integrar seleção exclusiva Aventura/Infinito, resultado pelo chefe e navegação. Remover dependência obrigatória de WaveDirector no HUD/dashboard quando a sessão for Aventura.
+- [x] Testar pausa na exploração e combate, cartas com árvore pausada, reinício de ambos os modos e retorno ao menu. Alternar de modo após adquirir upgrades; exigir XP/vida/cartas/entidades/mapa/filas iniciais na nova tentativa.
+- [x] Verificar visualmente 1280 × 720: menu, portas, cartas, pausa, progresso e resultados. Executar `adventure_flow_smoke.gd`, testes de menu/pausa/Infinito e `arena_smoke.gd`, atualizar README/AGENTS para o estado implementado e fazer commit.
 
 **Aceite:** ciclo completo jogável do menu ao chefe/vitória ou derrota, com reinício limpo no mesmo modo; Infinito preserva suas regras e não exibe a escolha antiga.
 
@@ -160,13 +162,14 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 **Prioridade:** P1. **Arquivos previstos:** criar `docs/VALIDATION_MVP_0.2.md`, atualizar GDD, arquitetura e README. Correções de código devem responder a falhas comprovadas e receber testes de regressão; não adicionar conteúdo de roadmap.
 
-- [ ] Revisar diff e requisitos de todas as tarefas; conferir que nenhum item proposto foi declarado aprovado ou entregue sem evidência. Auditar referências antigas a Ondas/WAVES/ENDLESS_CHOICE fora dos registros históricos.
-- [ ] Executar importação, scripts smoke e execução headless da entrada. Registrar versão do Godot, comandos, códigos de saída e avisos do ambiente; confirmar que a migração dos testes antigos em COD-013 não deixou expectativa de vitória na terceira onda em Aventura.
+- [x] Revisar diff e requisitos de todas as tarefas; conferir que nenhum item proposto foi declarado aprovado ou entregue sem evidência. Auditar referências antigas a Ondas/WAVES/ENDLESS_CHOICE fora dos registros históricos.
+- [x] Executar importação, scripts smoke e execução headless da entrada. Registrar versão do Godot, comandos, códigos de saída e avisos do ambiente; confirmar que a migração dos testes antigos em COD-013 não deixou expectativa de vitória na terceira onda em Aventura.
 - [ ] Completar manualmente ambas as rotas da bifurcação e uma partida no Infinito além da terceira onda; testar morte em combate/elite/chefe, pausa, recompensas, reinício e troca de modo. Conferir portas, projéteis, colisões, Y-sort e câmera.
-- [ ] Corrigir bloqueios reproduzidos, repetir somente verificações afetadas e registrar resultados/limites. Se a validação manual não for possível, registrá-la como pendente e não declarar aceite integral.
-- [ ] Atualizar o relatório com requisitos atendidos, riscos restantes e sugestões futuras. Fazer commits atômicos e Pull Request com revisão antes de eventual release.
+- [x] Corrigir bloqueios reproduzidos, repetir somente verificações afetadas e registrar resultados/limites. Se a validação manual não for possível, registrá-la como pendente e não declarar aceite integral.
+- [x] Atualizar o relatório com requisitos atendidos, riscos restantes e sugestões futuras. Fazer commits atômicos e Pull Request com revisão antes de eventual release.
 
 **Aceite:** critérios da seção 20.4 do GDD demonstrados; verificações automatizadas passam, ambas as rotas são concluídas manualmente e não há erro conhecido que impeça avanço ou encerramento. A validação histórica 0.1 não é reutilizada como evidência de 0.2.
+
 
 ## Estratégia de testes e riscos
 
@@ -198,6 +201,12 @@ git diff --check
 
 Cada novo script de teste listado nas tarefas só poderá ser executado depois de criado. Rodar todos os smoke existentes em COD-021; durante uma tarefa, executar o teste novo e as regressões pertinentes, além da importação e arena_smoke exigidos por AGENTS.md ao alterar cenas/recursos. Saída esperada: exit 0 e a mensagem de sucesso do teste, sem erros de script/carregamento. Avaliação manual não é substituída por esses comandos.
 
-## COD-022 — Proposta futura: chefes periódicos no Infinito
+## COD-022 — Chefes periódicos no Infinito
 
-**Fora da entrega inicial do MVP 0.2.** Dependências propostas: COD-019, COD-021 e aprovação de frequência, progressão e recompensas dos chefes no Infinito. Reutilizar o chefe e componentes de encontro, retomando ondas após a derrota dele; não causar VICTORY, recriar jogador ou apagar a build. A tarefa exigirá testes de agendamento, pausa/cartas, morte, reinício e continuidade das ondas. Nenhum intervalo ou algoritmo de agendamento foi aprovado por COD-012.
+**Implementada após ampliação explícita de escopo pelo usuário.** Depende de COD-019/COD-021 e da configuração aprovada em 01/11/2026. `EndlessBossSchedule` e `data/endless_bosses.tres` configuram chefe a cada cinco ondas, substituindo a onda comum e concedendo uma carta após XP. A cena de chefe é compartilhada com Aventura; sua derrota retoma as ondas sem VICTORY, reset ou nova instância do Player.
+
+- [x] Criar teste que falha sem o agendamento e verifica ondas 5/10, escala, recompensa, pausa, morte, reinício e continuidade.
+- [x] Integrar WaveDirector, sinais de recompensa e indicador de chefe, preservando as composições das ondas comuns.
+- [x] Executar regressão completa e revisão independente; corrigir os problemas reproduzidos.
+
+O aceite humano de dificuldade permanece pendente junto de COD-021. Não há geração procedural, outros mapas ou progressão permanente nesta entrega.

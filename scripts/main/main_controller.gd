@@ -3,9 +3,12 @@ extends Node2D
 const ENDLESS_SESSION: PackedScene = preload("res://scenes/main/endless_session.tscn")
 const ADVENTURE_SESSION: PackedScene = preload("res://scenes/main/adventure_session.tscn")
 
+@export var adventure_map: MapDefinition
+
 var player: PlayerController
 var wave_director: WaveDirector
 var adventure_session: AdventureSession
+var room_director: RoomDirector
 var _run_manager: RunProgress
 
 
@@ -18,6 +21,7 @@ func _ready() -> void:
 		player = session.get_node("Arena01/Player") as PlayerController
 		wave_director = session.get_node("WaveDirector") as WaveDirector
 		wave_director.arena_completed.connect(_run_manager.complete_initial_waves)
+		wave_director.boss_defeated.connect(_on_endless_boss_defeated)
 	else:
 		adventure_session = ADVENTURE_SESSION.instantiate() as AdventureSession
 		$SessionRoot.add_child(adventure_session)
@@ -37,18 +41,36 @@ func _ready() -> void:
 	$AdventureNotice.visible = adventure_session != null
 	if wave_director != null:
 		_run_manager.begin_combat()
+	elif adventure_map != null:
+		var result: Error = adventure_session.mount_definition(adventure_map)
+		if result != OK:
+			push_error("Não foi possível montar o mapa: %s" % error_string(result))
 
 
 func _on_adventure_map_loaded(_map: Node2D) -> void:
 	if _run_manager.state != RunProgress.RunState.READY:
 		return
 	$AdventureNotice.visible = false
-	_run_manager.begin_combat()
+	if adventure_session.definition != null:
+		room_director = RoomDirector.new()
+		add_child(room_director)
+		room_director.bind_upgrades($UpgradeManager as UpgradeManager)
+		if room_director.configure(adventure_session.definition, _map, player) == OK:
+			($HUD as GameHUD).bind_rooms(room_director)
+			($ResultScreen as ResultScreen).bind_rooms(room_director)
+			room_director.try_enter_room(adventure_session.definition.entry_room_id)
+	else:
+		_run_manager.begin_combat()
 
 
 func _restart_run() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+func _on_endless_boss_defeated(wave_number: int) -> void:
+	var upgrades: UpgradeManager = $UpgradeManager as UpgradeManager
+	for index: int in range(wave_director.boss_schedule.reward_choices):
+		upgrades.request_reward_choice(StringName("endless:boss:%d:%d" % [wave_number, index]))
 
 
 func _return_to_menu() -> void:

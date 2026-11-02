@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/arena_01.tscn" id="1_arena"]
 [ext_resource type="Script" path="res://scripts/systems/wave_director.gd" id="2_director"]
 [ext_resource type="Resource" path="res://data/wave_01.tres" id="3_wave"]
 [ext_resource type="Resource" path="res://data/wave_02.tres" id="4_wave"]
 [ext_resource type="Resource" path="res://data/wave_03.tres" id="5_wave"]
+[ext_resource type="Resource" path="res://data/endless_bosses.tres" id="6_bosses"]
 
 [node name="EndlessSession" type="Node2D"]
 
@@ -16,3 +17,4 @@ y_sort_enabled = true
 script = ExtResource("2_director")
 arena = NodePath("../Arena01")
 waves = Array[Resource]([ExtResource("3_wave"), ExtResource("4_wave"), ExtResource("5_wave")])
+boss_schedule = ExtResource("6_bosses")
