@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RoomDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/room_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+room_id = &"R05"
+display_name = "Sentinela do Umbral"
+stage = 5
+room_type = 3
+next_room_ids = Array[StringName]([])

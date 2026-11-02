@@ -6,6 +6,7 @@ const ADVENTURE_SESSION: PackedScene = preload("res://scenes/main/adventure_sess
 var player: PlayerController
 var wave_director: WaveDirector
 var adventure_session: AdventureSession
+var room_director: RoomDirector
 var _run_manager: RunProgress
 
 
@@ -43,7 +44,13 @@ func _on_adventure_map_loaded(_map: Node2D) -> void:
 	if _run_manager.state != RunProgress.RunState.READY:
 		return
 	$AdventureNotice.visible = false
-	_run_manager.begin_combat()
+	if adventure_session.definition != null:
+		room_director = RoomDirector.new()
+		add_child(room_director)
+		if room_director.configure(adventure_session.definition, _map, player) == OK:
+			room_director.try_enter_room(adventure_session.definition.entry_room_id)
+	else:
+		_run_manager.begin_combat()
 
 
 func _restart_run() -> void:

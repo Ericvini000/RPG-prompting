@@ -9,6 +9,7 @@ var definition: MapDefinition
 var player: PlayerController
 var controllers: Dictionary = {}
 var current_room_id: StringName
+var _map_root: Node2D
 var _completed: Dictionary = {}
 var _locked: Dictionary = {}
 @onready var run_manager: RunProgress = get_node("/root/RunManager") as RunProgress
@@ -17,6 +18,7 @@ func configure(map_data: MapDefinition, map_root: Node2D, target: PlayerControll
 	if map_data == null or not map_data.validate().is_empty() or map_root.get_node_or_null("Rooms") == null:
 		return ERR_INVALID_DATA
 	definition = map_data
+	_map_root = map_root
 	player = target
 	controllers.clear()
 	_completed.clear()
@@ -78,4 +80,11 @@ func _on_encounter_completed(id: StringName) -> void:
 	_refresh_doors()
 
 func _refresh_doors() -> void:
-	pass
+	var doors: Node = _map_root.get_node_or_null("Doors")
+	if doors == null:
+		return
+	for child: Node in doors.get_children():
+		var door: RoomDoor = child as RoomDoor
+		if door != null:
+			var open: bool = run_manager.state == RunProgress.RunState.EXPLORATION and not is_locked(door.from_room_id) and not is_locked(door.to_room_id) and is_completed(door.from_room_id)
+			door.set_open(open)

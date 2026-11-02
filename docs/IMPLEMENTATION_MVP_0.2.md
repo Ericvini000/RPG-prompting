@@ -14,6 +14,7 @@
 ## Registro de entregas
 
 - COD-014: Resources MapDefinition/RoomDefinition, validação de grafo e primeiro mapa, RoomController, RoomDirector e estado EXPLORATION. `room_graph_smoke.gd` passou após falhar pela ausência dos componentes. Nenhuma geometria ou encontro entregue nesta etapa.
+- COD-015: cena única Map01 com seis salas, seis portas, corredores, piso TileMapLayer 128×64 e colisão no contorno. Layout fixo autoral em coordenadas de tiles, sem geração aleatória. `adventure_map_smoke.gd` verifica passagem, bifurcação e identidade/vida/build; a montagem permanece explícita até a integração COD-020.
 
 ## Decisões de implementação
 

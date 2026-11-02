@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MapDefinition" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/map_definition.gd" id="1"]
+
+[ext_resource type="PackedScene" path="res://scenes/maps/map_01.tscn" id="2"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r01.tres" id="r0"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r02a.tres" id="r1"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r02b.tres" id="r2"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r03.tres" id="r3"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r04.tres" id="r4"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r05.tres" id="r5"]
+
+[resource]
+
+script = ExtResource("1")
+
+map_id = &"map_01"
+
+scene = ExtResource("2")
+
+entry_room_id = &"R01"
+
+rooms = Array[Resource]([ExtResource("r0"), ExtResource("r1"), ExtResource("r2"), ExtResource("r3"), ExtResource("r4"), ExtResource("r5")])
