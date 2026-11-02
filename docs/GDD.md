@@ -2,7 +2,7 @@
 
 **Game Design Document — Especificação 0.2 em desenvolvimento**
 
-**Status:** Especificação 0.2 em desenvolvimento; fundação COD-013 implementada, Aventura completa pendente<br>
+**Status:** Aventura e Infinito implementados até COD-022; validação automatizada concluída, aceite humano de dificuldade pendente<br>
 **Base preservada:** MVP 0.1 e incrementos UI-001, GAME-001 e UI-002<br>
 **Engine:** Godot 4.7.2<br>
 **Linguagem:** GDScript<br>
@@ -14,8 +14,8 @@
 ### Como ler este documento
 
 - **Histórico:** escopo e ciclo originais do MVP 0.1, preservados para rastreabilidade.
-- **Implementação existente:** COD-013 migra o menu e a identificação para Aventura (`ADVENTURE`) e Infinito (`ENDLESS`). Infinito continua jogável; Aventura tem apenas a fundação técnica e aguarda o mapa.
-- **Nova decisão aprovada:** a especificação 0.2 oferece somente **Modo Aventura** e **Modo Infinito**, conforme seções 19 e 20. Aventura substitui Ondas; suas salas e o ciclo completo ainda não estão implementados.
+- **Implementação existente:** Aventura (`ADVENTURE`) carrega o mapa de seis salas e Infinito (`ENDLESS`) gera ondas com chefes periódicos. O ciclo de combate, cartas, resultados e reinício está implementado.
+- **Decisões aprovadas:** somente Aventura e Infinito, conforme seções 19 a 21. Os parâmetros aprovados em 01/11/2026 e os resultados estão em IMPLEMENTATION_MVP_0.2.md e VALIDATION_MVP_0.2.md.
 - **Proposta:** detalhes de arquitetura ou balanceamento explicitamente marcados aguardam decisão; não alteram os parâmetros aprovados.
 - **Futuro:** itens do roadmap ficam fora da entrega inicial do MVP 0.2.
 
@@ -208,11 +208,11 @@ A interface principal terá:
 - Número da onda.
 - Indicador da recarga do dash.
 
-Essa lista descreve o HUD existente. Para a Aventura, o progresso deverá identificar etapa e sala; para o Infinito, continuará identificando a onda. A adaptação visual é trabalho planejado em COD-020.
+O HUD da Aventura identifica etapa e sala; o Infinito identifica a onda e sinaliza encontros de chefe. A vida do chefe aparece enquanto o encontro está ativo.
 
 Quando uma carta aparecer, o jogo deverá pausar e apresentar três opções com nome, ícone, descrição, efeito numérico e quantidade de evoluções já adquiridas, quando aplicável. A seleção deverá funcionar com mouse.
 
-A interface de cartas continua processando entradas durante a pausa. Na implementação existente, após uma escolha, outra seleção pendente é apresentada ou o combate é retomado, podendo concluir um resultado pendente. Na Aventura planejada, a última escolha deverá devolver o controle ao contexto de exploração ou combate pertinente, ou concluir a vitória pendente, conforme a proposta de estados em ARCHITECTURE.md, seção 22.
+A interface de cartas continua processando entradas durante a pausa. Após uma escolha, a próxima seleção pendente é apresentada ou o jogo retorna ao contexto de exploração/combate, podendo concluir a vitória pendente. A origem nível/recompensa não altera os efeitos da carta.
 
 ## 9. Arquitetura de software
 
@@ -351,7 +351,7 @@ O fluxo original do MVP 0.1 definiu cinco estados:
 
 Mudanças de estado devem ter um controlador único, evitando múltiplos scripts tentando pausar ou finalizar o jogo simultaneamente.
 
-GAME-001 acrescentou `ENDLESS_CHOICE`; UI-002 deixou de utilizá-lo no fluxo normal e COD-013 removeu esse legado. A fundação de Aventura aguarda mapa em READY; exploração e estados locais de sala continuam planejados. A auditoria histórica e os contratos implementados estão em ARCHITECTURE.md, seções 21 a 23.
+GAME-001 acrescentou `ENDLESS_CHOICE`; UI-002 deixou de utilizá-lo e COD-013 removeu o legado. Sem mapa configurado, a sessão pode aguardar em READY. A configuração padrão carrega Map01 e alterna EXPLORATION/COMBAT conforme as salas. Estado de sala é separado do estado global. A auditoria histórica e os contratos atuais estão em ARCHITECTURE.md, seções 21 a 24.
 
 ## 14. Backlog histórico de implementação para Codex — MVP 0.1
 
@@ -494,7 +494,7 @@ O planejamento original agrupava transições entre salas, caminhos e recompensa
 
 **Entrega inicial aprovada:** Modo Aventura, um mapa manual com seis salas em cinco etapas, combate e descanso, elite, recompensas e chefe final. Modo Infinito permanece independente com sua progressão existente.
 
-**Roadmap futuro, sem compromisso de entrega nesta etapa:** novos mapas completos, tipos adicionais de sala, armadilhas funcionais, inimigos, chefes, novas cartas e sinergias, raridades, acabamento artístico e progressão permanente. Chefes periódicos no Infinito ficam como proposta COD-022 e não encerram a partida ao morrer. Geração procedural continua fora da entrega inicial e sem requisito de implementação aprovado.
+**Roadmap futuro:** novos mapas completos, tipos adicionais de sala, armadilhas funcionais, inimigos, chefes, novas cartas/sinergias, raridades, acabamento artístico e progressão permanente. Chefes periódicos no Infinito, originalmente propostos como COD-022, foram incluídos e implementados após autorização em 01/11/2026. Geração procedural continua fora do escopo.
 
 ## 18. Modo Infinito — regras vigentes e histórico GAME-001
 
@@ -510,20 +510,20 @@ As ondas 1 a 3 conservam as composições da seção 5. Da onda 4 em diante, as 
 
 Experiência, níveis e cartas seguem as regras existentes. A build continua entre ondas, e seleções de cartas interrompem spawns e transições até a escolha. A morte encerra a partida e cancela spawns pendentes. O reinício restaura a onda 1 e limpa a build, preservando o Modo Infinito selecionado; não reapresenta a escolha histórica. Intervalos e demais parâmetros operacionais são provisórios e configuráveis, conforme `docs/ARCHITECTURE.md`.
 
-**Funcionalidade futura:** chefes reutilizáveis poderão aparecer periodicamente no Infinito. A derrota de um chefe não encerra esse modo. Frequência, escalonamento e recompensas de chefes serão definidos em outra tarefa, proposta como COD-022.
+**COD-022 implementada após autorização em 01/11/2026:** nas ondas 5, 10, 15… um chefe reutilizável substitui a composição comum. Usa o mesmo escalonamento de vida e dano por número da onda, concede 50 XP básicos e uma escolha de carta após evoluções pendentes. Sua derrota retoma as ondas, sem encerrar a partida. A fórmula de quantidade do parágrafo anterior se aplica às ondas comuns.
 
 ## 19. Menu principal e modalidades aprovadas — MVP 0.2
 
-**Seleção de modos implementada em COD-013; ciclo da Aventura pendente.** O jogo abre no menu principal, com o título provisório **ARQUEIRO ROGUELITE** e o botão **Jogar**. Jogar apresenta somente **Modo Aventura**, **Modo Infinito** e **Voltar**. A modalidade é escolhida antes de começar; Voltar retorna à tela inicial do menu.
+O jogo abre no menu principal, com o título provisório **ARQUEIRO ROGUELITE** e o botão **Jogar**. Jogar apresenta somente **Modo Aventura**, **Modo Infinito** e **Voltar**. A modalidade é escolhida antes de começar; Voltar retorna à tela inicial do menu.
 
 | Modalidade | Progressão | Conclusão |
 | --- | --- | --- |
 | Modo Aventura | Mapa manual com salas ligadas por corredores e portas, cartas e recompensas. | Derrotar o chefe final conclui a aventura; vida zero causa derrota. |
 | Modo Infinito | Três ondas originais, depois ondas geradas com dificuldade crescente, conforme seção 18. | Vida zero causa derrota; reiniciar inicia outra partida. Ondas e futuros chefes não concedem vitória final. |
 
-O antigo Modo Ondas foi retirado da seleção em COD-013, com a migração de `WAVES` para `ADVENTURE`. **Limite atual:** selecionar Aventura abre uma preparação que informa a ausência do mapa e permite retornar ao menu; não inicia ondas nem simula a aventura completa. A entrega das salas depende das próximas tarefas.
+O antigo Modo Ondas foi retirado da seleção em COD-013, com a migração de `WAVES` para `ADVENTURE`. COD-014 a COD-020 acrescentaram o mapa, salas, encontros, recompensas e chefe. O estado de preparação permanece disponível como contrato para uma sessão sem mapa configurado, mas não é a abertura padrão da Aventura.
 
-Nas telas de vitória da Aventura e derrota de ambos os modos, **Recomeçar** deverá iniciar uma partida limpa no modo selecionado, sem conservar XP, cartas ou atributos adquiridos. **Menu Principal** encerra a partida, retira a pausa e permite escolher novamente. UI-002 já fornece essa navegação para suas modalidades atuais; a adaptação à Aventura é planejada. A interface de pausa de UI-001 e a seleção de cartas devem ser preservadas.
+Nas telas de vitória da Aventura e derrota de ambos os modos, **Recomeçar** inicia uma partida limpa no modo selecionado, sem conservar XP, cartas ou atributos adquiridos. **Menu Principal** encerra a partida, retira a pausa e permite escolher novamente. A pausa de UI-001 conserva atributos e cartas adquiridas e também funciona durante exploração.
 
 ## 20. Escopo aprovado do MVP 0.2 — Modo Aventura
 
@@ -540,7 +540,7 @@ Nas telas de vitória da Aventura e derrota de ambos os modos, **Recomeçar** de
 
 ### 20.2. Topologia e ciclo da aventura
 
-As duas alternativas da segunda etapa deverão existir fisicamente e voltar a conectar-se à terceira. **Decisão aprovada no prompt de implementação do MVP 0.2:** somente um dos caminhos dessa etapa pode ser escolhido por partida; não é permitido obter recompensas das duas alternativas. O posicionamento isométrico, as distâncias e a política de retornar às salas já visitadas ainda precisam de definição. O mapa ainda não foi criado em COD-013.
+As duas alternativas da segunda etapa existem fisicamente e voltam a conectar-se à terceira. Somente um caminho pode ser escolhido por partida; o outro ramo fica bloqueado. O jogador pode retornar às salas concluídas sem reiniciar encontros ou receber benefícios novamente. O mapa fixo está implementado em `scenes/maps/map_01.tscn`.
 
 | Etapa | Salas físicas | Papel |
 | --- | --- | --- |
@@ -550,15 +550,15 @@ As duas alternativas da segunda etapa deverão existir fisicamente e voltar a co
 | 4 | R04 | Sala de elite. |
 | 5 | R05 | Chefe final e conclusão da aventura. |
 
-**Distribuição aprovada no prompt de implementação do MVP 0.2:** combate inicial → combate ou descanso → combate avançado → elite → chefe. A topologia lógica é aprovada; sua construção física pertence às tarefas seguintes.
+**Distribuição implementada:** combate inicial → combate ou descanso → combate avançado → elite → chefe.
 
 O fluxo aprovado é entrar no mapa, atravessar salas conectadas, enfrentar encontros, receber XP/cartas/recompensas, escolher entre combate e descanso e avançar até o chefe final. Concluir uma sala permite progressão local; não conclui a partida. Vida e build persistem entre salas. A derrota encerra a tentativa; Recomeçar limpa toda a tentativa e mantém Aventura selecionada.
 
 ### 20.3. Recompensas, descanso e elite
 
-A progressão por experiência conserva a fórmula e as oito cartas existentes. Recompensas de sala, quando configuradas, oferecem três cartas elegíveis para escolher uma, sem consumir evoluções pendentes. **Decisão aprovada no prompt de implementação:** concluir o combate, resolver evoluções por XP pendentes e então oferecer a recompensa configurada. O catálogo e a aplicação de efeitos devem ser reutilizados. Essa extensão ainda depende de COD-017.
+A progressão por experiência conserva a fórmula e as oito cartas existentes. Recompensas de sala oferecem três cartas elegíveis para escolher uma, sem consumir evoluções pendentes. A ordem implementada é concluir o combate, resolver evoluções por XP e então a recompensa. O catálogo e a aplicação de efeitos são compartilhados entre as origens.
 
-**Descanso aprovado no prompt de implementação:** recuperar vida por valor configurável. Quantidade e repetição da cura, composição dos encontros, atributos da elite, recompensas por tipo de sala e identidade/padrões/atributos do chefe continuam pendentes. Nenhum valor numérico adicional foi aprovado. Esses parâmetros deverão ser registrados antes de implementar suas tarefas; os atributos básicos existentes não serão sobrescritos.
+O descanso recupera 30 de vida uma vez por tentativa, limitado à vida máxima. Combates, elite e sala final concedem uma carta por sala. Composições e atributos aprovados estão na seção 21 e em IMPLEMENTATION_MVP_0.2.md. Os dados básicos compartilhados não são sobrescritos.
 
 ### 20.4. Exclusões e critérios de aceite
 

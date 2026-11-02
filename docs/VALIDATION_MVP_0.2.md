@@ -4,18 +4,21 @@
 
 ## Escopo
 
-COD-014 a COD-021: mapa único com seis salas, bifurcação exclusiva, encontros, XP, recompensas, descanso, elite, chefe, HUD, pausa, resultado, reinício e menu. COD-022 acrescenta chefes periódicos no Infinito e recebe sua verificação específica ao final desta sequência.
+COD-014 a COD-022: mapa único com seis salas, bifurcação exclusiva, encontros, XP, recompensas, descanso, elite, chefe, HUD, pausa, resultado, reinício, menu e chefes periódicos no Infinito.
 
 ## Evidências
 
 - Importação headless do projeto: saída 0, sem erros de parse dos scripts próprios. O ambiente registra avisos de escrita em user://, certificados, cache e sockets do Funplay; addons preservados.
 - Suíte smoke ampliada com grafo, mapa, encontros, recompensas, elite, chefe e ciclo da Aventura. Cada novo comportamento teve uma verificação que falhou antes de sua implementação/correção.
 - Ao concluir COD-021: 25/25 scripts smoke com saída 0, mensagem de sucesso e ausência de SCRIPT ERROR.
+- Validação final após COD-022 e correções da revisão: **26/26 smoke passaram**, importação saída 0, abertura headless saída 0 e `git diff --check` sem erros. Nenhum bloqueio conhecido permaneceu nos testes executados.
 - Duas rotas da Aventura concluídas por integração: ramo de combate e descanso, com vitória final, derrota, reinício e retorno ao menu.
 - `adventure_traversal_smoke.gd`: percorre fisicamente as duas rotas usando ações de movimento e CharacterBody2D, sem teleporte entre salas; verifica portas/corredores e colisão do ramo não escolhido. Inimigos são removidos e cartas resolvidas pela fixture para isolar a navegação, portanto esse teste não avalia dificuldade.
 - Renderização não headless em 1280 × 720: combate inicial, pausa com atributos/cartas/progresso e chefe com aviso visual e indicador de vida inspecionados.
 - Identidade do Player, vida atual/máxima, XP e build preservados durante a progressão; Resources básicos de atributos, inimigos e cartas não são alterados em runtime.
 - Revisão de bugs: retomada da quarta onda após cartas, escolha tardia após derrota e mira do chefe a partir da origem do projétil cobertas por regressão.
+- Revisão independente: corrigidos sensores que podiam ser contornados. O percurso periférico de retorno/avanço reproduziu o defeito e agora passa; o piso e as paredes também receberam a compensação de origem de 64 px do TileMap para alinhar as portas.
+- `endless_boss_smoke.gd`: chefes nas ondas 5 e 10, vida escalada, uma recompensa por chefe, pausa, continuidade, identidade do jogador, morte e reinício.
 
 ## Comandos
 
@@ -25,6 +28,7 @@ godot --headless --path . --script res://tests/arena_smoke.gd
 godot --headless --path . --script res://tests/adventure_flow_smoke.gd
 godot --headless --path . --script res://tests/adventure_traversal_smoke.gd --fixed-fps 120
 godot --headless --path . --script res://tests/endless_waves_smoke.gd
+godot --headless --path . --script res://tests/endless_boss_smoke.gd
 godot --headless --path . --quit-after 120
 git diff --check
 ```
