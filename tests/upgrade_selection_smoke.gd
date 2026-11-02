@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
@@ -52,7 +53,7 @@ func _verify() -> void:
 	manager.call("select_upgrade", first_id)
 	_check(run_manager.pending_level_ups == 0, "Clique extra nao deve aplicar outra carta", errors)
 	await physics_frame
-	var director: WaveDirector = main.get_node("WaveDirector") as WaveDirector
+	var director: WaveDirector = main.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
 	_check(director.current_wave == 1 and director.active_enemies.size() == 4, "Primeira onda deve estar ativa", errors)
 	var remaining_enemies: Array[EnemyController] = director.active_enemies.duplicate()
 	for enemy: EnemyController in remaining_enemies:

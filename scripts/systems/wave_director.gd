@@ -35,6 +35,9 @@ var _spawn_blocked: bool = false
 
 
 func _ready() -> void:
+	if run_manager.selected_mode != RunProgress.GameMode.ENDLESS:
+		set_process(false)
+		return
 	if arena == null:
 		push_error("WaveDirector precisa de uma arena.")
 		set_process(false)
@@ -74,6 +77,8 @@ func _process(delta: float) -> void:
 
 
 func _start_next_wave() -> void:
+	if run_manager.selected_mode != RunProgress.GameMode.ENDLESS:
+		return
 	if _completed or _player == null or _player.health.current <= 0 or run_manager.state == RunProgress.RunState.GAME_OVER or run_manager.state == RunProgress.RunState.VICTORY:
 		return
 	if current_wave >= waves.size():

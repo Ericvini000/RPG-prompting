@@ -87,11 +87,11 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Waves" type="Button" parent="Margin/Layout/Center/MenuPanel/Content/ModeChoices"]
+[node name="Adventure" type="Button" parent="Margin/Layout/Center/MenuPanel/Content/ModeChoices"]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "MODO ONDAS"
+text = "MODO AVENTURA"
 
 [node name="Endless" type="Button" parent="Margin/Layout/Center/MenuPanel/Content/ModeChoices"]
 custom_minimum_size = Vector2(0, 56)

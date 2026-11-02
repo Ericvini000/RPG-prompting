@@ -6,12 +6,13 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
 	var run: RunProgress = root.get_node("RunManager") as RunProgress
-	var player: PlayerController = main.get_node("Arena01/Player") as PlayerController
-	var director: WaveDirector = main.get_node("WaveDirector") as WaveDirector
+	var player: PlayerController = main.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
+	var director: WaveDirector = main.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
 	var manager: UpgradeManager = main.get_node("UpgradeManager") as UpgradeManager
 	var hud: Control = main.get_node("HUD/Overlay") as Control
 	var results: CanvasLayer = main.get_node("ResultScreen") as CanvasLayer
@@ -26,18 +27,15 @@ func _verify() -> void:
 	run.add_experience(20)
 	_check(run.state == RunProgress.RunState.UPGRADE_SELECTION, "Subida de nivel deve pausar", errors)
 	_check(str(hud.get_node("Top/Progress/Level").text).contains("2"), "HUD deve atualizar nivel", errors)
-	run.request_victory()
-	_check(run.state == RunProgress.RunState.UPGRADE_SELECTION, "Vitoria deve esperar carta pendente", errors)
 	manager.select_upgrade(manager.current_offer[0].upgrade_id)
-	_check(run.state == RunProgress.RunState.VICTORY and results.visible, "Vitoria deve aparecer apos escolha", errors)
-	_check(get_tree_paused(), "Vitoria deve pausar a arena", errors)
+	_check(run.state == RunProgress.RunState.COMBAT and not results.visible and not paused, "Escolha deve retomar o combate no Infinito", errors)
 	main.queue_free()
 	await process_frame
 
 	var second: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(second)
 	var second_run: RunProgress = root.get_node("RunManager") as RunProgress
-	var second_player: PlayerController = second.get_node("Arena01/Player") as PlayerController
+	var second_player: PlayerController = second.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController
 	var second_results: CanvasLayer = second.get_node("ResultScreen") as CanvasLayer
 	await physics_frame
 	_check(second_run.level == 1 and second_run.pending_level_ups == 0 and second_run.state == RunProgress.RunState.COMBAT, "Reinicio deve limpar progresso e estado", errors)
@@ -62,7 +60,7 @@ func _verify() -> void:
 	await process_frame
 	await process_frame
 	_check(current_scene != null and current_scene != second and second_run.state == RunProgress.RunState.COMBAT, "Botao reiniciar deve recarregar partida", errors)
-	_check((current_scene.get_node("WaveDirector") as WaveDirector).current_wave == 1, "Reinicio deve restaurar primeira onda", errors)
+	_check((current_scene.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector).current_wave == 1, "Reinicio deve restaurar primeira onda", errors)
 	_finish(errors)
 
 

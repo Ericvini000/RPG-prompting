@@ -1,6 +1,6 @@
 # Plano de implementação — MVP 0.2
 
-**Status:** planejamento; nenhuma tarefa COD-013 a COD-021 implementada por COD-012.<br>
+**Status:** fundação COD-013 implementada; COD-014 a COD-021 continuam planejadas.<br>
 **Data e base auditada:** 30/10/2026, `origin/develop` em `e6e3dd8`.<br>
 **Objetivo:** entregar Aventura em um mapa manual de seis salas conectadas, preservando o Infinito.<br>
 **Especificação:** [GDD.md](GDD.md), especialmente seções 18 a 20.<br>
@@ -19,16 +19,18 @@ O escopo de gameplay aprovado vem do GDD. A decomposição, os nomes de arquivos
 - Geração procedural, novos mapas completos, armadilhas funcionais, novas cartas, raridades e progressão permanente ficam fora da entrega inicial.
 - Parâmetros de descanso, encontros, elite e chefe precisam de aprovação antes de sua implementação; não alterar os atributos básicos para preencher lacunas.
 
-## Base confirmada e pendências de design
+## Base histórica do planejamento e progresso atual
 
 UI-001, GAME-001 e UI-002 já estão integrados em develop. O código usa `GameMode.WAVES`/`ENDLESS`, menu com Ondas/Infinito, referências `Arena01/Player` e estados legados de escolha pós-terceira onda. Aventura, MapDefinition, RoomDefinition, RoomDirector e RoomController ainda não existem. O relatório [VALIDATION_MVP_0.1.md](VALIDATION_MVP_0.1.md) é histórico; seus testes não certificam Aventura.
 
+O parágrafo anterior registra a base auditada em COD-012. **Progresso COD-013:** identificação ADVENTURE/ENDLESS, menu, composição separada, sessão de preparação e contrato mínimo de montagem de mapa implementados. ENDLESS_CHOICE foi removido. MapDefinition, RoomDefinition, RoomDirector, RoomController e mapa jogável continuam pendentes. O novo prompt também aprovou a distribuição lógica das salas, exclusividade de um ramo por tentativa e descanso com cura configurável; esses requisitos serão implementados nas tarefas seguintes.
+
 | Decisão pendente | Proposta ou limite já conhecido | Resolver antes de |
 | --- | --- | --- |
-| Distribuição física e tipos por etapa | Proposta: combate → combate/descanso → combate → elite → chefe. Contagem e bifurcação da etapa 2 são aprovadas. | COD-015 |
-| Reentrada, retorno e ramo não escolhido | Não conceder de novo XP, encontros ou recompensa por gatilho repetido. Política de bloqueio do outro ramo ainda não aprovada. | COD-015 |
+| Distribuição física | Tipos por etapa aprovados: combate → combate/descanso → combate avançado → elite → chefe. Falta construir a geometria. | COD-015 |
+| Reentrada e retorno | Ramo exclusivo na etapa 2 já aprovado. Não duplicar XP/recompensa; definir retorno a salas já visitadas. | COD-015 |
 | Encontros comuns e limpeza local | Usar inimigos existentes; decidir composições e destino de projéteis ao concluir sala. | COD-016 |
-| Descanso e recompensas | Definir benefício, magnitude, repetição e quais salas concedem ofertas. Proposta: níveis pendentes antes de recompensas. | COD-017 |
+| Descanso e recompensas | Cura configurável e ordem XP antes de recompensa aprovadas. Definir valor, repetição e quais salas concedem ofertas. | COD-017 |
 | Elite | Definir composição, escala e recompensa, sem modificar EnemyData compartilhado. | COD-018 |
 | Chefe | Definir identidade, ataques, telegráficos, atributos e recompensa. Sem frequência de chefes no Infinito nesta entrega. | COD-019 |
 
@@ -50,16 +52,18 @@ COD-018 e COD-019 não dependem do comportamento interno uma da outra; ambas sã
 
 ## COD-013 — Migrar modos e separar composição da sessão
 
+**Concluída como fundação técnica.** Contratos efetivos e limitações estão em ARCHITECTURE.md, seção 23. Novos arquivos: `scripts/main/adventure_session.gd`, `scenes/main/adventure_session.tscn`, `scenes/main/endless_session.tscn`, `scenes/ui/adventure_notice.tscn` e `tests/game_mode_smoke.gd`. O contrato usa PackedScene com Marker2D PlayerSpawn; os Resources de mapa/sala ficam para COD-014.
+
 **Prioridade:** P0. **Arquivos previstos:** modificar `scripts/core/run_manager.gd`, `scripts/main/main_controller.gd`, `scenes/main.tscn`, `scripts/ui/main_menu.gd`, `scenes/ui/main_menu.tscn`, `scripts/ui/hud.gd`, `scripts/ui/result_screen.gd`, `scenes/ui/result_screen.tscn` e `scripts/systems/wave_director.gd`. Atualizar os nove testes que dependem de Main/arena ou do modo antigo, listados na arquitetura, seção 21.1; criar `tests/game_mode_smoke.gd`.
 
 **Interfaces:** enum planejado `GameMode { ADVENTURE, ENDLESS }`; preservar `select_mode(mode: GameMode) -> void`, `reset_run() -> void` e `return_to_menu() -> void`. Main compõe o modo selecionado. A preparação da Aventura não inicia o WaveDirector automático nem simula a arena antiga com outro nome.
 
-- [ ] Criar testes de seleção/padrão ADVENTURE, reinício no mesmo modo e limpeza de XP/cartas/pausa; confirmar falha com o enum atual.
-- [ ] Migrar `WAVES`, os padrões e a apresentação; retirar ENDLESS_CHOICE, suas flags, métodos, sinais, botões e conexões legadas auditadas na arquitetura.
-- [ ] Isolar a composição por modo. Manter arena e geração existentes no Infinito; deixar a preparação da Aventura pronta para o mapa de COD-014/COD-015, sem prometer uma aventura já jogável.
-- [ ] Adaptar já nesta tarefa o bind mínimo de HUD/ResultScreen para a preparação da Aventura sem WaveDirector: nenhuma leitura/conexão de referência ausente. Testar carregamento e retorno ao menu nessa composição. O progresso real de sala/etapa fica para COD-020; não atrasar a correção dessa dependência estrutural até lá.
-- [ ] Migrar os testes acoplados a Main para selecionar Infinito explicitamente quando verificam arena/ondas/cartas, ou para fixtures de componentes quando verificam vitória pendente. Trocar a expectativa automática de vitória na terceira onda por continuação no Infinito; não criar uma modalidade Ondas oculta para manter testes antigos.
-- [ ] Importar e executar os testes de modo, arena e todos os smoke existentes afetados; pesquisar referências remanescentes a WAVES/ENDLESS_CHOICE em scripts, cenas e testes. Atualizar docs, revisar diff e fazer commit na branch da tarefa.
+- [x] Criar testes de seleção/padrão ADVENTURE, reinício no mesmo modo e limpeza de XP/cartas/pausa; confirmar falha com o enum anterior.
+- [x] Migrar modos/menu e remover os métodos, estados, sinais e botões legados.
+- [x] Separar sessão Infinito da preparação de Aventura, sem montar a arena antiga como aventura.
+- [x] Adaptar binds de HUD/ResultScreen e UpgradeManager para jogador por referência e diretor opcional.
+- [x] Migrar testes de Main/arena para modo explícito e preservar vitória pendente em teste isolado de RunManager.
+- [x] Importar, executar os 16 smoke e auditar referências antigas; documentação e validação da entrega registradas na arquitetura e no Pull Request.
 
 **Aceite:** enum e menu possuem só os dois modos aprovados; nenhuma seleção antiga após a terceira onda; reset preserva o modo e limpa a tentativa; Infinito ainda começa nas três ondas originais e avança à quarta. A migração de identificadores não é tratada como conclusão da Aventura.
 

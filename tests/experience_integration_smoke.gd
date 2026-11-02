@@ -6,13 +6,14 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var manager: Node = root.get_node("RunManager")
 	manager.call("reset_run")
 	manager.call("add_experience", 100)
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
-	var director: WaveDirector = main.get_node("WaveDirector") as WaveDirector
+	var director: WaveDirector = main.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
 	_check(manager.get("level") == 1 and manager.get("experience") == 0 and manager.get("pending_level_ups") == 0, "Nova cena principal deve iniciar uma partida sem progresso anterior", errors)
 	var level_requests: Array[int] = [0]
 	var progress_events: Array[Vector2i] = []
@@ -49,7 +50,7 @@ func _verify() -> void:
 	_check(manager.get("level") == 5 and manager.get("experience") == 35, "Três ondas devem conceder 175 XP no total", errors)
 	_check(manager.get("pending_level_ups") == 0 and level_requests[0] == 4, "Quatro evolucoes devem ser solicitadas e resolvidas", errors)
 	_check(not progress_events.is_empty() and progress_events.back() == Vector2i(35, 60), "Sinal final deve informar 35 de 60 XP", errors)
-	_check(manager.get("state") == RunProgress.RunState.VICTORY, "Modo Ondas deve vencer após a terceira onda", errors)
+	_check(manager.get("state") == RunProgress.RunState.COMBAT and manager.get("endless_mode"), "Infinito deve continuar após a terceira onda", errors)
 	_finish(errors)
 
 

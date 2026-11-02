@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _verify() -> void:
+	(root.get_node("RunManager") as RunProgress).select_mode(RunProgress.GameMode.ENDLESS)
 	var errors: Array[String] = []
 	var viewport_size: Vector2i = Vector2i(
 		ProjectSettings.get_setting("display/window/size/viewport_width", 0),
@@ -29,7 +30,7 @@ func _verify() -> void:
 
 	var main: Node = packed.instantiate()
 	root.add_child(main)
-	var arena: Node2D = main.get_node_or_null("Arena01") as Node2D
+	var arena: Node2D = main.get_node_or_null("SessionRoot/EndlessSession/Arena01") as Node2D
 	if arena == null:
 		errors.append("Main deve conter Arena01")
 		_finish(errors)

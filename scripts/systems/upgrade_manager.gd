@@ -16,11 +16,17 @@ var _offer_active: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if player == null or screen == null:
-		push_error("UpgradeManager precisa do jogador e da tela de cartas.")
-		return
-	run_manager.level_up_requested.connect(_on_level_up_requested)
-	screen.upgrade_chosen.connect(select_upgrade)
+	if player != null and screen != null:
+		bind(player, screen)
+
+
+func bind(player_ref: PlayerController, screen_ref: UpgradeScreen) -> void:
+	player = player_ref
+	screen = screen_ref
+	if not run_manager.level_up_requested.is_connected(_on_level_up_requested):
+		run_manager.level_up_requested.connect(_on_level_up_requested)
+	if not screen.upgrade_chosen.is_connected(select_upgrade):
+		screen.upgrade_chosen.connect(select_upgrade)
 
 
 func get_acquired_count(upgrade_id: String) -> int:
@@ -86,4 +92,4 @@ func _show_next_offer() -> void:
 		return
 	_offer_active = true
 	screen.show_offer(current_offer, owned_counts)
-	run_manager.set_state(RunProgress.RunState.UPGRADE_SELECTION)
+	run_manager.begin_upgrade_selection()

@@ -12,7 +12,7 @@ func _ready() -> void:
 	_run_manager = get_node("/root/RunManager") as RunProgress
 	_run_manager.return_to_menu()
 	$Margin/Layout/Center/MenuPanel/Content/Home/Play.pressed.connect(_show_modes)
-	$Margin/Layout/Center/MenuPanel/Content/ModeChoices/Waves.pressed.connect(_start_mode.bind(RunProgress.GameMode.WAVES))
+	$Margin/Layout/Center/MenuPanel/Content/ModeChoices/Adventure.pressed.connect(_start_mode.bind(RunProgress.GameMode.ADVENTURE))
 	$Margin/Layout/Center/MenuPanel/Content/ModeChoices/Endless.pressed.connect(_start_mode.bind(RunProgress.GameMode.ENDLESS))
 	$Margin/Layout/Center/MenuPanel/Content/ModeChoices/Back.pressed.connect(_show_home)
 	_show_home()

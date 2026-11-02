@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/main/adventure_session.gd" id="1_session"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+
+[node name="AdventureSession" type="Node2D"]
+script = ExtResource("1_session")
+
+[node name="GameplayRoot" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="MapRoot" type="Node2D" parent="GameplayRoot"]
+y_sort_enabled = true
+
+[node name="Player" parent="GameplayRoot" instance=ExtResource("2_player")]
