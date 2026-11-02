@@ -13,6 +13,8 @@ func _verify() -> void:
 	root.add_child(endless_main)
 	var endless_run: RunProgress = root.get_node("RunManager") as RunProgress
 	var endless_director: WaveDirector = endless_main.get_node("SessionRoot/EndlessSession/WaveDirector") as WaveDirector
+	# Keep coverage of ordinary compositions independent of boss scheduling.
+	endless_director.boss_schedule = null
 	var endless_manager: UpgradeManager = endless_main.get_node("UpgradeManager") as UpgradeManager
 	var endless_results: ResultScreen = endless_main.get_node("ResultScreen") as ResultScreen
 	var player: PlayerController = endless_main.get_node("SessionRoot/EndlessSession/Arena01/Player") as PlayerController

@@ -21,6 +21,7 @@ func _ready() -> void:
 		player = session.get_node("Arena01/Player") as PlayerController
 		wave_director = session.get_node("WaveDirector") as WaveDirector
 		wave_director.arena_completed.connect(_run_manager.complete_initial_waves)
+		wave_director.boss_defeated.connect(_on_endless_boss_defeated)
 	else:
 		adventure_session = ADVENTURE_SESSION.instantiate() as AdventureSession
 		$SessionRoot.add_child(adventure_session)
@@ -65,6 +66,11 @@ func _on_adventure_map_loaded(_map: Node2D) -> void:
 func _restart_run() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+func _on_endless_boss_defeated(wave_number: int) -> void:
+	var upgrades: UpgradeManager = $UpgradeManager as UpgradeManager
+	for index: int in range(wave_director.boss_schedule.reward_choices):
+		upgrades.request_reward_choice(StringName("endless:boss:%d:%d" % [wave_number, index]))
 
 
 func _return_to_menu() -> void:

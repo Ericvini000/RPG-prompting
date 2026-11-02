@@ -10,6 +10,7 @@ class_name GameHUD
 
 var _player: PlayerController
 var _rooms: RoomDirector
+var _waves: WaveDirector
 @onready var _boss_label: Label = $Overlay/Boss
 
 func bind_rooms(director: RoomDirector) -> void:
@@ -23,6 +24,7 @@ func _update_room(stage: int, room_name: String) -> void:
 
 func bind(player: PlayerController, director: WaveDirector, run_manager: RunProgress) -> void:
 	_player = player
+	_waves = director
 	player.health.health_changed.connect(_update_health)
 	run_manager.experience_changed.connect(_update_experience)
 	if director != null:
@@ -65,4 +67,4 @@ func _update_wave(number: int) -> void:
 	elif number <= 3:
 		_wave_label.text = "ONDA  %d / 3" % number
 	else:
-		_wave_label.text = "ONDA  %d  ·  INFINITO" % number
+		_wave_label.text = "ONDA  %d  ·  %s" % [number, "CHEFE" if _waves != null and _waves.is_boss_wave else "INFINITO"]
