@@ -15,6 +15,7 @@ func _verify() -> void:
 	var run: RunProgress = root.get_node("RunManager") as RunProgress
 	_check(run.selected_mode == RunProgress.GameMode.ADVENTURE, "Aventura deve ser o modo padrão", errors)
 	var game: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	game.adventure_map = null
 	root.add_child(game)
 	current_scene = game
 	var session: Node = game.get("adventure_session") as Node
@@ -61,8 +62,14 @@ func _verify() -> void:
 	await process_frame
 	game = current_scene
 	player = game.get("player") as PlayerController
-	_check(run.selected_mode == RunProgress.GameMode.ADVENTURE and run.level == 1 and run.state == RunProgress.RunState.READY and player.health.current == 100, "Reinício deve preservar Aventura e limpar a tentativa", errors)
+	_check(run.selected_mode == RunProgress.GameMode.ADVENTURE and run.level == 1 and run.state == RunProgress.RunState.COMBAT and player.health.current == 100, "Reinício deve preservar Aventura e limpar a tentativa", errors)
 	_check((game.get_node("UpgradeManager") as UpgradeManager).get_acquired_upgrades().is_empty(), "Reinício deve limpar cartas", errors)
+	game.queue_free()
+	await process_frame
+	game = (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	game.adventure_map = null
+	root.add_child(game)
+	current_scene = game
 	session = game.get("adventure_session") as Node
 	var invalid_map: PackedScene = PackedScene.new()
 	var invalid_root: Node2D = Node2D.new()

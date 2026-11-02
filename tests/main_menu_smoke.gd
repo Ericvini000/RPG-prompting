@@ -36,8 +36,10 @@ func _verify() -> void:
 	_check(run.level == 1 and run.experience == 0 and player.health.current == 100 and manager.get_acquired_upgrades().is_empty(), "Nova partida deve começar limpa", errors)
 	run.add_experience(20)
 	manager.select_upgrade(manager.current_offer[0].upgrade_id)
-	_check(run.state == RunProgress.RunState.READY and game.get("wave_director") == null, "Fundação Aventura deve aguardar mapa sem ondas", errors)
-	(game.get_node("AdventureNotice/Center/Panel/Content/MainMenu") as Button).pressed.emit()
+	_check(run.state == RunProgress.RunState.COMBAT and game.get("wave_director") == null, "Aventura deve iniciar mapa sem ondas automáticas", errors)
+	player.health.configure(100)
+	player.health.apply_damage(100)
+	(game.get_node("ResultScreen/Overlay/Panel/Content/MainMenu") as Button).pressed.emit()
 	await process_frame
 	await process_frame
 	menu = current_scene as MainMenu

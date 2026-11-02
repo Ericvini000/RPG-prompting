@@ -11,6 +11,7 @@ func _verify() -> void:
 		return
 	assert(data.validate_first_map().is_empty())
 	var game: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	game.adventure_map = null
 	root.add_child(game)
 	var session: AdventureSession = game.adventure_session
 	var player: PlayerController = game.player

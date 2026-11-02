@@ -16,8 +16,11 @@
 
 [ext_resource type="PackedScene" path="res://scenes/ui/adventure_notice.tscn" id="19_notice"]
 
+[ext_resource type="Resource" path="res://data/maps/map_01.tres" id="20_map"]
+
 [node name="Main" type="Node2D" unique_id=20680396]
 script = ExtResource("6_main")
+adventure_map = ExtResource("20_map")
 
 [node name="Background" type="Polygon2D" parent="." unique_id=1523244982]
 z_index = -100

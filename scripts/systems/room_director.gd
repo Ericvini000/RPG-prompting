@@ -49,6 +49,16 @@ func is_completed(id: StringName) -> bool:
 func is_locked(id: StringName) -> bool:
 	return _locked.has(id)
 
+func get_total_stages() -> int:
+	var total: int = 0
+	for room: RoomDefinition in definition.rooms:
+		total = maxi(total, room.stage)
+	return total
+
+func get_progress_text() -> String:
+	var room: RoomDefinition = definition.get_room(current_room_id)
+	return "Aventura" if room == null else "Etapa %d/%d · %s" % [room.stage, get_total_stages(), room.display_name]
+
 func can_enter(id: StringName) -> bool:
 	if definition == null or is_locked(id) or not controllers.has(id):
 		return false

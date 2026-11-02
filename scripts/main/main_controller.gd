@@ -3,6 +3,8 @@ extends Node2D
 const ENDLESS_SESSION: PackedScene = preload("res://scenes/main/endless_session.tscn")
 const ADVENTURE_SESSION: PackedScene = preload("res://scenes/main/adventure_session.tscn")
 
+@export var adventure_map: MapDefinition
+
 var player: PlayerController
 var wave_director: WaveDirector
 var adventure_session: AdventureSession
@@ -38,6 +40,10 @@ func _ready() -> void:
 	$AdventureNotice.visible = adventure_session != null
 	if wave_director != null:
 		_run_manager.begin_combat()
+	elif adventure_map != null:
+		var result: Error = adventure_session.mount_definition(adventure_map)
+		if result != OK:
+			push_error("Não foi possível montar o mapa: %s" % error_string(result))
 
 
 func _on_adventure_map_loaded(_map: Node2D) -> void:
@@ -49,6 +55,8 @@ func _on_adventure_map_loaded(_map: Node2D) -> void:
 		add_child(room_director)
 		room_director.bind_upgrades($UpgradeManager as UpgradeManager)
 		if room_director.configure(adventure_session.definition, _map, player) == OK:
+			($HUD as GameHUD).bind_rooms(room_director)
+			($ResultScreen as ResultScreen).bind_rooms(room_director)
 			room_director.try_enter_room(adventure_session.definition.entry_room_id)
 	else:
 		_run_manager.begin_combat()

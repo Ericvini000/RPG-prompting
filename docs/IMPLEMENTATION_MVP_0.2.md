@@ -19,6 +19,7 @@
 - COD-017: fila única de apresentação com origem nível/recompensa separada; IDs de origem impedem concessão repetida. Cartas de nível precedem recompensa de sala, morte cancela ofertas e descanso cura 30 uma vez. A sala só libera portas após todas as escolhas. Suíte: 20/20 smoke passaram.
 - COD-018: elite com tanque e dois atiradores, vida ×1,6/dano ×1,2 por instância, destaque âmbar e recompensa única. `elite_room_smoke.gd` passou; Resources básicos permanecem inalterados. Regressões de recompensas, arena e Infinito passaram.
 - COD-019: Sentinela do Umbral reutilizável, 450 HP, contato 15, projétil 9 e 50 XP, leque de três e radial de oito projéteis com aviso de 0,6 s. Somente RoomDirector solicita vitória após concluir a sala final e suas escolhas. Teste isolado preserva COMBAT no Infinito; integração completa da rota de combate passou. Parâmetros operacionais provisórios: chefe estacionário, intervalo 2,4 s, projétil 360 px/s e dispersão do leque 0,25 rad.
+- COD-020: mapa carregado automaticamente em Aventura; HUD e pausa exibem etapa/sala, chefe tem indicador de vida. Testes atravessam as duas rotas com gatilhos físicos e validam vitória, derrota, reinício e menu. Fixtures de preparação definem adventure_map como nulo explicitamente. Suíte: 23/23 smoke passaram.
 
 ## Decisões de implementação
 

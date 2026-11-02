@@ -38,6 +38,7 @@ func _verify() -> void:
 	await process_frame
 	run.select_mode(RunProgress.GameMode.ADVENTURE)
 	var game: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	game.adventure_map = null
 	root.add_child(game)
 	game.adventure_session.mount_definition(load("res://data/maps/map_01.tres") as MapDefinition)
 	for id: StringName in [&"R01", &"R02A", &"R03", &"R04", &"R05"]:

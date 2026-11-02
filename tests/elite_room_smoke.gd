@@ -3,6 +3,7 @@ func _initialize() -> void:
 	call_deferred("_verify")
 func _verify() -> void:
 	var game: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	game.adventure_map = null
 	root.add_child(game)
 	game.adventure_session.mount_definition(load("res://data/maps/map_01.tres") as MapDefinition)
 	await _clear(game)

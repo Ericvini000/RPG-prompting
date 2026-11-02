@@ -14,6 +14,10 @@ var _warning_left: float = 0.0
 var _pattern: int = 0
 var _aim: Vector2 = Vector2.RIGHT
 
+func _ready() -> void:
+	super._ready()
+	add_to_group("bosses")
+
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
 	if not can_act():
