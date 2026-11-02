@@ -8,7 +8,7 @@ func _initialize() -> void:
 func _verify() -> void:
 	var errors: Array[String] = []
 	_check(RunProgress.GameMode.keys() == ["ADVENTURE", "ENDLESS"], "Modos devem ser ADVENTURE e ENDLESS", errors)
-	_check(RunProgress.RunState.keys() == ["READY", "COMBAT", "UPGRADE_SELECTION", "VICTORY", "GAME_OVER"], "Escolha legada deve ser removida", errors)
+	_check(RunProgress.RunState.keys() == ["READY", "COMBAT", "UPGRADE_SELECTION", "VICTORY", "GAME_OVER", "EXPLORATION"], "Estados devem incluir exploração sem escolha legada", errors)
 	if not errors.is_empty():
 		_finish(errors)
 		return

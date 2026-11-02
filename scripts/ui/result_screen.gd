@@ -60,7 +60,7 @@ func _on_state_changed(new_state: int) -> void:
 
 
 func _on_pause_changed(is_paused: bool) -> void:
-	if _run_manager != null and _run_manager.state == RunProgress.RunState.COMBAT:
+	if _run_manager != null and _run_manager.state in [RunProgress.RunState.COMBAT, RunProgress.RunState.EXPLORATION]:
 		if is_paused:
 			_stats_panel.refresh(_player)
 			_cards_panel.refresh(_upgrade_manager)

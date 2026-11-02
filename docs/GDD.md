@@ -574,3 +574,9 @@ O MVP 0.2 só poderá ser declarado concluído quando:
 6. Pausa, cartas, derrota, vitória, reinício e menu funcionarem sem perder escolhas pendentes ou conservar dados da tentativa anterior.
 7. O Infinito conservar as regras da seção 18, sem escolha extra na terceira onda e sem vitória por chefe.
 8. Testes automatizados e uma travessia manual completa validarem colisões, portas, Y-sort, câmera, persistência e conclusão, conforme PLAN_MVP_0.2.md.
+
+## 21. Balanceamento inicial aprovado — COD-014 a COD-022
+
+Em 01/11/2026, o usuário aprovou a configuração de descanso, encontros, elite, chefe e chefes periódicos no Infinito registrada em [IMPLEMENTATION_MVP_0.2.md](IMPLEMENTATION_MVP_0.2.md). Esses valores substituem as pendências correspondentes das seções 18 e 20: cura 30 uma vez; uma carta por combate/elite; encontros configurados no registro; elite com vida ×1,6/dano ×1,2; Sentinela do Umbral com 450 HP, contato 15, projétil 9 e 50 XP; chefe no Infinito a cada cinco ondas em substituição à onda comum, sem vitória final e com uma carta de recompensa.
+
+Revisitar salas concluídas não repete benefícios ou encontros, e o ramo não escolhido fica bloqueado. O escopo desta execução inclui COD-022. Valores básicos dos inimigos comuns e das cartas permanecem preservados; o balanceamento novo usa configurações de encontro e instâncias.

@@ -7,7 +7,7 @@ signal state_changed(new_state: int)
 signal pause_changed(is_paused: bool)
 signal endless_mode_started()
 
-enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER }
+enum RunState { READY, COMBAT, UPGRADE_SELECTION, VICTORY, GAME_OVER, EXPLORATION }
 enum GameMode { ADVENTURE, ENDLESS }
 
 var level: int = 1
@@ -55,7 +55,20 @@ func reset_run() -> void:
 
 
 func begin_combat() -> void:
-	set_state(RunState.COMBAT)
+	_set_activity(RunState.COMBAT)
+
+
+func begin_exploration() -> void:
+	_set_activity(RunState.EXPLORATION)
+
+
+func _set_activity(activity: RunState) -> void:
+	if state == RunState.GAME_OVER or state == RunState.VICTORY:
+		return
+	if state == RunState.UPGRADE_SELECTION:
+		_upgrade_return_state = activity
+	else:
+		set_state(activity)
 
 
 func begin_upgrade_selection() -> void:
@@ -109,7 +122,7 @@ func request_game_over() -> void:
 
 
 func toggle_pause() -> void:
-	if state != RunState.COMBAT:
+	if state != RunState.COMBAT and state != RunState.EXPLORATION:
 		return
 	normal_paused = not normal_paused
 	get_tree().paused = normal_paused
@@ -119,7 +132,7 @@ func toggle_pause() -> void:
 func set_state(new_state: RunState) -> void:
 	var changed: bool = state != new_state
 	state = new_state
-	if state != RunState.COMBAT and normal_paused:
+	if state != RunState.COMBAT and state != RunState.EXPLORATION and normal_paused:
 		normal_paused = false
 		pause_changed.emit(false)
 	get_tree().paused = normal_paused or state == RunState.UPGRADE_SELECTION or state == RunState.VICTORY or state == RunState.GAME_OVER

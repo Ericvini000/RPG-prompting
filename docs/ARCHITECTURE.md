@@ -402,3 +402,7 @@ ENDLESS_CHOICE, seus métodos/flags e os sinais/botões de escolha antiga foram 
 `tests/game_mode_smoke.gd` verifica os identificadores, preparação sem ondas, montagem de fixture, identidade do jogador, vida/build/XP preservados, rejeição de mapas inválidos/duplicados, pausa sem WaveDirector, morte, reinício e retorno ao menu. Os testes existentes de arena, XP, cartas, pausa e ondas agora selecionam Infinito explicitamente e usam os caminhos da sessão. A vitória pendente é verificada isoladamente em `run_manager_smoke.gd`, sem conservar um modo Ondas oculto.
 
 A importação e os testes headless devem ser registrados na entrega. Avisos ambientais de acesso a `user://`, certificados e sockets do addon Funplay não devem ser confundidos com erros de script. Aventura completa não foi entregue: mapa, seis salas, portas, encontros, recompensas, descanso, elite, chefe e conclusão jogável permanecem para as próximas tarefas. COD-014 prepara as definições e a coordenação do primeiro mapa; COD-015 constrói sua geometria.
+
+## 24. Incrementos COD-014 a COD-022
+
+O progresso, parâmetros aprovados e decisões da execução iniciada em 01/11/2026 estão em [IMPLEMENTATION_MVP_0.2.md](IMPLEMENTATION_MVP_0.2.md). COD-014 implementa MapDefinition/RoomDefinition, validação de IDs/conexões e alcance, RoomController/RoomDirector e EXPLORATION. O estado da progressão é separado dos Resources; a pausa e a restauração após cartas aceitam exploração. As seções 21–23 são registros das etapas anteriores, não o estado final desta sequência.
