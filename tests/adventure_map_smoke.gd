@@ -23,6 +23,7 @@ func _verify() -> void:
 	assert(map.get_node("Rooms").get_child_count() == 6)
 	assert(map.get_node("Doors").get_child_count() == 6)
 	var floor: TileMapLayer = map.get_node("Floor") as TileMapLayer
+	assert(floor.to_global(floor.map_to_local(Vector2i.ZERO)).is_equal_approx((map.get_node("Rooms/R01") as Node2D).global_position), "Piso, portas e salas devem compartilhar a mesma origem")
 	assert(floor.tile_set.tile_size == Vector2i(128, 64) and floor.get_used_cells().size() > 300)
 	var director: RoomDirector = game.room_director
 	var door: Node = map.get_node("Doors/Door01")

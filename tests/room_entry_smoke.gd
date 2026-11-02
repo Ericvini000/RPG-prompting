@@ -15,5 +15,9 @@ func _verify() -> void:
 	player.global_position = room.global_position
 	room.call("_on_body_entered", player)
 	assert(requests[0] == 1)
+	player.global_position = room.global_position + Vector2(350, 0)
+	for frame: int in range(5):
+		await physics_frame
+	assert((room.get_node("Entry") as Area2D).overlaps_body(player), "Entrada deve abranger a borda navegável da sala")
 	print("Room entry smoke: OK")
 	quit()
