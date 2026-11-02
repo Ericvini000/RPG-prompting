@@ -18,6 +18,7 @@
 - COD-016: encontros finitos com inimigos existentes e XP único, espera por cartas, portas bloqueadas e cancelamento após morte. Projéteis remanescentes são removidos ao concluir a sala. Distância operacional mínima de spawn: 80 px, configurável por código de encontro para o mapa compacto; parâmetros comuns do Infinito foram preservados. Testes de encontro, mapa, grafo, arena e Infinito passaram.
 - COD-017: fila única de apresentação com origem nível/recompensa separada; IDs de origem impedem concessão repetida. Cartas de nível precedem recompensa de sala, morte cancela ofertas e descanso cura 30 uma vez. A sala só libera portas após todas as escolhas. Suíte: 20/20 smoke passaram.
 - COD-018: elite com tanque e dois atiradores, vida ×1,6/dano ×1,2 por instância, destaque âmbar e recompensa única. `elite_room_smoke.gd` passou; Resources básicos permanecem inalterados. Regressões de recompensas, arena e Infinito passaram.
+- COD-019: Sentinela do Umbral reutilizável, 450 HP, contato 15, projétil 9 e 50 XP, leque de três e radial de oito projéteis com aviso de 0,6 s. Somente RoomDirector solicita vitória após concluir a sala final e suas escolhas. Teste isolado preserva COMBAT no Infinito; integração completa da rota de combate passou. Parâmetros operacionais provisórios: chefe estacionário, intervalo 2,4 s, projétil 360 px/s e dispersão do leque 0,25 rad.
 
 ## Decisões de implementação
 

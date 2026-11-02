@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="RoomDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RoomDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/room_definition.gd" id="1"]
+
+[ext_resource type="Resource" path="res://data/rooms/map_01/r05_encounter.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -8,4 +10,6 @@ room_id = &"R05"
 display_name = "Sentinela do Umbral"
 stage = 5
 room_type = 3
+encounters = Array[Resource]([ExtResource("2")])
+reward_choices = 1
 next_room_ids = Array[StringName]([])

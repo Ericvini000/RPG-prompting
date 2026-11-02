@@ -109,6 +109,8 @@ func _finish_pending_room() -> void:
 	run_manager.begin_exploration()
 	room_completed.emit(id)
 	_refresh_doors()
+	if definition.get_room(id).room_type == RoomDefinition.RoomType.BOSS:
+		run_manager.request_victory()
 
 func _refresh_doors() -> void:
 	var doors: Node = _map_root.get_node_or_null("Doors")
