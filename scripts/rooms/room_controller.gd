@@ -67,6 +67,8 @@ func _start_next_wave() -> void:
 		enemy.target = player
 		enemy.health_multiplier = definition.health_multiplier
 		enemy.damage_multiplier = definition.damage_multiplier
+		if definition.room_type == RoomDefinition.RoomType.ELITE:
+			enemy.modulate = Color(1.0, 0.78, 0.5)
 		add_child(enemy)
 		enemy.global_position = points[index].global_position
 		enemy.enemy_defeated.connect(_run_manager.add_experience)
